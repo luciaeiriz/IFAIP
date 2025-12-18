@@ -1,19 +1,16 @@
 export type CourseLevel = 'Beginner' | 'Intermediate' | 'Advanced'
-export type CourseTag = 'General' | 'Restaurant' | 'Fleet'
+export type CourseTag = 'Business' | 'Restaurant' | 'Fleet'
 
 export interface Course {
   id: string
   title: string
-  description: string | null
+  description: string
   provider: string | null
-  level: CourseLevel | null
-  duration: string | null
-  price_label: string | null
-  tag: CourseTag
+  level: CourseLevel
+  duration: string
+  tags: CourseTag[]  // Array of tags
   external_url: string | null
-  signup_enabled: boolean
-  priority: number | null
-  is_featured: boolean
+  priority: number
   rating: number | null
   reviews: number | null
   course_type: string | null
@@ -22,10 +19,14 @@ export interface Course {
   instructors: string | null
   effort: string | null
   languages: string | null
-  free_trial: string | null
+  price: string | undefined  // From free_trial
   source: string
-  created_at: string
-  updated_at: string
+  signup_enabled: boolean
+  is_featured: boolean
+  price_label: string | null
+  free_trial: string | null
+  created_at: string | null
+  updated_at: string | null
 }
 
 export interface DatabaseCourse {
@@ -35,12 +36,9 @@ export interface DatabaseCourse {
   provider: string | null
   level: CourseLevel | null
   duration: string | null
-  price_label: string | null
-  tag: CourseTag
+  tag: CourseTag  // Single tag in DB
   external_url: string | null
-  signup_enabled: boolean
   priority: number | null
-  is_featured: boolean
   rating: number | null
   reviews: number | null
   course_type: string | null
@@ -51,7 +49,10 @@ export interface DatabaseCourse {
   languages: string | null
   free_trial: string | null
   source: string
-  created_at: string
-  updated_at: string
+  signup_enabled: boolean
+  is_featured: boolean
+  price_label: string | null
+  created_at: string | null
+  updated_at: string | null
 }
 

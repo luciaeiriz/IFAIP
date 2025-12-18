@@ -2,19 +2,58 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import Logo from './Logo'
 
 const courseCategories = [
-  { name: 'General', href: '/courses?tag=General' },
-  { name: 'Restaurant', href: '/courses?tag=Restaurant' },
-  { name: 'Fleet', href: '/courses?tag=Fleet' },
+  { name: 'Business', href: '/courses/business' },
+  { name: 'Restaurant', href: '/courses/restaurant' },
+  { name: 'Fleet', href: '/courses/fleet' },
 ]
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [coursesDropdownOpen, setCoursesDropdownOpen] = useState(false)
   const pathname = usePathname()
+  
+  // Check if we're on a courses page (but not the old /courses page)
+  const isCoursesPage = pathname?.startsWith('/courses') && pathname !== '/courses'
+
+  // Simplified header for courses pages
+  if (isCoursesPage) {
+    return (
+      <header className="sticky top-0 z-50 bg-black">
+        <nav className="mx-auto" style={{ maxWidth: '912px', height: '50px' }}>
+          <div className="flex h-full items-center justify-center">
+            <Link 
+              href="/"
+              className="font-euclid font-bold leading-none transition-opacity hover:opacity-80 flex items-center justify-center gap-2"
+              style={{ 
+                color: '#FCFCFC',
+                margin: '5px 0px 0px',
+                fontSize: '28px',
+                lineHeight: '29px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                letterSpacing: '0.5px'
+              }}
+            >
+              <Image 
+                src="/logomark_white.png" 
+                alt="IFAIP Logo" 
+                width={36} 
+                height={36}
+                style={{ objectFit: 'contain' }}
+              />
+              IFAIP
+            </Link>
+          </div>
+        </nav>
+      </header>
+    )
+  }
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow-sm">
@@ -28,49 +67,52 @@ export default function Header() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex md:items-center md:space-x-8">
             {/* Courses Dropdown */}
-            <div className="relative">
-              <button
-                onMouseEnter={() => setCoursesDropdownOpen(true)}
-                onMouseLeave={() => setCoursesDropdownOpen(false)}
-                className="flex items-center text-gray-700 hover:text-primary-600 transition-colors"
-              >
-                Courses
-                <svg
-                  className="ml-1 h-4 w-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+            <div
+              className="relative"
+              onMouseEnter={() => setCoursesDropdownOpen(true)}
+              onMouseLeave={() => setCoursesDropdownOpen(false)}
+            >
+              <div className="pb-2">
+                <Link
+                  href="/courses/business"
+                  className="flex items-center text-gray-700 hover:text-primary-600 transition-colors"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </button>
+                  Courses
+                  <svg
+                    className="ml-1 h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </Link>
+              </div>
               {coursesDropdownOpen && (
-                <div
-                  onMouseEnter={() => setCoursesDropdownOpen(true)}
-                  onMouseLeave={() => setCoursesDropdownOpen(false)}
-                  className="absolute left-0 mt-2 w-48 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5"
-                >
-                  <div className="py-1">
-                    {courseCategories.map((category) => (
+                <div className="absolute left-0 top-full pt-2 w-48">
+                  <div className="rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5">
+                    <div className="py-1">
+                      {courseCategories.map((category) => (
+                        <Link
+                          key={category.name}
+                          href={category.href}
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        >
+                          {category.name}
+                        </Link>
+                      ))}
                       <Link
-                        key={category.name}
-                        href={category.href}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        href="/courses/business"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 border-t border-gray-200"
                       >
-                        {category.name}
+                        All Courses
                       </Link>
-                    ))}
-                    <Link
-                      href="/courses"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 border-t border-gray-200"
-                    >
-                      All Courses
-                    </Link>
+                    </div>
                   </div>
                 </div>
               )}
@@ -91,7 +133,7 @@ export default function Header() {
             </Link>
 
             <Link
-              href="/courses"
+              href="/courses/business"
               className="rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 transition-colors"
             >
               Browse Courses
@@ -176,13 +218,13 @@ export default function Header() {
                         {category.name}
                       </Link>
                     ))}
-                    <Link
-                      href="/courses"
-                      className="block px-3 py-2 text-sm text-gray-600"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      All Courses
-                    </Link>
+                <Link
+                  href="/courses/business"
+                  className="block px-3 py-2 text-sm text-gray-600"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  All Courses
+                </Link>
                   </div>
                 )}
               </div>
@@ -201,7 +243,7 @@ export default function Header() {
                 About
               </Link>
               <Link
-                href="/courses"
+                href="/courses/business"
                 className="block px-3 py-2 text-base font-medium text-white bg-primary-600 rounded-md"
                 onClick={() => setMobileMenuOpen(false)}
               >

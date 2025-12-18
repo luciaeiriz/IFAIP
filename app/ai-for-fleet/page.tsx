@@ -28,7 +28,7 @@ export default function AIForFleetPage() {
 
       <div className="text-center">
         <Link
-          href="/courses?tag=Fleet"
+          href="/courses/fleet"
           className="rounded-md bg-primary-600 px-6 py-3 text-base font-semibold text-white shadow-sm hover:bg-primary-500"
         >
           View All Fleet Courses

@@ -13,7 +13,7 @@ export default function AIForBusinessPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 mb-12">
-        {/* Course cards will be filtered by tag=General */}
+        {/* Course cards will be filtered by tag=Business */}
         <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
           <h3 className="text-xl font-semibold text-gray-900 mb-2">Business AI Course</h3>
           <p className="text-gray-600 mb-4">Learn how to implement AI in your business...</p>
@@ -28,7 +28,7 @@ export default function AIForBusinessPage() {
 
       <div className="text-center">
         <Link
-          href="/courses?tag=General"
+          href="/courses/business"
           className="rounded-md bg-primary-600 px-6 py-3 text-base font-semibold text-white shadow-sm hover:bg-primary-500"
         >
           View All Business Courses

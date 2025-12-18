@@ -10,7 +10,7 @@ CREATE TABLE courses (
     level TEXT CHECK (level IN ('Beginner', 'Intermediate', 'Advanced')),
     duration TEXT,
     price_label TEXT,
-    tag TEXT NOT NULL CHECK (tag IN ('General', 'Restaurant', 'Fleet')),
+    tag TEXT NOT NULL CHECK (tag IN ('Business', 'Restaurant', 'Fleet')),
     external_url TEXT,
     signup_enabled BOOLEAN DEFAULT true,
     priority INTEGER,
