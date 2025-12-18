@@ -36,7 +36,7 @@ export interface DatabaseCourse {
   provider: string | null
   level: CourseLevel | null
   duration: string | null
-  tag: CourseTag  // Single tag in DB
+  tag: CourseTag | null  // Single tag in DB (nullable for backward compatibility)
   external_url: string | null
   priority: number | null
   rating: number | null
@@ -52,6 +52,9 @@ export interface DatabaseCourse {
   signup_enabled: boolean
   is_featured: boolean
   price_label: string | null
+  business_relevancy: number | null  // Relevancy rank for business owners (lower = higher relevancy)
+  restaurant_relevancy: number | null  // Relevancy rank for restaurant owners (lower = higher relevancy)
+  fleet_relevancy: number | null  // Relevancy rank for fleet managers (lower = higher relevancy)
   created_at: string | null
   updated_at: string | null
 }

@@ -8,12 +8,16 @@
     "start": "next start",
     "lint": "next lint",
     "import-courses": "tsx scripts/import-courses.ts",
-    "test-db": "tsx scripts/test-connection.ts"
+    "test-db": "tsx scripts/test-connection.ts",
+    "analyze-courses": "tsx scripts/analyze-courses-with-openai.ts",
+    "remove-duplicates": "tsx scripts/remove-duplicates.ts",
+    "rank-relevancy": "tsx scripts/rank-relevancy.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.38.0",
     "dotenv": "^16.3.1",
     "next": "^14.0.0",
+    "openai": "^6.14.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "zod": "^3.22.4"
@@ -30,4 +34,3 @@
     "typescript": "^5.2.2"
   }
 }
-

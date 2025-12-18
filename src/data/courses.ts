@@ -161,46 +161,56 @@ export async function getAllCourses(): Promise<Course[]> {
 }
 
 /**
- * Fetches courses filtered by tag - DIRECT DATABASE QUERY
+ * Fetches courses filtered by tag - uses relevancy columns for ranking
  */
 export async function getCoursesByTag(tag: CourseTag): Promise<Course[]> {
   try {
     console.log(`🏷️ getCoursesByTag: Fetching courses for tag "${tag}"...`)
-    console.log(`🏷️ Using direct database query with .eq('tag', '${tag}')`)
     
-    // Query directly from database instead of fetching all and filtering
+    // Determine which relevancy column to use based on tag
+    const relevancyColumn = tag === 'Business' 
+      ? 'business_relevancy' 
+      : tag === 'Restaurant' 
+      ? 'restaurant_relevancy' 
+      : 'fleet_relevancy'
+    
+    console.log(`🏷️ Using relevancy column: ${relevancyColumn}`)
+    
+    // Query all courses, ordered by relevancy (lower number = higher relevancy)
+    // Filter out courses where relevancy is null for this category
     const { data, error, count } = await supabase
       .from('courses')
       .select('*', { count: 'exact' })
-      .eq('tag', tag)
-      .order('priority', { ascending: true, nullsFirst: false })
+      .not(relevancyColumn, 'is', null)
+      .order(relevancyColumn, { ascending: true, nullsFirst: false })
 
     if (error) {
       console.error('❌ getCoursesByTag DATABASE ERROR:', error)
       console.error('Error code:', error.code)
       console.error('Error message:', error.message)
-      return []
+      
+      // Fallback: try using tag column for backward compatibility
+      console.warn('⚠️ Falling back to tag-based filtering...')
+      const { data: fallbackData, error: fallbackError } = await supabase
+        .from('courses')
+        .select('*', { count: 'exact' })
+        .eq('tag', tag)
+        .order('priority', { ascending: true, nullsFirst: false })
+      
+      if (fallbackError) {
+        console.error('❌ Fallback query also failed:', fallbackError)
+        return []
+      }
+      
+      const transformed = (fallbackData || []).map(transformCourse)
+      console.log(`🏷️ getCoursesByTag (fallback): Returned ${transformed.length} courses`)
+      return transformed
     }
 
     console.log(`🏷️ getCoursesByTag: Database returned ${data?.length || 0} courses (count: ${count})`)
     
     if (!data || data.length === 0) {
       console.warn(`⚠️ getCoursesByTag: No courses found for tag "${tag}"`)
-      console.warn('Checking if ANY courses exist...')
-      
-      // Fallback: try to get all courses to see what tags exist
-      const { data: allData } = await supabase
-        .from('courses')
-        .select('tag')
-        .limit(10)
-      
-      if (allData && allData.length > 0) {
-        const uniqueTags = Array.from(new Set(allData.map(c => c.tag)))
-        console.warn(`Found courses with these tags:`, uniqueTags)
-      } else {
-        console.warn('No courses found at all in database')
-      }
-      
       return []
     }
 
@@ -213,7 +223,9 @@ export async function getCoursesByTag(tag: CourseTag): Promise<Course[]> {
         id: transformed[0].id,
         title: transformed[0].title,
         tags: transformed[0].tags,
-        priority: transformed[0].priority,
+        business_relevancy: data[0].business_relevancy,
+        restaurant_relevancy: data[0].restaurant_relevancy,
+        fleet_relevancy: data[0].fleet_relevancy,
       })
     }
 
@@ -257,24 +269,36 @@ export async function getCourseById(id: string): Promise<Course | null> {
 }
 
 /**
- * Fetches featured courses
+ * Fetches featured courses - directly queries database with is_featured filter
+ * This is more efficient than fetching all courses and filtering in memory
  */
 export async function getFeaturedCourses(): Promise<Course[]> {
   try {
-    console.log('⭐ getFeaturedCourses: Fetching featured courses...')
+    console.log('⭐ getFeaturedCourses: Fetching featured courses from database...')
     
-    const allCourses = await getAllCourses()
-    
-    const featured = allCourses.filter(c => c.is_featured)
-    
-    // Sort by priority
-    featured.sort((a, b) => {
-      const priorityA = a.priority || 999
-      const priorityB = b.priority || 999
-      return priorityA - priorityB
-    })
+    // Query database directly for featured courses
+    const { data, error } = await supabase
+      .from('courses')
+      .select('*')
+      .eq('is_featured', true)
+      .order('priority', { ascending: true, nullsFirst: false })
 
-    console.log(`⭐ getFeaturedCourses: Found ${featured.length} featured courses`)
+    if (error) {
+      console.error('❌ getFeaturedCourses DATABASE ERROR:', error)
+      return []
+    }
+
+    if (!data || data.length === 0) {
+      console.log('⭐ getFeaturedCourses: No featured courses found')
+      return []
+    }
+
+    console.log(`⭐ getFeaturedCourses: Database returned ${data.length} featured courses`)
+    
+    // Transform database rows to Course objects
+    const featured = data.map(transformCourse)
+
+    console.log(`⭐ getFeaturedCourses: Successfully returned ${featured.length} featured courses`)
     return featured
   } catch (error) {
     console.error('❌ getFeaturedCourses ERROR:', error)

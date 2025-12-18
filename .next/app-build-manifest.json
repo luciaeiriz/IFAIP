@@ -1,9 +1,9 @@
 {
   "pages": {
-    "/courses/business/page": [
+    "/courses/fleet/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/courses/business/page.js"
+      "static/chunks/app/courses/fleet/page.js"
     ],
     "/layout": [
       "static/chunks/webpack.js",
@@ -16,20 +16,15 @@
       "static/chunks/main-app.js",
       "static/chunks/app/not-found.js"
     ],
-    "/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/page.js"
-    ],
     "/courses/restaurant/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/courses/restaurant/page.js"
     ],
-    "/courses/fleet/page": [
+    "/courses/business/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/courses/fleet/page.js"
+      "static/chunks/app/courses/business/page.js"
     ]
   }
 }

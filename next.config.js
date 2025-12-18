@@ -8,10 +8,14 @@ const nextConfig = {
         hostname: 'logo.clearbit.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'img.logo.dev',
+        pathname: '/**',
+      },
     ],
     unoptimized: false,
   },
 }
 
 module.exports = nextConfig
-

@@ -55,19 +55,11 @@ function RestaurantCoursesContent() {
   }, [])
 
 
-  // Get featured courses for top picks (sorted by priority)
+  // Get top 3 courses for top picks (already sorted by restaurant_relevancy from getCoursesByTag)
   const featuredTopPicks = useMemo(() => {
-    let featured = [...featuredCourses]
-
-    // Sort by priority
-    featured.sort((a, b) => {
-      const priorityA = a.priority ?? Infinity
-      const priorityB = b.priority ?? Infinity
-      return priorityA - priorityB
-    })
-
-    return featured.slice(0, 3)
-  }, [featuredCourses])
+    // Use top 3 from allCourses (already sorted by restaurant_relevancy, lower = higher priority)
+    return allCourses.slice(0, 3)
+  }, [allCourses])
 
 
   if (isLoading) {
@@ -107,7 +99,7 @@ function RestaurantCoursesContent() {
 
       {/* All Courses Section */}
       {allCourses.length > 0 && (
-        <div className="bg-white py-12">
+        <div className="bg-white pt-4 pb-12">
           <AllCoursesGrid courses={allCourses} />
         </div>
       )}
