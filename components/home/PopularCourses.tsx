@@ -46,9 +46,9 @@ export default function PopularCourses() {
 
   if (isLoading) {
     return (
-      <section className="bg-white py-16">
+      <section className="bg-homepage-white py-20 lg:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center text-gray-600">Loading courses...</div>
+          <div className="text-center text-homepage-dark/60 font-medium">Loading courses...</div>
         </div>
       </section>
     )
@@ -59,17 +59,20 @@ export default function PopularCourses() {
   }
 
   return (
-    <section className="bg-white py-16">
+    <section className="bg-homepage-white py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-8 flex items-center justify-between">
-          <h2 className="text-3xl font-bold text-editorial-900 sm:text-4xl">
+        <div className="mb-12 flex items-center justify-between">
+          <h2 className="text-3xl font-bold text-homepage-dark sm:text-4xl lg:text-5xl tracking-tight">
             Popular Courses
           </h2>
           <Link
             href="/courses/business"
-            className="text-editorial-900 font-medium hover:text-editorial-800"
+            className="text-sm font-semibold text-homepage-dark hover:text-homepage-accentDark transition-colors flex items-center gap-1"
           >
-            View All Courses →
+            View All Courses
+            <svg className="h-4 w-4 transition-transform hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
           </Link>
         </div>
 
@@ -80,20 +83,20 @@ export default function PopularCourses() {
               <Link
                 key={course.id}
                 href={`/courses/${course.id}`}
-                className="group rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
+                className="group rounded-2xl border border-homepage-accentLight/50 bg-homepage-white p-6 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1"
               >
-                <div className="mb-2 text-sm font-medium text-gray-500">
+                <div className="mb-2 text-sm font-medium text-homepage-dark/60">
                   {course.provider}
                 </div>
-                <h3 className="mb-2 text-lg font-bold text-editorial-900 group-hover:text-editorial-800">
+                <h3 className="mb-2 text-lg font-bold text-homepage-dark group-hover:text-homepage-accentDark">
                   {course.title}
                 </h3>
-                <p className="mb-4 line-clamp-2 text-sm text-gray-600">
+                <p className="mb-4 line-clamp-2 text-sm text-homepage-dark/70">
                   {course.description}
                 </p>
                 {course.rating && (
                   <div className="mb-4 flex items-center gap-2">
-                    <div className="text-lg font-bold text-editorial-900">
+                    <div className="text-lg font-bold text-homepage-dark">
                       {course.rating.toFixed(1)}
                     </div>
                     <span
@@ -114,7 +117,7 @@ export default function PopularCourses() {
                     </span>
                   )}
                   {course.duration && (
-                    <span className="text-xs text-gray-600">{course.duration}</span>
+                    <span className="text-xs text-homepage-dark/60">{course.duration}</span>
                   )}
                 </div>
               </Link>

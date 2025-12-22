@@ -6,9 +6,5 @@
   "app/courses/fleet/page.tsx -> @/src/data/courses": {
     "id": "app/courses/fleet/page.tsx -> @/src/data/courses",
     "files": []
-  },
-  "app/courses/restaurant/page.tsx -> @/src/data/courses": {
-    "id": "app/courses/restaurant/page.tsx -> @/src/data/courses",
-    "files": []
   }
 }

@@ -14,24 +14,24 @@ export default function CTASection({
   trustPoints,
 }: CTASectionProps) {
   return (
-    <section className="bg-white py-16">
+    <section className="bg-white py-12 lg:py-16">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-        <div className="rounded-lg border border-gray-200 bg-gray-50 p-12 text-center">
-          <h2 className="mb-6 text-3xl font-bold text-gray-900 sm:text-4xl">
+        <div className="rounded-2xl border border-homepage-accentLight/50 bg-homepage-accentLight/50 backdrop-blur-sm px-8 py-12 lg:px-12 lg:py-16 text-center shadow-lg">
+          <h2 className="mb-8 text-3xl font-bold text-homepage-dark sm:text-4xl lg:text-5xl tracking-tight">
             {title}
           </h2>
           <Link
             href={buttonHref}
-            className="mb-8 inline-block rounded-md bg-primary-600 px-8 py-3 text-base font-semibold text-white shadow-sm transition-colors hover:bg-primary-700"
+            className="mb-10 inline-block rounded-lg bg-[#36498C] px-10 py-4 text-base font-semibold text-white shadow-xl transition-all hover:bg-[#36498C]/90 hover:shadow-2xl hover:scale-105 active:scale-100"
           >
             {buttonText}
           </Link>
 
-          <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-600">
+          <div className="flex flex-nowrap justify-center items-center gap-6 text-sm text-homepage-dark/70 whitespace-nowrap overflow-x-auto">
             {trustPoints.map((point, index) => (
-              <div key={index} className="flex items-center gap-2">
+              <div key={index} className="flex items-center gap-2 flex-shrink-0">
                 <svg
-                  className="h-5 w-5 text-green-600"
+                  className="h-5 w-5 text-homepage-accentDark flex-shrink-0"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -43,7 +43,7 @@ export default function CTASection({
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                <span>{point}</span>
+                <span className="font-medium whitespace-nowrap">{point}</span>
               </div>
             ))}
           </div>

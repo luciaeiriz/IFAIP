@@ -78,35 +78,39 @@ export default function FeaturedTopPicks({ courses }: FeaturedTopPicksProps) {
       return `/api/logo/${encodeURIComponent(normalizedProvider)}`
     }
 
-    // If no mapping found and not a domain, return null (will use logomark.png)
+    // If no mapping found and not a domain, return null (will use cognite_logo.jpeg)
     return null
   }
 
   return (
-    <section style={{ backgroundColor: '#F6F7FF', width: '100%', padding: '32px 0', marginLeft: '0', marginRight: '0' }}>
+    <section className="hidden lg:block" style={{ backgroundColor: '#F6F7FF', width: '100%', padding: '16px 0 32px 0', marginLeft: '0', marginRight: '0', height: '249px' }}>
       <div style={{ width: '100%', paddingLeft: '80px', paddingRight: '80px', boxSizing: 'border-box' }}>
-        <h2 className="mb-6" style={{ fontSize: '18px', color: '#181716', fontFamily: 'EuclidCircularB, sans-serif' }}>
+        <h2 className="mb-6" style={{ fontSize: '18px', color: '#181716', fontFamily: 'EuclidCircularB, sans-serif', marginTop: '-8px' }}>
           Our Top 3 Providers
         </h2>
 
-        <div className="flex justify-start" style={{ gap: '24px', flexWrap: 'nowrap', width: '100%', maxWidth: '100%', alignItems: 'flex-start', boxSizing: 'border-box' }}>
+        <div className="flex justify-start" style={{ gap: '24px', flexWrap: 'nowrap', width: '100%', maxWidth: '100%', alignItems: 'flex-start', boxSizing: 'border-box', marginTop: '-10px' }}>
           {top3.map((course, index) => {
             // The middle card (index 1) is always the #1 ranked course (highest priority)
             // Only show "MOST POPULAR" badge if we have all 3 courses and this is the middle one
             const isMostPopular = index === 1 && courses.length >= 3
-            // Make middle card slightly larger, accounting for gaps (48px total for 2 gaps)
-            const cardWidth = isMostPopular 
-              ? 'calc((100% - 48px) / 3 * 1.15)'  // Slightly larger for middle card
-              : 'calc((100% - 48px) / 3 * 0.925)' // Slightly smaller for side cards
+            // Card dimensions: left (0) = 413×157, middle (1) = 450×185, right (2) = 415×150
+            const cardWidth = index === 1 ? '450px' : (index === 2 ? '415px' : '413px')
+            const cardHeight = index === 0 ? '157px' : (index === 1 ? '185px' : '150px')
+            // Center left and right cards vertically with middle card (185px height)
+            // Left: (185 - 157) / 2 = 14px, Right: (185 - 150) / 2 = 17.5px
+            const cardMarginTop = index === 0 ? '14px' : (index === 2 ? '18px' : '0px')
             return (
               <div
                 key={course.id}
                 className="relative bg-white shadow-sm transition-shadow hover:shadow-md"
                 style={{ 
                   width: cardWidth,
-                  aspectRatio: '825 / 320',
-                  padding: '20px',
-                  border: isMostPopular ? '3px solid #36498C' : '1px solid #E0E0E0',
+                  height: cardHeight,
+                  marginTop: cardMarginTop,
+                  padding: isMostPopular ? '20px 20px 0px 33px' : '20px 20px 0px 20px',
+                  border: isMostPopular ? '5px solid #36498C' : '1px solid #E0E0E0',
+                  boxShadow: isMostPopular ? 'none' : '0 1px 3px rgba(184, 197, 224, 0.3), 0 1px 2px rgba(184, 197, 224, 0.2)',
                   borderRadius: '0px',
                   display: 'flex',
                   flexDirection: 'column',
@@ -119,13 +123,13 @@ export default function FeaturedTopPicks({ courses }: FeaturedTopPicksProps) {
                   <div 
                     className="absolute"
                     style={{
-                      top: '-12px',
-                      left: '16px',
+                      top: '4px',
+                      left: '4px',
                       backgroundColor: '#36498C',
                       color: '#FFFFFF',
                       padding: '6px 12px',
-                      borderRadius: '0px',
-                      fontSize: '12px',
+                      borderRadius: '4px',
+                      fontSize: '14px',
                       fontWeight: 'bold',
                       fontFamily: 'EuclidCircularB, sans-serif',
                       textTransform: 'uppercase',
@@ -138,21 +142,24 @@ export default function FeaturedTopPicks({ courses }: FeaturedTopPicksProps) {
 
                 {/* Title */}
                 <h3 
-                  className="mb-2 font-bold"
+                  className="font-bold"
                   style={{ 
                     fontSize: '16px', 
                     fontFamily: 'EuclidCircularB, sans-serif',
                     color: '#181716',
-                    lineHeight: '1.4'
+                    lineHeight: '1.4',
+                    marginTop: isMostPopular ? '26px' : '0px',
+                    marginLeft: '0px',
+                    marginBottom: '2px'
                   }}
                 >
                   {course.title}
                 </h3>
 
-                {/* Brief description tagline */}
-                {course.description && (
+                {/* Brief description tagline - Prioritize headline field */}
+                {(course.headline || course.description) && (
                   <div 
-                    className="mb-3"
+                    className=""
                     style={{ 
                       fontSize: '14px', 
                       fontFamily: 'EuclidCircularB, sans-serif',
@@ -160,11 +167,14 @@ export default function FeaturedTopPicks({ courses }: FeaturedTopPicksProps) {
                       fontWeight: '500',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap'
+                      whiteSpace: 'nowrap',
+                      marginTop: index === 2 ? '0px' : '2px',
+                      marginBottom: '0px'
                     }}
                   >
-                    {(() => {
-                      // Extract a brief tagline - take first sentence or first 60 characters
+                    {/* Use headline if available, otherwise fallback to description extraction */}
+                    {course.headline ? course.headline : (() => {
+                      // Fallback to description extraction if headline not available
                       const desc = course.description.trim();
                       const firstSentence = desc.split('.')[0].trim();
                       if (firstSentence.length <= 60 && firstSentence.length > 0) {
@@ -177,9 +187,9 @@ export default function FeaturedTopPicks({ courses }: FeaturedTopPicksProps) {
                 )}
 
                 {/* Bottom section: Logo on left, Learn More button and Rating on right */}
-                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 'auto', paddingTop: '12px' }}>
+                <div style={{ position: 'absolute', bottom: '20px', left: isMostPopular ? '33px' : '20px', right: '20px', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', paddingTop: '12px' }}>
                     {/* Provider Logo - Left aligned */}
-                    <div>
+                    <div style={{ marginLeft: isMostPopular ? '-13px' : '-13px' }}>
                       <ProviderLogo 
                         provider={course.provider}
                         logoUrl={getLogoUrl(course.provider)}
@@ -248,13 +258,13 @@ export default function FeaturedTopPicks({ courses }: FeaturedTopPicksProps) {
 function ProviderLogo({ provider, logoUrl }: { provider: string | null; logoUrl: string | null }) {
   const [imageError, setImageError] = useState(false)
   
-  // If no provider or logoUrl, always use logomark.png
+  // If no provider or logoUrl, always use cognite_logo.jpeg
   if (!provider || !provider.trim() || !logoUrl) {
     return (
       <div
         style={{
-          width: '100px',
-          height: '60px',
+          width: '80px',
+          height: '48px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -262,10 +272,10 @@ function ProviderLogo({ provider, logoUrl }: { provider: string | null; logoUrl:
         }}
       >
         <Image
-          src="/logomark.png"
-          alt="IFAIP logo"
-          width={100}
-          height={60}
+          src="/cognite_logo.jpeg"
+          alt="Cognite logo"
+          width={80}
+          height={48}
           style={{
             objectFit: 'contain',
             maxWidth: '100%',
@@ -276,13 +286,13 @@ function ProviderLogo({ provider, logoUrl }: { provider: string | null; logoUrl:
     )
   }
 
-  // If image failed to load, show logomark.png
+  // If image failed to load, show cognite_logo.jpeg
   if (imageError) {
     return (
       <div
         style={{
-          width: '100px',
-          height: '60px',
+          width: '80px',
+          height: '48px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -290,10 +300,10 @@ function ProviderLogo({ provider, logoUrl }: { provider: string | null; logoUrl:
         }}
       >
         <Image
-          src="/logomark.png"
-          alt="IFAIP logo"
-          width={100}
-          height={60}
+          src="/cognite_logo.jpeg"
+          alt="Cognite logo"
+          width={80}
+          height={48}
           style={{
             objectFit: 'contain',
             maxWidth: '100%',
@@ -308,8 +318,8 @@ function ProviderLogo({ provider, logoUrl }: { provider: string | null; logoUrl:
   return (
     <div
       style={{
-        width: '100px',
-        height: '60px',
+        width: '80px',
+        height: '48px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -319,15 +329,15 @@ function ProviderLogo({ provider, logoUrl }: { provider: string | null; logoUrl:
       <Image
         src={logoUrl}
         alt="Provider logo"
-        width={100}
-        height={60}
+        width={80}
+        height={48}
         style={{
           objectFit: 'contain',
           maxWidth: '100%',
           maxHeight: '100%'
         }}
         onError={() => {
-          // Fallback to logomark.png if logo fails to load
+          // Fallback to cognite_logo.jpeg if logo fails to load
           setImageError(true)
         }}
       />

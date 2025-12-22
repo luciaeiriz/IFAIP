@@ -31,6 +31,13 @@ const config: Config = {
           800: '#075985',
           900: '#0c4a6e',
         },
+        // Homepage color palette
+        homepage: {
+          dark: '#181716',
+          white: '#FFFFFF',
+          accentLight: '#F6F7FF',
+          accentDark: '#36498C',
+        },
         // Forbes-style editorial colors
         editorial: {
           900: '#1a1a1a',

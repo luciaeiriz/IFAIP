@@ -13,6 +13,11 @@ const nextConfig = {
         hostname: 'img.logo.dev',
         pathname: '/**',
       },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        pathname: '/**',
+      },
     ],
     unoptimized: false,
   },

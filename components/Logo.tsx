@@ -17,7 +17,7 @@ export default function Logo({ className = '', href = '/', variant = 'light' }: 
       {!imageError ? (
         // Try to load logo image
         <img
-          src="/logo.png"
+          src={variant === 'light' ? '/logo_white.png' : '/logo.png'}
           alt="IFAIP Logo"
           className="h-12 w-auto object-contain"
           onError={() => {

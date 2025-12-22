@@ -1,5 +1,9 @@
 {
+  "/page": "app/page.js",
   "/courses/business/page": "app/courses/business/page.js",
-  "/courses/fleet/page": "app/courses/fleet/page.js",
-  "/courses/restaurant/page": "app/courses/restaurant/page.js"
+  "/about/page": "app/about/page.js",
+  "/terms/page": "app/terms/page.js",
+  "/admin/page": "app/admin/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/privacy/page": "app/privacy/page.js"
 }

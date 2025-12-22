@@ -193,3 +193,4 @@ rankRelevancy()
     console.error('\n❌ Error during relevancy ranking:', error)
     process.exit(1)
   })
+

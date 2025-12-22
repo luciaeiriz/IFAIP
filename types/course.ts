@@ -5,6 +5,8 @@ export interface Course {
   id: string
   title: string
   description: string
+  headline: string | null  // Short headline/tagline (max 60 chars)
+  bullet_points: string[] | null  // Array of bullet points
   provider: string | null
   level: CourseLevel
   duration: string
@@ -33,6 +35,8 @@ export interface DatabaseCourse {
   id: string
   title: string
   description: string | null
+  headline: string | null  // Short headline/tagline (max 60 chars)
+  bullet_points: string[] | null  // Array of bullet points
   provider: string | null
   level: CourseLevel | null
   duration: string | null

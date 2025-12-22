@@ -8,7 +8,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           {/* Brand */}
           <div className="col-span-1">
-            <Logo href="/" className="mb-4" />
+            <Logo href="/" className="mb-4" variant="light" />
             <p className="text-gray-400 text-sm mt-2">
               International Federation for Artificial Intelligence Professionals
             </p>

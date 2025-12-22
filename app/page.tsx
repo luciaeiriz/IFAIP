@@ -115,23 +115,23 @@ export default function HomePage() {
   ]
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-homepage-white">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900 py-20 sm:py-32">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section className="relative bg-white py-12 sm:py-16 lg:py-20 overflow-hidden">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center">
             {/* Badge */}
-            <div className="mb-6 inline-flex items-center rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm">
+            <div className="mb-6 inline-flex items-center rounded-full bg-homepage-accentLight px-5 py-2.5 text-sm font-medium text-homepage-dark border border-homepage-accentLight transition-all hover:bg-homepage-accentLight/80">
               Empowering AI Professionals Worldwide
             </div>
 
             {/* Title */}
-            <h1 className="mb-6 text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl">
-              Master the Future of Artificial Intelligence
+            <h1 className="mb-6 text-4xl font-bold tracking-tight text-homepage-dark sm:text-5xl md:text-6xl lg:text-7xl leading-tight">
+              Master the Future of<br className="hidden sm:block" /> Artificial Intelligence
             </h1>
 
             {/* Subtitle */}
-            <p className="mx-auto mb-10 max-w-3xl text-xl text-white/90 sm:text-2xl">
+            <p className="mx-auto mb-10 max-w-3xl text-lg text-homepage-dark/70 sm:text-xl lg:text-2xl leading-relaxed font-light">
               Join the International Federation for Artificial Intelligence Professionals 
               and unlock world-class training programs designed to advance your career 
               in the rapidly evolving field of AI.
@@ -141,13 +141,13 @@ export default function HomePage() {
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link
                 href="/courses"
-                className="rounded-md bg-white px-8 py-3 text-base font-semibold text-primary-600 shadow-lg transition-all hover:bg-gray-100 hover:shadow-xl"
+                className="group rounded-lg bg-[#36498C] px-8 py-3.5 text-base font-semibold text-white shadow-xl transition-all hover:bg-[#36498C]/90 hover:shadow-2xl hover:scale-105 active:scale-100"
               >
                 Explore Courses
               </Link>
               <Link
                 href="/about"
-                className="rounded-md border-2 border-white bg-transparent px-8 py-3 text-base font-semibold text-white transition-all hover:bg-white/10"
+                className="rounded-lg bg-[#36498C] px-8 py-3.5 text-base font-semibold text-white shadow-xl transition-all hover:bg-[#36498C]/90 hover:shadow-2xl hover:scale-105 active:scale-100"
               >
                 Learn About IFAIP
               </Link>

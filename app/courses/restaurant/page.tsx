@@ -100,7 +100,7 @@ function RestaurantCoursesContent() {
       {/* All Courses Section */}
       {allCourses.length > 0 && (
         <div className="bg-white pt-4 pb-12">
-          <AllCoursesGrid courses={allCourses} />
+          <AllCoursesGrid courses={allCourses.slice(0, 10)} />
         </div>
       )}
     </div>
