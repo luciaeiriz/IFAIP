@@ -167,7 +167,7 @@ export async function testDatabaseConnection(): Promise<void> {
     console.log(`Found ${data?.length || 0} courses in database`)
     if (data && data.length > 0) {
       console.log('Sample courses:', data)
-      const uniqueTags = [...new Set(data.map(c => c.tag).filter(Boolean))]
+      const uniqueTags = Array.from(new Set(data.map(c => c.tag).filter(Boolean)))
       console.log('Unique tags found:', uniqueTags)
     }
   } catch (error) {
