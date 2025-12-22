@@ -1,6 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { supabase } from '@/lib/supabase'
+import AdminLogin from '@/components/admin/AdminLogin'
 import DashboardOverview from '@/components/admin/DashboardOverview'
 import CourseManagement from '@/components/admin/CourseManagement'
 import LeadsManagement from '@/components/admin/LeadsManagement'
@@ -11,6 +13,66 @@ type AdminTab = 'dashboard' | 'courses' | 'leads' | 'signups' | 'analytics'
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<AdminTab>('dashboard')
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    // Check if user is already logged in
+    checkAuth()
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        setIsAuthenticated(true)
+      } else {
+        setIsAuthenticated(false)
+      }
+    })
+
+    return () => {
+      subscription.unsubscribe()
+    }
+  }, [])
+
+  const checkAuth = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      setIsAuthenticated(!!session)
+    } catch (error) {
+      console.error('Error checking auth:', error)
+      setIsAuthenticated(false)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleLoginSuccess = () => {
+    setIsAuthenticated(true)
+  }
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut()
+      setIsAuthenticated(false)
+    } catch (error) {
+      console.error('Error logging out:', error)
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-[#36498C] border-r-transparent"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!isAuthenticated) {
+    return <AdminLogin onLoginSuccess={handleLoginSuccess} />
+  }
 
   const tabs = [
     { id: 'dashboard' as AdminTab, label: 'Dashboard', icon: '📊' },
@@ -26,6 +88,12 @@ export default function AdminPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <h1 className="text-2xl font-bold text-gray-900">Administration</h1>
+            <button
+              onClick={handleLogout}
+              className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+              Logout
+            </button>
           </div>
           
           {/* Tab Navigation */}
