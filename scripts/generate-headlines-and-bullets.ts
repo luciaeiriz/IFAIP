@@ -240,3 +240,4 @@ generateAndUpdateCourses()
     process.exit(1)
   })
 
+

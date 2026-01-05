@@ -502,3 +502,4 @@ function CourseEditModal({ course, onSave, onCancel, isSaving }: CourseEditModal
   )
 }
 
+

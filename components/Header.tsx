@@ -196,19 +196,20 @@ export default function Header() {
   }
 
   const isHomePage = pathname === '/'
+  const isCoursesLandingPage = pathname === '/courses'
   const isAboutPage = pathname === '/about'
   const isTermsPage = pathname === '/terms'
   const isPrivacyPage = pathname === '/privacy'
   const isAdminPage = pathname === '/admin'
 
-  // Turing Institute style header for homepage
-  if (isHomePage) {
+  // Turing Institute style header for homepage and courses landing page
+  if (isHomePage || isCoursesLandingPage) {
     return (
       <header className="sticky top-0 z-50 bg-white">
         <nav className="mx-auto max-w-7xl">
           <div className="flex items-center justify-between" style={{ height: '107px' }}>
             {/* Left - Logo */}
-            <div className="flex items-center pl-2 sm:pl-3 lg:pl-4">
+            <div className="flex items-center pl-0 sm:pl-1 lg:pl-2" style={{ marginLeft: '-8px' }}>
               <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
                 <Image 
                   src="/logo.png" 
@@ -248,25 +249,13 @@ export default function Header() {
                 onMouseEnter={() => setCoursesDropdownOpen(true)}
                 onMouseLeave={() => setCoursesDropdownOpen(false)}
               >
-                <button
+                <Link
+                  href="/courses"
                   className="text-sm font-medium text-black hover:text-gray-600 transition-colors flex items-center"
                   style={{ fontSize: '15px' }}
                 >
                   Courses
-                  <svg
-                    className="ml-1 h-4 w-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                </button>
+                </Link>
                 {coursesDropdownOpen && (
                   <div className="absolute left-0 top-full pt-2 w-48">
                     <div className="rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5">

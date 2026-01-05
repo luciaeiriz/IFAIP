@@ -10,3 +10,4 @@ ADD COLUMN IF NOT EXISTS bullet_points TEXT[];
 COMMENT ON COLUMN courses.headline IS 'Short headline/tagline generated from course description (max 60 chars)';
 COMMENT ON COLUMN courses.bullet_points IS 'Array of bullet points breaking down the course description';
 
+

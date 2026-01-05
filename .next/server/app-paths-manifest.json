@@ -1,6 +1,9 @@
 {
   "/page": "app/page.js",
-  "/membership/page": "app/membership/page.js",
+  "/courses/restaurant/page": "app/courses/restaurant/page.js",
+  "/signup/[courseId]/page": "app/signup/[courseId]/page.js",
+  "/courses/page": "app/courses/page.js",
   "/courses/[id]/page": "app/courses/[id]/page.js",
-  "/courses/business/page": "app/courses/business/page.js"
+  "/courses/business/page": "app/courses/business/page.js",
+  "/_not-found/page": "app/_not-found/page.js"
 }

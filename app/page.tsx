@@ -20,7 +20,6 @@ interface LatestCard {
 
 export default function HomePage() {
   const [activeFilter, setActiveFilter] = useState<FilterType>('all')
-  const [coursesDropdownOpen, setCoursesDropdownOpen] = useState(false)
 
   // Feature cards data (similar to news cards in Turing Institute)
   const featureCards = [
@@ -303,64 +302,16 @@ export default function HomePage() {
               We are the international federation for artificial intelligence professionals.
             </h1>
             
-            {/* CTA Button with Dropdown */}
-            <div
-              className="relative"
-              onMouseEnter={() => setCoursesDropdownOpen(true)}
-              onMouseLeave={() => setCoursesDropdownOpen(false)}
+            {/* CTA Button */}
+            <Link
+              href="/courses"
+              className="inline-flex items-center justify-start bg-white text-black px-4 py-2.5 sm:px-5 sm:py-3 text-sm sm:text-base font-semibold hover:bg-gray-100 transition-colors"
+              style={{ 
+                fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+              }}
             >
-              <button
-                className="inline-flex items-center justify-start bg-white text-black px-6 py-3 sm:px-8 sm:py-4 text-sm sm:text-base font-semibold hover:bg-gray-100 transition-colors"
-                style={{ 
-                  fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
-                }}
-              >
-                Our courses and training
-                <svg
-                  className="ml-2 h-4 w-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </button>
-              {coursesDropdownOpen && (
-                <>
-                  {/* Invisible bridge area to prevent mouse leave */}
-                  <div className="absolute left-0 top-full w-full h-1" />
-                  <div className="absolute left-0 top-full w-48 z-50" style={{ marginTop: '4px' }}>
-                    <div className="rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 border border-gray-200">
-                      <div className="py-1">
-                        <Link
-                          href="/courses/business"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        >
-                          Business
-                        </Link>
-                        <Link
-                          href="/courses/restaurant"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        >
-                          Restaurant
-                        </Link>
-                        <Link
-                          href="/courses/fleet"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        >
-                          Fleet
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
+              Our courses and training
+            </Link>
           </div>
         </div>
 
@@ -372,7 +323,7 @@ export default function HomePage() {
             clipPath: 'polygon(50% 0, 100% 0, 100% 100%, 0 100%, 15% 30%)',
           }}
         >
-          <div className="space-y-6" style={{ position: 'absolute', right: '20px', width: '483px' }}>
+          <div className="space-y-10" style={{ position: 'absolute', right: '50px', top: '220px', width: '483px' }}>
             {featureCards.map((card, index) => (
               <Link
                 key={index}
@@ -403,7 +354,7 @@ export default function HomePage() {
                     className="text-sm text-white mb-3 leading-tight"
                     style={{ 
                       fontFamily: '"Helvetica Roman", Helvetica, sans-serif',
-                      fontWeight: 400
+                      fontWeight: 700
                     }}
                   >
                     {card.title}

@@ -92,3 +92,4 @@ BEGIN
   RAISE NOTICE '✅ Indexes created for better performance';
 END $$;
 
+
