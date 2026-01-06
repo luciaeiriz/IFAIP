@@ -390,8 +390,8 @@ function CourseEditModal({ course, onSave, onCancel, isSaving }: CourseEditModal
       : null
 
     onSave({
-      headline: formData.headline || null,
-      description: formData.description || null,
+      headline: formData.headline || undefined,
+      description: formData.description || undefined,
       bullet_points: bulletPointsArray,
       signup_enabled: formData.signup_enabled,
       is_featured: formData.is_featured,

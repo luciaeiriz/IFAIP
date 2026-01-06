@@ -20,8 +20,8 @@ const supabase = createClient(supabaseUrl, supabaseKey)
 
 async function testConnection() {
   console.log('🧪 === TESTING SUPABASE CONNECTION ===\n')
-  console.log('URL:', supabaseUrl.substring(0, 30) + '...')
-  console.log('Key:', supabaseKey.substring(0, 20) + '...\n')
+  console.log('URL:', supabaseUrl!.substring(0, 30) + '...')
+  console.log('Key:', supabaseKey!.substring(0, 20) + '...\n')
 
   try {
     // Test 1: Count
