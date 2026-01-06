@@ -12,12 +12,16 @@ if (!apiKey) {
   process.exit(1)
 }
 
+// TypeScript now knows apiKey is string (not undefined) after the check above
+// But we need to ensure it's typed correctly for the rest of the file
+const LOGO_DEV_API: string = apiKey
+
 async function testLogoDomain(domain: string) {
-  const logoUrl = `https://img.logo.dev/${domain}?token=${apiKey}&size=128&format=png&theme=light&fallback=404`
+  const logoUrl = `https://img.logo.dev/${domain}?token=${LOGO_DEV_API}&size=128&format=png&theme=light&fallback=404`
   
   try {
     console.log(`\n🔍 Testing domain: ${domain}`)
-    console.log(`   URL: ${logoUrl.replace(apiKey, '***')}`)
+    console.log(`   URL: ${logoUrl.replace(LOGO_DEV_API, '***')}`)
     
     const response = await fetch(logoUrl, {
       signal: AbortSignal.timeout(5000),
@@ -80,7 +84,7 @@ async function testLogos() {
   ]
   
   console.log('🧪 Testing Logo.dev API for various domains...')
-  console.log(`   API Key: ${apiKey ? '✅ Set' : '❌ Missing'}`)
+  console.log(`   API Key: ${LOGO_DEV_API ? '✅ Set' : '❌ Missing'}`)
   
   for (const domain of testDomains) {
     await testLogoDomain(domain)
