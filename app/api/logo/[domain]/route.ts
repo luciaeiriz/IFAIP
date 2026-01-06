@@ -137,7 +137,7 @@ export async function GET(
         console.log(`[Logo API] ⚠️ Authentication failed (401) for domain: ${domain}, returning fallback logo`)
         console.log(`[Logo API] ⚠️ Please check your LOGO_DEV_API or LOGO_DEV_PUBLIC_API key in .env.local`)
         const fallbackLogoBuffer = await getFallbackLogo()
-        // Convert Buffer to ArrayBuffer
+        // Convert Buffer to ArrayBuffer for NextResponse compatibility
         const fallbackLogo: ArrayBuffer = new Uint8Array(fallbackLogoBuffer).buffer
         return new NextResponse(fallbackLogo, {
           status: 200,
