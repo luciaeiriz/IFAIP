@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST="{}"
+self.__REACT_LOADABLE_MANIFEST='{"app/courses/business/page.tsx -> @/src/data/courses":{"id":1581,"files":[]},"app/courses/fleet/page.tsx -> @/src/data/courses":{"id":1581,"files":[]},"app/courses/restaurant/page.tsx -> @/src/data/courses":{"id":1581,"files":[]}}';

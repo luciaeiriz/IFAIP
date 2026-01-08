@@ -191,7 +191,7 @@ async function getCoursesByTagInternal(
     
     console.log(`🏷️ getCoursesByTagInternal: Fetching courses for tag "${tag}" (includeHidden: ${includeHidden}, limit: ${limit || 'none'})...`)
     console.log(`🏷️ IMPORTANT: NO tag filter, NO signup_enabled filter - getting ALL courses sorted by ${relevancyColumn}`)
-    console.log(`🏷️ Ordering by: ${relevancyColumn} (ascending, nullsLast)`)
+    console.log(`🏷️ Ordering by: ${relevancyColumn} (ascending, nullsFirst: false)`)
     
     // Build query step by step - Supabase queries are chainable
     // CRITICAL: NO FILTERING BY TAG OR signup_enabled - get ALL courses, sort by relevancy score
@@ -204,7 +204,7 @@ async function getCoursesByTagInternal(
     
     // Order by relevancy column (lower number = higher priority)
     // This determines which courses appear on each page
-    query = query.order(relevancyColumn || 'priority', { ascending: true, nullsLast: true })
+    query = query.order(relevancyColumn || 'priority', { ascending: true, nullsFirst: false })
     
     // Apply limit AFTER ordering to ensure we get the top N courses
     if (limit) {
@@ -240,7 +240,7 @@ async function getCoursesByTagInternal(
         .select('*')
         // NO .eq('tag', tag) - get ALL courses
       
-      fallbackQuery = fallbackQuery.order('priority', { ascending: true, nullsLast: true })
+      fallbackQuery = fallbackQuery.order('priority', { ascending: true, nullsFirst: false })
       
       if (limit) {
         fallbackQuery = fallbackQuery.limit(limit)
@@ -324,7 +324,7 @@ export async function getCoursesByTagWithRelevancy(
       query = query.eq('signup_enabled', true)
     }
     
-    query = query.order(relevancyColumn || 'priority', { ascending: true, nullsLast: true })
+    query = query.order(relevancyColumn || 'priority', { ascending: true, nullsFirst: false })
     
     if (limit) {
       query = query.limit(limit)
@@ -344,7 +344,7 @@ export async function getCoursesByTagWithRelevancy(
         fallbackQuery = fallbackQuery.eq('signup_enabled', true)
       }
       
-      fallbackQuery = fallbackQuery.order('priority', { ascending: true, nullsLast: true })
+      fallbackQuery = fallbackQuery.order('priority', { ascending: true, nullsFirst: false })
       
       if (limit) {
         fallbackQuery = fallbackQuery.limit(limit)
