@@ -1,7 +1,1 @@
-{
-  "/courses/business/page": "app/courses/business/page.js",
-  "/courses/[id]/page": "app/courses/[id]/page.js",
-  "/admin/page": "app/admin/page.js",
-  "/courses/restaurant/page": "app/courses/restaurant/page.js",
-  "/page": "app/page.js"
-}
+{}

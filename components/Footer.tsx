@@ -62,9 +62,12 @@ export default function Footer() {
             <h4 className="text-sm font-semibold uppercase tracking-wider mb-4">
               Contact
             </h4>
-            <p className="text-gray-400 text-sm">
+            <p className="text-gray-400 text-sm mb-2">
               Get in touch with us for more information about our courses and programs.
             </p>
+            <Link href="/contact" className="text-gray-400 hover:text-white transition-colors text-sm underline">
+              Contact Us
+            </Link>
           </div>
         </div>
 

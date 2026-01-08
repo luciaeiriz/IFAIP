@@ -253,6 +253,49 @@ export default function HomePage() {
     setActiveFilter(filter)
   }
 
+  const scrollToCourses = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault()
+    const coursesSection = document.getElementById('courses')
+    if (coursesSection) {
+      // Get the header element to calculate its actual height
+      const header = document.querySelector('header')
+      const headerHeight = header ? header.offsetHeight : 68
+      
+      // Calculate the target position with proper offset
+      const elementTop = coursesSection.getBoundingClientRect().top + window.pageYOffset
+      const targetPosition = elementTop - headerHeight - 60 // More spacing for smoother transition
+      
+      // Smooth scroll with very smooth easing
+      const startPosition = window.pageYOffset
+      const distance = targetPosition - startPosition
+      const duration = 2000 // 2 seconds for very smooth transition
+      let startTime: number | null = null
+      
+      // Ease-out-expo for very smooth deceleration
+      const easeOutExpo = (t: number): number => {
+        return t === 1 ? 1 : 1 - Math.pow(2, -10 * t)
+      }
+      
+      const animate = (currentTime: number) => {
+        if (startTime === null) startTime = currentTime
+        const elapsed = currentTime - startTime
+        const progress = Math.min(elapsed / duration, 1)
+        
+        // Apply easing for smooth deceleration
+        const eased = easeOutExpo(progress)
+        const currentPosition = startPosition + distance * eased
+        
+        window.scrollTo(0, currentPosition)
+        
+        if (progress < 1) {
+          requestAnimationFrame(animate)
+        }
+      }
+      
+      requestAnimationFrame(animate)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-white overflow-hidden">
       {/* Split Layout Section */}
@@ -303,15 +346,16 @@ export default function HomePage() {
             </h1>
             
             {/* CTA Button */}
-            <Link
-              href="/courses"
-              className="inline-flex items-center justify-start bg-white text-black px-4 py-2.5 sm:px-5 sm:py-3 text-sm sm:text-base font-semibold hover:bg-gray-100 transition-colors"
+            <a
+              href="#courses"
+              onClick={scrollToCourses}
+              className="inline-flex items-center justify-center bg-black text-white px-6 py-3 text-base font-medium hover:bg-gray-800 transition-colors"
               style={{ 
                 fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
               }}
             >
-              Our courses and training
-            </Link>
+              Learn more
+            </a>
           </div>
         </div>
 
@@ -328,13 +372,14 @@ export default function HomePage() {
               <Link
                 key={index}
                 href={card.href}
-                className="block p-6 sm:p-8 hover:shadow-xl transition-all duration-300 overflow-hidden relative"
+                className="block p-6 sm:p-8 hover:shadow-xl transition-all duration-300 overflow-hidden relative cursor-pointer"
                 style={{ 
                   fontFamily: '"Helvetica Roman", Helvetica, sans-serif',
                   transform: 'translateZ(0)',
                   width: '483px',
                   height: '200px',
                   backgroundColor: '#353DFC',
+                  zIndex: 10,
                 }}
               >
                 <div style={{ transform: 'translateY(-20px)', paddingTop: '10px' }}>
@@ -401,8 +446,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Latest Section */}
-      <section className="bg-white py-16 lg:py-24">
+      {/* Our courses and training Section */}
+      <section id="courses" className="bg-white py-16 lg:py-24 scroll-mt-24">
         <div className="mx-auto" style={{ maxWidth: '100%', paddingLeft: '0', paddingRight: '0' }}>
           {/* Header */}
           <div 

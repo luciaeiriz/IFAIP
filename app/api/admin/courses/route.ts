@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 import { rankNewCourse } from '@/lib/rank-course'
+import { randomUUID } from 'crypto'
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,7 +16,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Prepare the course data for database
+    // Generate UUID client-side to ensure it's set (database default might not work with admin client)
     const courseData: any = {
+      id: randomUUID(), // Generate UUID client-side
       title: body.title,
       description: body.description || null,
       headline: body.headline || null,
@@ -37,11 +40,10 @@ export async function POST(request: NextRequest) {
       price_label: body.price_label || null,
       source: body.source || 'admin',
       signup_enabled: body.signup_enabled ?? true,
-      is_featured: body.is_featured ?? false,
     }
 
-    // Insert the course first
-    const { data, error } = await supabase
+    // Insert the course first (using admin client to bypass RLS)
+    const { data, error } = await supabaseAdmin
       .from('courses')
       .insert([courseData])
       .select()
@@ -60,8 +62,8 @@ export async function POST(request: NextRequest) {
       console.log('🤖 Ranking new course with OpenAI...')
       const relevancyScores = await rankNewCourse(data.id)
       
-      // Update the course with relevancy scores
-      const { error: updateError } = await supabase
+      // Update the course with relevancy scores (using admin client to bypass RLS)
+      const { error: updateError } = await supabaseAdmin
         .from('courses')
         .update({
           business_relevancy: relevancyScores.business_relevancy,
@@ -76,7 +78,7 @@ export async function POST(request: NextRequest) {
       } else {
         console.log('✅ Relevancy scores updated successfully')
         // Fetch the updated course
-        const { data: updatedCourse } = await supabase
+        const { data: updatedCourse } = await supabaseAdmin
           .from('courses')
           .select()
           .eq('id', data.id)

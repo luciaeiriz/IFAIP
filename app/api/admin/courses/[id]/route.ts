@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 
 export async function PUT(
   request: NextRequest,
@@ -28,7 +28,6 @@ export async function PUT(
       duration: body.duration || null,
       tag: body.tag,
       external_url: body.external_url || null,
-      priority: body.priority || null,
       rating: body.rating || null,
       reviews: body.reviews || null,
       course_type: body.course_type || null,
@@ -41,10 +40,9 @@ export async function PUT(
       price_label: body.price_label || null,
       source: body.source || 'admin',
       signup_enabled: body.signup_enabled ?? true,
-      is_featured: body.is_featured ?? false,
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('courses')
       .update(courseData)
       .eq('id', id)
@@ -83,7 +81,7 @@ export async function DELETE(
   try {
     const { id } = params
 
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('courses')
       .delete()
       .eq('id', id)

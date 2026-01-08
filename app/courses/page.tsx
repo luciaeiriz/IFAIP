@@ -269,9 +269,6 @@ export default function CoursesPage() {
             >
               Our Fundamental Research team is also leading a mission developing the next generation of fundamental AI tools and theory for modelling, prediction and control of physical systems.
             </p>
-            <button className="bg-black text-white px-6 py-3 rounded-md font-medium hover:bg-gray-800 transition-colors">
-              Learn more
-            </button>
           </div>
         </div>
         </div>

@@ -23,10 +23,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate landing_tag
-    const validLandingTags = ['Business', 'Restaurant', 'Fleet']
+    const validLandingTags = ['Business', 'Restaurant', 'Fleet', 'Membership']
     if (!validLandingTags.includes(body.landing_tag)) {
       return NextResponse.json(
-        { error: 'Invalid landing_tag. Must be one of: Business, Restaurant, Fleet' },
+        { error: 'Invalid landing_tag. Must be one of: Business, Restaurant, Fleet, Membership' },
         { status: 400 }
       )
     }

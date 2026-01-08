@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
@@ -18,7 +18,17 @@ export default function Header() {
   const [coursesDropdownOpen, setCoursesDropdownOpen] = useState(false)
   const [breadcrumbCoursesDropdownOpen, setBreadcrumbCoursesDropdownOpen] = useState(false)
   const [disclosureModalOpen, setDisclosureModalOpen] = useState(false)
+  const [coursesDropdownTimeout, setCoursesDropdownTimeout] = useState<NodeJS.Timeout | null>(null)
   const pathname = usePathname()
+  
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (coursesDropdownTimeout) {
+        clearTimeout(coursesDropdownTimeout)
+      }
+    }
+  }, [coursesDropdownTimeout])
   
   // Check if we're on a courses page (but not the old /courses page)
   const isCoursesPage = pathname?.startsWith('/courses') && pathname !== '/courses'
@@ -198,15 +208,18 @@ export default function Header() {
   const isHomePage = pathname === '/'
   const isCoursesLandingPage = pathname === '/courses'
   const isAboutPage = pathname === '/about'
+  const isMembershipPage = pathname === '/membership' || pathname?.startsWith('/membership')
   const isTermsPage = pathname === '/terms'
   const isPrivacyPage = pathname === '/privacy'
+  const isContactPage = pathname === '/contact'
+  const isPartnerPage = pathname === '/partner'
   const isAdminPage = pathname === '/admin'
 
-  // Turing Institute style header for homepage and courses landing page
-  if (isHomePage || isCoursesLandingPage) {
+  // Turing Institute style header for homepage, courses landing page, about page, membership page, terms page, privacy page, contact page, and partner page
+  if (isHomePage || isCoursesLandingPage || isAboutPage || isMembershipPage || isTermsPage || isPrivacyPage || isContactPage || isPartnerPage) {
     return (
       <header className="sticky top-0 z-50 bg-white">
-        <nav className="mx-auto max-w-7xl">
+        <nav className="mx-auto max-w-7xl relative">
           <div className="flex items-center justify-between" style={{ height: '107px' }}>
             {/* Left - Logo */}
             <div className="flex items-center pl-0 sm:pl-1 lg:pl-2" style={{ marginLeft: '-8px' }}>
@@ -231,13 +244,6 @@ export default function Header() {
               }}
             >
               <Link
-                href="/membership"
-                className="text-sm font-medium text-black hover:text-gray-600 transition-colors"
-                style={{ fontSize: '15px' }}
-              >
-                Membership
-              </Link>
-              <Link
                 href="/about"
                 className="text-sm font-medium text-black hover:text-gray-600 transition-colors"
                 style={{ fontSize: '15px' }}
@@ -246,8 +252,19 @@ export default function Header() {
               </Link>
               <div
                 className="relative"
-                onMouseEnter={() => setCoursesDropdownOpen(true)}
-                onMouseLeave={() => setCoursesDropdownOpen(false)}
+                onMouseEnter={() => {
+                  if (coursesDropdownTimeout) {
+                    clearTimeout(coursesDropdownTimeout)
+                    setCoursesDropdownTimeout(null)
+                  }
+                  setCoursesDropdownOpen(true)
+                }}
+                onMouseLeave={() => {
+                  const timeout = setTimeout(() => {
+                    setCoursesDropdownOpen(false)
+                  }, 200) // 200ms delay before closing
+                  setCoursesDropdownTimeout(timeout)
+                }}
               >
                 <Link
                   href="/courses"
@@ -257,41 +274,96 @@ export default function Header() {
                   Courses
                 </Link>
                 {coursesDropdownOpen && (
-                  <div className="absolute left-0 top-full pt-2 w-48">
-                    <div className="rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5">
-                      <div className="py-1">
-                        <Link
-                          href="/courses/business"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        >
-                          Business
-                        </Link>
-                        <Link
-                          href="/courses/restaurant"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        >
-                          Restaurant
-                        </Link>
-                        <Link
-                          href="/courses/fleet"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        >
-                          Fleet
-                        </Link>
+                  <div 
+                    className="fixed top-[107px] left-1/2 pt-4" 
+                    style={{ transform: 'translateX(-50%)', width: '1200px', maxWidth: 'calc(100vw - 40px)', zIndex: 50 }}
+                    onMouseEnter={() => {
+                      if (coursesDropdownTimeout) {
+                        clearTimeout(coursesDropdownTimeout)
+                        setCoursesDropdownTimeout(null)
+                      }
+                      setCoursesDropdownOpen(true)
+                    }}
+                    onMouseLeave={() => {
+                      const timeout = setTimeout(() => {
+                        setCoursesDropdownOpen(false)
+                      }, 200) // 200ms delay before closing
+                      setCoursesDropdownTimeout(timeout)
+                    }}
+                  >
+                    <div className="shadow-2xl" style={{ backgroundColor: '#1C1C1C', clipPath: 'polygon(0 0, 100% 0, 95% 100%, 0 100%)' }}>
+                      <div className="p-12">
+                        {/* Course Cards - Horizontal Layout */}
+                        <div className="grid grid-cols-3 gap-6" style={{ maxWidth: '900px', margin: '0 auto' }}>
+                          {/* Business Card */}
+                          <Link
+                            href="/courses/business"
+                            className="group block"
+                          >
+                            <div className="rounded overflow-hidden relative" style={{ backgroundColor: '#2663EB', height: '100px', width: '100%' }}>
+                              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></div>
+                              <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
+                                <h4 className="text-base font-semibold mb-1">Business</h4>
+                                <p className="text-sm text-white/90 line-clamp-2">
+                                  AI certification programs for business owners and entrepreneurs
+                                </p>
+                              </div>
+                            </div>
+                          </Link>
+
+                          {/* Restaurant Card */}
+                          <Link
+                            href="/courses/restaurant"
+                            className="group block"
+                          >
+                            <div className="rounded overflow-hidden relative" style={{ backgroundColor: '#16A349', height: '100px', width: '100%' }}>
+                              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></div>
+                              <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
+                                <h4 className="text-base font-semibold mb-1">Restaurant</h4>
+                                <p className="text-sm text-white/90 line-clamp-2">
+                                  Specialized AI training for restaurant operations and customer experience
+                                </p>
+                              </div>
+                            </div>
+                          </Link>
+
+                          {/* Fleet Card */}
+                          <Link
+                            href="/courses/fleet"
+                            className="group block"
+                          >
+                            <div className="rounded overflow-hidden relative" style={{ backgroundColor: '#9333EA', height: '100px', width: '100%' }}>
+                              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></div>
+                              <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
+                                <h4 className="text-base font-semibold mb-1">Fleet</h4>
+                                <p className="text-sm text-white/90 line-clamp-2">
+                                  AI certification courses for fleet managers and logistics optimization
+                                </p>
+                              </div>
+                            </div>
+                          </Link>
+                        </div>
                       </div>
                     </div>
                   </div>
                 )}
               </div>
               <Link
-                href="/about"
+                href="/membership"
+                className="text-sm font-medium text-black hover:text-gray-600 transition-colors"
+                style={{ fontSize: '15px' }}
+              >
+                Membership
+              </Link>
+              <Link
+                href="/partner"
                 className="text-sm font-medium text-black hover:text-gray-600 transition-colors"
                 style={{ fontSize: '15px' }}
               >
                 Partner with us
               </Link>
               <Link
-                href="/about"
+                href="/contact"
                 className="text-sm font-medium text-black hover:text-gray-600 transition-colors"
                 style={{ fontSize: '15px' }}
               >
@@ -443,11 +515,28 @@ export default function Header() {
           {/* Right side - Desktop Navigation */}
           {!isTermsPage && !isPrivacyPage && !isAdminPage && (
             <div className="hidden md:flex md:items-center md:justify-end md:space-x-8 md:ml-auto md:mr-0 lg:mr-0 xl:mr-0">
+              <Link
+                href="/about"
+                className="text-sm text-white hover:text-gray-300 transition-colors"
+              >
+                About us
+              </Link>
               {/* Courses Dropdown */}
               <div
                 className="relative"
-                onMouseEnter={() => setCoursesDropdownOpen(true)}
-                onMouseLeave={() => setCoursesDropdownOpen(false)}
+                onMouseEnter={() => {
+                  if (coursesDropdownTimeout) {
+                    clearTimeout(coursesDropdownTimeout)
+                    setCoursesDropdownTimeout(null)
+                  }
+                  setCoursesDropdownOpen(true)
+                }}
+                onMouseLeave={() => {
+                  const timeout = setTimeout(() => {
+                    setCoursesDropdownOpen(false)
+                  }, 200) // 200ms delay before closing
+                  setCoursesDropdownTimeout(timeout)
+                }}
               >
                 <Link
                   href="/courses/business"
@@ -469,47 +558,98 @@ export default function Header() {
                   </svg>
                 </Link>
                 {coursesDropdownOpen && (
-                  <div className="absolute left-0 top-full pt-2 w-48">
-                    <div className="rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5">
-                      <div className="py-1">
-                        {courseCategories.map((category) => (
+                  <div 
+                    className="fixed top-[50px] left-1/2 pt-4" 
+                    style={{ transform: 'translateX(-50%)', width: '1200px', maxWidth: 'calc(100vw - 40px)', zIndex: 50 }}
+                    onMouseEnter={() => {
+                      if (coursesDropdownTimeout) {
+                        clearTimeout(coursesDropdownTimeout)
+                        setCoursesDropdownTimeout(null)
+                      }
+                      setCoursesDropdownOpen(true)
+                    }}
+                    onMouseLeave={() => {
+                      const timeout = setTimeout(() => {
+                        setCoursesDropdownOpen(false)
+                      }, 200) // 200ms delay before closing
+                      setCoursesDropdownTimeout(timeout)
+                    }}
+                  >
+                    <div className="shadow-2xl" style={{ backgroundColor: '#1C1C1C', clipPath: 'polygon(0 0, 100% 0, 95% 100%, 0 100%)' }}>
+                      <div className="p-12">
+                        {/* Course Cards - Horizontal Layout */}
+                        <div className="grid grid-cols-3 gap-6" style={{ maxWidth: '900px', margin: '0 auto' }}>
+                          {/* Business Card */}
                           <Link
-                            key={category.name}
-                            href={category.href}
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            href="/courses/business"
+                            className="group block"
                           >
-                            {category.name}
+                            <div className="rounded overflow-hidden relative" style={{ backgroundColor: '#2663EB', height: '100px', width: '100%' }}>
+                              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></div>
+                              <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
+                                <h4 className="text-base font-semibold mb-1">Business</h4>
+                                <p className="text-sm text-white/90 line-clamp-2">
+                                  AI certification programs for business owners and entrepreneurs
+                                </p>
+                              </div>
+                            </div>
                           </Link>
-                        ))}
-                        <Link
-                          href="/courses/business"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 border-t border-gray-200"
-                        >
-                          All Courses
-                        </Link>
+
+                          {/* Restaurant Card */}
+                          <Link
+                            href="/courses/restaurant"
+                            className="group block"
+                          >
+                            <div className="rounded overflow-hidden relative" style={{ backgroundColor: '#16A349', height: '100px', width: '100%' }}>
+                              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></div>
+                              <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
+                                <h4 className="text-base font-semibold mb-1">Restaurant</h4>
+                                <p className="text-sm text-white/90 line-clamp-2">
+                                  Specialized AI training for restaurant operations and customer experience
+                                </p>
+                              </div>
+                            </div>
+                          </Link>
+
+                          {/* Fleet Card */}
+                          <Link
+                            href="/courses/fleet"
+                            className="group block"
+                          >
+                            <div className="rounded overflow-hidden relative" style={{ backgroundColor: '#9333EA', height: '100px', width: '100%' }}>
+                              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></div>
+                              <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
+                                <h4 className="text-base font-semibold mb-1">Fleet</h4>
+                                <p className="text-sm text-white/90 line-clamp-2">
+                                  AI certification courses for fleet managers and logistics optimization
+                                </p>
+                              </div>
+                            </div>
+                          </Link>
+                        </div>
                       </div>
                     </div>
                   </div>
                 )}
               </div>
-
-              {!isAboutPage && (
-                <Link
-                  href="/membership"
-                  className="text-sm text-white hover:text-gray-300 transition-colors"
-                >
-                  Membership
-                </Link>
-              )}
-
-              {!isAboutPage && (
-                <Link
-                  href="/about"
-                  className="text-sm text-white hover:text-gray-300 transition-colors"
-                >
-                  About
-                </Link>
-              )}
+              <Link
+                href="/membership"
+                className="text-sm text-white hover:text-gray-300 transition-colors"
+              >
+                Membership
+              </Link>
+              <Link
+                href="/partner"
+                className="text-sm text-white hover:text-gray-300 transition-colors"
+              >
+                Partner with us
+              </Link>
+              <Link
+                href="/contact"
+                className="text-sm text-white hover:text-gray-300 transition-colors"
+              >
+                Contact us
+              </Link>
             </div>
           )}
         </div>
@@ -562,24 +702,34 @@ export default function Header() {
                   </div>
                 )}
               </div>
-              {!isAboutPage && (
-                <Link
-                  href="/membership"
-                  className="block px-3 py-2 text-sm font-medium text-white hover:text-gray-300"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Membership
-                </Link>
-              )}
-              {!isAboutPage && (
-                <Link
-                  href="/about"
-                  className="block px-3 py-2 text-sm font-medium text-white hover:text-gray-300"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  About
-                </Link>
-              )}
+              <Link
+                href="/about"
+                className="block px-3 py-2 text-sm font-medium text-white hover:text-gray-300"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                About us
+              </Link>
+              <Link
+                href="/membership"
+                className="block px-3 py-2 text-sm font-medium text-white hover:text-gray-300"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Membership
+              </Link>
+              <Link
+                href="/partner"
+                className="block px-3 py-2 text-sm font-medium text-white hover:text-gray-300"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Partner with us
+              </Link>
+              <Link
+                href="/contact"
+                className="block px-3 py-2 text-sm font-medium text-white hover:text-gray-300"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Contact us
+              </Link>
             </div>
           </div>
         )}
