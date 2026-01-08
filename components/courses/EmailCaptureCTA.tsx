@@ -3,17 +3,27 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { createLead, getUTMParams } from '@/lib/leads'
+import { CourseTag } from '@/types/course'
 
-export default function EmailCaptureCTA() {
+interface EmailCaptureCTAProps {
+  tag?: CourseTag
+}
+
+export default function EmailCaptureCTA({ tag: tagProp }: EmailCaptureCTAProps = {}) {
   const searchParams = useSearchParams()
-  const [tag, setTag] = useState<string>('Business')
+  const [tag, setTag] = useState<CourseTag>(tagProp || 'Business')
 
   useEffect(() => {
-    const tagParam = searchParams.get('tag')
-    if (tagParam) {
-      setTag(tagParam)
+    // If tag prop is provided, use it; otherwise check search params
+    if (tagProp) {
+      setTag(tagProp)
+    } else {
+      const tagParam = searchParams?.get('tag')
+      if (tagParam && ['Business', 'Restaurant', 'Fleet'].includes(tagParam)) {
+        setTag(tagParam as CourseTag)
+      }
     }
-  }, [searchParams])
+  }, [tagProp, searchParams])
   
   const [email, setEmail] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)

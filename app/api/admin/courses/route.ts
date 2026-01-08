@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
+import { rankNewCourse } from '@/lib/rank-course'
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,7 +25,6 @@ export async function POST(request: NextRequest) {
       duration: body.duration || null,
       tag: body.tag,
       external_url: body.external_url || null,
-      priority: body.priority || null,
       rating: body.rating || null,
       reviews: body.reviews || null,
       course_type: body.course_type || null,
@@ -40,6 +40,7 @@ export async function POST(request: NextRequest) {
       is_featured: body.is_featured ?? false,
     }
 
+    // Insert the course first
     const { data, error } = await supabase
       .from('courses')
       .insert([courseData])
@@ -52,6 +53,42 @@ export async function POST(request: NextRequest) {
         { error: error.message || 'Failed to create course' },
         { status: 500 }
       )
+    }
+
+    // Rank the new course using OpenAI
+    try {
+      console.log('🤖 Ranking new course with OpenAI...')
+      const relevancyScores = await rankNewCourse(data.id)
+      
+      // Update the course with relevancy scores
+      const { error: updateError } = await supabase
+        .from('courses')
+        .update({
+          business_relevancy: relevancyScores.business_relevancy,
+          restaurant_relevancy: relevancyScores.restaurant_relevancy,
+          fleet_relevancy: relevancyScores.fleet_relevancy,
+        })
+        .eq('id', data.id)
+
+      if (updateError) {
+        console.error('Error updating relevancy scores:', updateError)
+        // Don't fail the request, just log the error
+      } else {
+        console.log('✅ Relevancy scores updated successfully')
+        // Fetch the updated course
+        const { data: updatedCourse } = await supabase
+          .from('courses')
+          .select()
+          .eq('id', data.id)
+          .single()
+        
+        if (updatedCourse) {
+          return NextResponse.json({ success: true, course: updatedCourse }, { status: 201 })
+        }
+      }
+    } catch (rankingError) {
+      console.error('Error ranking course:', rankingError)
+      // Don't fail the request if ranking fails, just log it
     }
 
     return NextResponse.json({ success: true, course: data }, { status: 201 })

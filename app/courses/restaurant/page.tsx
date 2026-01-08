@@ -6,6 +6,7 @@ import { Course, CourseTag } from '@/types/course'
 import ForbesHeroSection from '@/components/courses/ForbesHeroSection'
 import FeaturedTopPicks from '@/components/courses/FeaturedTopPicks'
 import AllCoursesGrid from '@/components/courses/AllCoursesGrid'
+import EmailCaptureCTA from '@/components/courses/EmailCaptureCTA'
 
 const TAG = 'Restaurant'
 
@@ -100,9 +101,12 @@ function RestaurantCoursesContent() {
       {/* All Courses Section */}
       {allCourses.length > 0 && (
         <div className="bg-white pt-4 pb-12">
-          <AllCoursesGrid courses={allCourses.slice(0, 10)} />
+          <AllCoursesGrid courses={allCourses} />
         </div>
       )}
+
+      {/* Email Capture CTA */}
+      <EmailCaptureCTA tag={TAG} />
     </div>
   )
 }

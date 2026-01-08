@@ -3,15 +3,16 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { getAllCourses } from '@/lib/courses'
-import Link from 'next/link'
 
 interface DashboardStats {
   totalCourses: number
   totalLeads: number
   totalSignups: number
-  featuredCourses: number
   recentSignups: any[]
   popularCourses: { course_id: string; count: number; title: string }[]
+  signupsByTag: { tag: string; count: number }[]
+  topUTMSources: { source: string; count: number }[]
+  signupsByMonth: { month: string; count: number }[]
 }
 
 export default function DashboardOverview() {
@@ -22,17 +23,38 @@ export default function DashboardOverview() {
     fetchStats()
   }, [])
 
+  // Helper function to get all visible course IDs for a tag (top 10 by relevancy)
+  const getVisibleCourseIds = async (tag: string): Promise<string[]> => {
+    const relevancyColumn = tag === 'Business' 
+      ? 'business_relevancy' 
+      : tag === 'Restaurant' 
+      ? 'restaurant_relevancy' 
+      : 'fleet_relevancy'
+    
+    // Get top 10 courses by relevancy (no tag or signup_enabled filter)
+    const { data } = await supabase
+      .from('courses')
+      .select('id')
+      .order(relevancyColumn, { ascending: true, nullsFirst: false })
+      .limit(10)
+    
+    return (data || []).map(course => course.id)
+  }
+
   const fetchStats = async () => {
     try {
       // Fetch courses using getAllCourses to ensure proper transformation
       const allCourses = await getAllCourses()
       const totalCourses = allCourses.length
-      const featuredCourses = allCourses.filter(c => c.is_featured).length
 
+      // Get all leads and signups (not filtered)
       const [leadsRes, signupsRes] = await Promise.all([
         supabase.from('leads').select('id', { count: 'exact' }),
         supabase.from('signups').select('id, created_at, course_id', { count: 'exact' })
       ])
+      
+      const totalLeads = leadsRes.count || leadsRes.data?.length || 0
+      const totalSignups = signupsRes.count || signupsRes.data?.length || 0
       
       // Get recent signups
       const recentSignupsRes = await supabase
@@ -41,7 +63,7 @@ export default function DashboardOverview() {
         .order('created_at', { ascending: false })
         .limit(5)
 
-      // Get popular courses (by signup count)
+      // Get popular courses (by signup count) - all signups
       const signupsWithCourses = await supabase
         .from('signups')
         .select('course_id, courses(title)')
@@ -66,13 +88,94 @@ export default function DashboardOverview() {
         .sort((a, b) => b.count - a.count)
         .slice(0, 5)
 
+      // Get visible course IDs for analytics (top 10 per tag)
+      const [businessCourseIds, restaurantCourseIds, fleetCourseIds] = await Promise.all([
+        getVisibleCourseIds('Business'),
+        getVisibleCourseIds('Restaurant'),
+        getVisibleCourseIds('Fleet'),
+      ])
+
+      const visibleCourseIds = [...businessCourseIds, ...restaurantCourseIds, ...fleetCourseIds]
+
+      // Get signups by landing tag (only for visible courses)
+      let signupsByTagRes
+      if (visibleCourseIds.length > 0) {
+        signupsByTagRes = await supabase
+          .from('signups')
+          .select('landing_tag, course_id')
+          .in('course_id', visibleCourseIds)
+      } else {
+        signupsByTagRes = { data: [], error: null }
+      }
+
+      const tagCounts: Record<string, number> = {}
+      signupsByTagRes.data?.forEach((item: any) => {
+        const tag = item.landing_tag || 'Unknown'
+        tagCounts[tag] = (tagCounts[tag] || 0) + 1
+      })
+
+      const signupsByTag = Object.entries(tagCounts)
+        .map(([tag, count]) => ({ tag, count }))
+        .sort((a, b) => b.count - a.count)
+
+      // Get top UTM sources (only for visible courses)
+      let topSourcesRes
+      if (visibleCourseIds.length > 0) {
+        topSourcesRes = await supabase
+          .from('signups')
+          .select('utm_source, course_id')
+          .in('course_id', visibleCourseIds)
+          .not('utm_source', 'is', null)
+      } else {
+        topSourcesRes = { data: [], error: null }
+      }
+
+      const sourceCounts: Record<string, number> = {}
+      topSourcesRes.data?.forEach((item: any) => {
+        const source = item.utm_source || 'Unknown'
+        sourceCounts[source] = (sourceCounts[source] || 0) + 1
+      })
+
+      const topUTMSources = Object.entries(sourceCounts)
+        .map(([source, count]) => ({ source, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 10)
+
+      // Get signups by month (last 6 months, only for visible courses)
+      const sixMonthsAgo = new Date()
+      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
+
+      let signupsByMonthRes
+      if (visibleCourseIds.length > 0) {
+        signupsByMonthRes = await supabase
+          .from('signups')
+          .select('created_at, course_id')
+          .in('course_id', visibleCourseIds)
+          .gte('created_at', sixMonthsAgo.toISOString())
+      } else {
+        signupsByMonthRes = { data: [], error: null }
+      }
+
+      const monthCounts: Record<string, number> = {}
+      signupsByMonthRes.data?.forEach((item: any) => {
+        const date = new Date(item.created_at)
+        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+        monthCounts[monthKey] = (monthCounts[monthKey] || 0) + 1
+      })
+
+      const signupsByMonth = Object.entries(monthCounts)
+        .map(([month, count]) => ({ month, count }))
+        .sort((a, b) => a.month.localeCompare(b.month))
+
       setStats({
         totalCourses,
-        totalLeads: leadsRes.count || leadsRes.data?.length || 0,
-        totalSignups: signupsRes.count || signupsRes.data?.length || 0,
-        featuredCourses,
+        totalLeads,
+        totalSignups,
         recentSignups: recentSignupsRes.data || [],
         popularCourses,
+        signupsByTag,
+        topUTMSources,
+        signupsByMonth,
       })
     } catch (error) {
       console.error('Error fetching stats:', error)
@@ -123,6 +226,95 @@ export default function DashboardOverview() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <RecentSignups signups={stats?.recentSignups || []} />
         <PopularCourses courses={stats?.popularCourses || []} />
+      </div>
+
+      {/* Analytics Section */}
+      <div>
+        <h2 className="text-xl font-bold text-gray-900 mb-4">Analytics & Insights</h2>
+        <p className="text-sm text-gray-600 mb-6">
+          Analytics of all courses
+        </p>
+      </div>
+
+      {/* Signups by Tag */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Signups by Landing Tag</h3>
+        {stats?.signupsByTag && stats.signupsByTag.length === 0 ? (
+          <p className="text-sm text-gray-500">No data available</p>
+        ) : (
+          <div className="space-y-3">
+            {stats?.signupsByTag.map((item) => {
+              const totalVisibleSignups = stats.signupsByTag.reduce((sum, t) => sum + t.count, 0)
+              const percentage = totalVisibleSignups > 0
+                ? ((item.count / totalVisibleSignups) * 100).toFixed(1)
+                : 0
+              return (
+                <div key={item.tag}>
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-sm font-medium text-gray-900">{item.tag}</span>
+                    <span className="text-sm text-gray-600">{item.count} ({percentage}%)</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="bg-[#36498C] h-2 rounded-full"
+                      style={{ width: `${percentage}%` }}
+                    />
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Top UTM Sources */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Top UTM Sources</h3>
+        {stats?.topUTMSources && stats.topUTMSources.length === 0 ? (
+          <p className="text-sm text-gray-500">No UTM source data available</p>
+        ) : (
+          <div className="space-y-2">
+            {stats?.topUTMSources.map((item, index) => (
+              <div key={item.source} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+                <div className="flex items-center">
+                  <span className="text-sm font-medium text-gray-400 mr-3 w-6">#{index + 1}</span>
+                  <span className="text-sm text-gray-900">{item.source}</span>
+                </div>
+                <span className="text-sm text-gray-600 font-medium">{item.count} signups</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Signups by Month */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Signups Trend (Last 6 Months)</h3>
+        {stats?.signupsByMonth && stats.signupsByMonth.length === 0 ? (
+          <p className="text-sm text-gray-500">No data available</p>
+        ) : (
+          <div className="space-y-2">
+            {stats?.signupsByMonth.map((item) => {
+              const maxCount = Math.max(...(stats.signupsByMonth || []).map(m => m.count))
+              const percentage = maxCount > 0 ? (item.count / maxCount) * 100 : 0
+              const monthName = new Date(item.month + '-01').toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+              return (
+                <div key={item.month}>
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-sm font-medium text-gray-900">{monthName}</span>
+                    <span className="text-sm text-gray-600">{item.count} signups</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="bg-[#34B682] h-2 rounded-full"
+                      style={{ width: `${percentage}%` }}
+                    />
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
       </div>
     </div>
   )
@@ -196,4 +388,3 @@ function PopularCourses({ courses }: { courses: { course_id: string; count: numb
     </div>
   )
 }
-

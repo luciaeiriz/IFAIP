@@ -7,10 +7,9 @@ import DashboardOverview from '@/components/admin/DashboardOverview'
 import CourseManagement from '@/components/admin/CourseManagement'
 import LeadsManagement from '@/components/admin/LeadsManagement'
 import SignupsManagement from '@/components/admin/SignupsManagement'
-import Analytics from '@/components/admin/Analytics'
 import LandingPageManagement from '@/components/admin/LandingPageManagement'
 
-type AdminTab = 'dashboard' | 'courses' | 'landing-pages' | 'leads' | 'signups' | 'analytics'
+type AdminTab = 'dashboard' | 'courses' | 'landing-pages' | 'leads' | 'signups'
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<AdminTab>('dashboard')
@@ -81,7 +80,6 @@ export default function AdminPage() {
     { id: 'landing-pages' as AdminTab, label: 'Landing Pages', icon: '🎨' },
     { id: 'leads' as AdminTab, label: 'Leads', icon: '👥' },
     { id: 'signups' as AdminTab, label: 'Signups', icon: '✅' },
-    { id: 'analytics' as AdminTab, label: 'Analytics', icon: '📈' },
   ]
 
   return (
@@ -124,7 +122,6 @@ export default function AdminPage() {
         {activeTab === 'landing-pages' && <LandingPageManagement />}
         {activeTab === 'leads' && <LeadsManagement />}
         {activeTab === 'signups' && <SignupsManagement />}
-        {activeTab === 'analytics' && <Analytics />}
       </div>
     </div>
   )

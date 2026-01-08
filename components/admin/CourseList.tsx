@@ -34,12 +34,6 @@ export default function CourseList({ courses, onEdit, onDelete }: CourseListProp
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Level
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Priority
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Featured
-            </th>
             <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
               Actions
             </th>
@@ -66,18 +60,6 @@ export default function CourseList({ courses, onEdit, onDelete }: CourseListProp
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 {course.level || '-'}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                {course.priority ?? '-'}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                {course.is_featured ? (
-                  <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
-                    Yes
-                  </span>
-                ) : (
-                  <span className="text-sm text-gray-500">No</span>
-                )}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <button

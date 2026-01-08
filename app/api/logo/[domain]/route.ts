@@ -4,7 +4,7 @@ import { join } from 'path'
 
 async function getFallbackLogo(): Promise<Buffer> {
   try {
-    const filePath = join(process.cwd(), 'public', 'cognite_logo.jpeg')
+    const filePath = join(process.cwd(), 'public', 'cognite_logo.png')
     return await readFile(filePath)
   } catch (error) {
     console.error('Error reading fallback logo:', error)
@@ -41,12 +41,16 @@ export async function GET(
   const keyType = publicApiKey ? 'PUBLIC (pk_)' : (apiKey ? 'SECRET (sk_)' : 'NONE')
 
   if (!keyToUse) {
-    console.warn('[Logo API] ⚠️ Logo.dev API key not configured, returning 404')
-    console.warn('[Logo API] ⚠️ Please set LOGO_DEV_API or LOGO_DEV_PUBLIC_API environment variable in .env.local')
-    // Return 404 so Image component's onError handler fires
-    return new NextResponse(null, {
-      status: 404,
+    console.warn('[Logo API] ⚠️ Logo.dev API key not configured, returning fallback logo')
+    console.warn('[Logo API] ⚠️ Please set LOGO_DEV_API or LOGO_DEV_PUBLIC_API environment variable in Vercel')
+    // Return fallback logo instead of 404 so logos still display
+    const fallbackLogoBuffer = await getFallbackLogo()
+    // Convert Buffer to ArrayBuffer for NextResponse compatibility
+    const fallbackLogo: ArrayBuffer = new Uint8Array(fallbackLogoBuffer).buffer
+    return new NextResponse(fallbackLogo, {
+      status: 200,
       headers: {
+        'Content-Type': 'image/png',
         'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
       },
     })
@@ -142,7 +146,7 @@ export async function GET(
         return new NextResponse(fallbackLogo, {
           status: 200,
           headers: {
-            'Content-Type': 'image/jpeg',
+            'Content-Type': 'image/png',
             'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
           },
         })

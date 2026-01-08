@@ -118,7 +118,7 @@ export default function AllCoursesGrid({ courses }: AllCoursesGridProps) {
       }
     }
 
-    // If no mapping found and not a domain, return null (will use cognite_logo.jpeg)
+    // If no mapping found and not a domain, return null (will use cognite_logo.png)
     return null
   }
 
@@ -581,7 +581,7 @@ export default function AllCoursesGrid({ courses }: AllCoursesGridProps) {
 function ProviderLogo({ provider, logoUrl }: { provider: string | null; logoUrl: string | null }) {
   const [imageError, setImageError] = useState(false)
   
-  // If no provider or logoUrl, always use cognite_logo.jpeg
+  // If no provider or logoUrl, always use cognite_logo.png
   if (!provider || !provider.trim() || !logoUrl) {
     return (
       <div
@@ -595,7 +595,7 @@ function ProviderLogo({ provider, logoUrl }: { provider: string | null; logoUrl:
         }}
       >
         <Image
-          src="/cognite_logo.jpeg"
+          src="/cognite_logo.png"
           alt="Cognite logo"
           width={120}
           height={72}
@@ -609,7 +609,7 @@ function ProviderLogo({ provider, logoUrl }: { provider: string | null; logoUrl:
     )
   }
 
-  // If image failed to load, show cognite_logo.jpeg
+  // If image failed to load, show cognite_logo.png
   if (imageError) {
     return (
       <div
@@ -623,7 +623,7 @@ function ProviderLogo({ provider, logoUrl }: { provider: string | null; logoUrl:
         }}
       >
         <Image
-          src="/cognite_logo.jpeg"
+          src="/cognite_logo.png"
           alt="Cognite logo"
           width={120}
           height={72}
@@ -660,7 +660,7 @@ function ProviderLogo({ provider, logoUrl }: { provider: string | null; logoUrl:
           maxHeight: '100%'
         }}
         onError={() => {
-          // Fallback to cognite_logo.jpeg if logo fails to load
+          // Fallback to cognite_logo.png if logo fails to load
           setImageError(true)
         }}
       />

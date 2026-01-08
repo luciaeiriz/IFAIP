@@ -21,7 +21,6 @@ export default function CourseForm({ course, onSave, onCancel }: CourseFormProps
     duration: '',
     tag: '' as CourseTag | '',
     external_url: '',
-    priority: '',
     rating: '',
     reviews: '',
     course_type: '',
@@ -34,7 +33,6 @@ export default function CourseForm({ course, onSave, onCancel }: CourseFormProps
     price_label: '',
     source: 'admin',
     signup_enabled: true,
-    is_featured: false,
   })
 
   useEffect(() => {
@@ -49,7 +47,6 @@ export default function CourseForm({ course, onSave, onCancel }: CourseFormProps
         duration: course.duration || '',
         tag: course.tags?.[0] || '',
         external_url: course.external_url || '',
-        priority: course.priority?.toString() || '',
         rating: course.rating?.toString() || '',
         reviews: course.reviews?.toString() || '',
         course_type: course.course_type || '',
@@ -62,7 +59,6 @@ export default function CourseForm({ course, onSave, onCancel }: CourseFormProps
         price_label: course.price_label || '',
         source: course.source || 'admin',
         signup_enabled: course.signup_enabled ?? true,
-        is_featured: course.is_featured ?? false,
       })
     }
   }, [course])
@@ -86,7 +82,6 @@ export default function CourseForm({ course, onSave, onCancel }: CourseFormProps
         duration: formData.duration || null,
         tag: formData.tag || null,
         external_url: formData.external_url || null,
-        priority: formData.priority ? parseInt(formData.priority) : null,
         rating: formData.rating ? parseFloat(formData.rating) : null,
         reviews: formData.reviews ? parseInt(formData.reviews) : null,
         course_type: formData.course_type || null,
@@ -99,7 +94,6 @@ export default function CourseForm({ course, onSave, onCancel }: CourseFormProps
         price_label: formData.price_label || null,
         source: formData.source,
         signup_enabled: formData.signup_enabled,
-        is_featured: formData.is_featured,
       }
 
       const url = course
@@ -250,19 +244,6 @@ export default function CourseForm({ course, onSave, onCancel }: CourseFormProps
               type="url"
               value={formData.external_url}
               onChange={(e) => setFormData({ ...formData, external_url: e.target.value })}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-[#36498C] focus:outline-none focus:ring-1 focus:ring-[#36498C]"
-            />
-          </div>
-
-          {/* Priority */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Priority (lower = higher priority)
-            </label>
-            <input
-              type="number"
-              value={formData.priority}
-              onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
               className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-[#36498C] focus:outline-none focus:ring-1 focus:ring-[#36498C]"
             />
           </div>
@@ -424,16 +405,6 @@ export default function CourseForm({ course, onSave, onCancel }: CourseFormProps
               className="rounded border-gray-300 text-[#36498C] focus:ring-[#36498C]"
             />
             <span className="ml-2 text-sm text-gray-700">Signup Enabled</span>
-          </label>
-
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              checked={formData.is_featured}
-              onChange={(e) => setFormData({ ...formData, is_featured: e.target.checked })}
-              className="rounded border-gray-300 text-[#36498C] focus:ring-[#36498C]"
-            />
-            <span className="ml-2 text-sm text-gray-700">Featured Course</span>
           </label>
         </div>
 

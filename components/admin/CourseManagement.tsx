@@ -17,7 +17,6 @@ export default function CourseManagement() {
   const [searchQuery, setSearchQuery] = useState('')
   const [tagFilter, setTagFilter] = useState<CourseTag | 'all'>('all')
   const [levelFilter, setLevelFilter] = useState<string>('all')
-  const [featuredFilter, setFeaturedFilter] = useState<string>('all')
 
   useEffect(() => {
     fetchCourses()
@@ -25,7 +24,7 @@ export default function CourseManagement() {
 
   useEffect(() => {
     filterCourses()
-  }, [courses, searchQuery, tagFilter, levelFilter, featuredFilter])
+  }, [courses, searchQuery, tagFilter, levelFilter])
 
   const fetchCourses = async () => {
     try {
@@ -60,12 +59,6 @@ export default function CourseManagement() {
     // Level filter
     if (levelFilter !== 'all') {
       filtered = filtered.filter(course => course.level === levelFilter)
-    }
-
-    // Featured filter
-    if (featuredFilter !== 'all') {
-      const isFeatured = featuredFilter === 'yes'
-      filtered = filtered.filter(course => course.is_featured === isFeatured)
     }
 
     setFilteredCourses(filtered)
@@ -111,14 +104,12 @@ export default function CourseManagement() {
 
   const handleExport = () => {
     const csv = [
-      ['Title', 'Provider', 'Tag', 'Level', 'Priority', 'Featured', 'Rating', 'URL'],
+      ['Title', 'Provider', 'Tag', 'Level', 'Rating', 'URL'],
       ...filteredCourses.map(c => [
         `"${c.title}"`,
         `"${c.provider || ''}"`,
         c.tags?.[0] || '',
         c.level || '',
-        c.priority?.toString() || '',
-        c.is_featured ? 'Yes' : 'No',
         c.rating?.toString() || '',
         c.external_url || ''
       ])
@@ -170,7 +161,7 @@ export default function CourseManagement() {
         <>
           {/* Filters */}
           <div className="bg-white rounded-lg border border-gray-200 p-4">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">
                   Search
@@ -211,20 +202,6 @@ export default function CourseManagement() {
                   <option value="Beginner">Beginner</option>
                   <option value="Intermediate">Intermediate</option>
                   <option value="Advanced">Advanced</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">
-                  Featured
-                </label>
-                <select
-                  value={featuredFilter}
-                  onChange={(e) => setFeaturedFilter(e.target.value)}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#36498C] focus:ring-1 focus:ring-[#36498C]"
-                >
-                  <option value="all">All</option>
-                  <option value="yes">Featured</option>
-                  <option value="no">Not Featured</option>
                 </select>
               </div>
             </div>

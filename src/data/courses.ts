@@ -163,41 +163,90 @@ export async function getAllCourses(): Promise<Course[]> {
 }
 
 /**
- * Fetches courses filtered by tag - uses relevancy columns for ranking
+ * Helper function to get the relevancy column name for a given tag
  */
-export async function getCoursesByTag(tag: CourseTag): Promise<Course[]> {
-  try {
-    console.log(`🏷️ getCoursesByTag: Fetching courses for tag "${tag}"...`)
-    
-    // Determine which relevancy column to use based on tag
-    const relevancyColumn = tag === 'Business' 
-      ? 'business_relevancy' 
-      : tag === 'Restaurant' 
-      ? 'restaurant_relevancy' 
-      : 'fleet_relevancy'
-    
-    console.log(`🏷️ Using relevancy column: ${relevancyColumn}`)
-    
-    // Query all courses, ordered by relevancy (lower number = higher relevancy)
-    // Filter out courses where relevancy is null for this category
-    const { data, error, count } = await supabase
-      .from('courses')
-      .select('*', { count: 'exact' })
-      .not(relevancyColumn, 'is', null)
-      .order(relevancyColumn, { ascending: true, nullsFirst: false })
+export function getRelevancyColumn(tag: CourseTag): string {
+  return tag === 'Business' 
+    ? 'business_relevancy' 
+    : tag === 'Restaurant' 
+    ? 'restaurant_relevancy' 
+    : 'fleet_relevancy'
+}
 
+/**
+ * Base internal function - fetches courses with flexible options
+ * This is the single source of truth for course fetching logic
+ * Returns courses with relevancy data preserved (even though Course type doesn't include it)
+ */
+async function getCoursesByTagInternal(
+  tag: CourseTag, 
+  options: {
+    includeHidden?: boolean
+    limit?: number
+  } = {}
+): Promise<Course[]> {
+  try {
+    const { includeHidden = false, limit } = options
+    const relevancyColumn = getRelevancyColumn(tag)
+    
+    console.log(`🏷️ getCoursesByTagInternal: Fetching courses for tag "${tag}" (includeHidden: ${includeHidden}, limit: ${limit || 'none'})...`)
+    console.log(`🏷️ IMPORTANT: NO tag filter, NO signup_enabled filter - getting ALL courses sorted by ${relevancyColumn}`)
+    console.log(`🏷️ Ordering by: ${relevancyColumn} (ascending, nullsLast)`)
+    
+    // Build query step by step - Supabase queries are chainable
+    // CRITICAL: NO FILTERING BY TAG OR signup_enabled - get ALL courses, sort by relevancy score
+    // The relevancy score determines which page the course appears on, not the tag field
+    let query = supabase
+      .from('courses')
+      .select('*')
+      // NO .eq('tag', tag) - we want ALL courses, not filtered by tag
+      // NO .eq('signup_enabled', true) - we want ALL courses regardless of signup_enabled
+    
+    // Order by relevancy column (lower number = higher priority)
+    // This determines which courses appear on each page
+    query = query.order(relevancyColumn || 'priority', { ascending: true, nullsLast: true })
+    
+    // Apply limit AFTER ordering to ensure we get the top N courses
+    if (limit) {
+      query = query.limit(limit)
+      console.log(`🏷️ Limiting to ${limit} courses`)
+    }
+    
+    const { data, error } = await query
+    
+    // Log the actual results to debug
+    console.log(`🏷️ Query executed: returned ${data?.length || 0} courses (limit was ${limit || 'none'})`)
+    if (data && data.length > 0) {
+      console.log(`🏷️ Relevancy scores for returned courses:`, data.map((r: any) => ({
+        id: r.id,
+        title: r.title,
+        [relevancyColumn]: r[relevancyColumn],
+        signup_enabled: r.signup_enabled
+      })))
+    }
+    if (data && limit && data.length > limit) {
+      console.error(`❌ ERROR: Query returned ${data.length} courses but limit was ${limit}! This should not happen.`)
+    }
+    
     if (error) {
-      console.error('❌ getCoursesByTag DATABASE ERROR:', error)
+      console.error('❌ getCoursesByTagInternal DATABASE ERROR:', error)
       console.error('Error code:', error.code)
       console.error('Error message:', error.message)
       
-      // Fallback: try using tag column for backward compatibility
-      console.warn('⚠️ Falling back to tag-based filtering...')
-      const { data: fallbackData, error: fallbackError } = await supabase
+      // Fallback: try using priority if relevancy column doesn't exist
+      console.warn('⚠️ Falling back to priority-based ordering...')
+      let fallbackQuery = supabase
         .from('courses')
-        .select('*', { count: 'exact' })
-        .eq('tag', tag)
-        .order('priority', { ascending: true, nullsFirst: false })
+        .select('*')
+        // NO .eq('tag', tag) - get ALL courses
+      
+      fallbackQuery = fallbackQuery.order('priority', { ascending: true, nullsLast: true })
+      
+      if (limit) {
+        fallbackQuery = fallbackQuery.limit(limit)
+      }
+      
+      const { data: fallbackData, error: fallbackError } = await fallbackQuery
       
       if (fallbackError) {
         console.error('❌ Fallback query also failed:', fallbackError)
@@ -205,40 +254,159 @@ export async function getCoursesByTag(tag: CourseTag): Promise<Course[]> {
       }
       
       const transformed = (fallbackData || []).map(transformCourse)
-      console.log(`🏷️ getCoursesByTag (fallback): Returned ${transformed.length} courses`)
+      console.log(`🏷️ getCoursesByTagInternal (fallback): Returned ${transformed.length} courses`)
       return transformed
     }
-
-    console.log(`🏷️ getCoursesByTag: Database returned ${data?.length || 0} courses (count: ${count})`)
     
     if (!data || data.length === 0) {
-      console.warn(`⚠️ getCoursesByTag: No courses found for tag "${tag}"`)
+      console.warn(`⚠️ getCoursesByTagInternal: No courses found for tag "${tag}"`)
       return []
     }
-
-    console.log(`🏷️ Transforming ${data.length} courses...`)
-    const transformed = data.map(transformCourse)
     
-    console.log(`🏷️ getCoursesByTag: Successfully returned ${transformed.length} courses for tag "${tag}"`)
-    if (transformed.length > 0) {
-      console.log('Sample transformed course:', {
-        id: transformed[0].id,
-        title: transformed[0].title,
-        tags: transformed[0].tags,
-        headline: transformed[0].headline,
-        bullet_points: transformed[0].bullet_points,
-        business_relevancy: data[0].business_relevancy,
-        restaurant_relevancy: data[0].restaurant_relevancy,
-        fleet_relevancy: data[0].fleet_relevancy,
-      })
+    // Transform courses - relevancy data exists in raw rows but Course type doesn't include it
+    // The calling code can access it via type assertion if needed (CourseWithRelevancy)
+    let transformed = data.map(transformCourse)
+    
+    // CRITICAL: Enforce limit in case database returns more than requested
+    // This ensures we NEVER return more courses than the limit
+    if (limit && transformed.length > limit) {
+      console.warn(`⚠️ WARNING: Database returned ${transformed.length} courses but limit is ${limit}. Truncating to ${limit}.`)
+      transformed = transformed.slice(0, limit)
     }
-
+    
+    console.log(`🏷️ getCoursesByTagInternal: Successfully returned ${transformed.length} courses for tag "${tag}" (limit was ${limit || 'none'})`)
+    
     return transformed
   } catch (error: any) {
-    console.error('❌ getCoursesByTag EXCEPTION:', error)
+    console.error('❌ getCoursesByTagInternal EXCEPTION:', error)
     console.error('Exception message:', error?.message)
     return []
   }
+}
+
+/**
+ * Interface for courses with relevancy data (used by admin management)
+ */
+export interface CourseWithRelevancy extends Course {
+  business_relevancy?: number | null
+  restaurant_relevancy?: number | null
+  fleet_relevancy?: number | null
+}
+
+/**
+ * For course pages - returns exactly 10 courses sorted by relevancy (no signup_enabled filter)
+ */
+export async function getCoursesByTag(tag: CourseTag): Promise<Course[]> {
+  return getCoursesByTagInternal(tag, { includeHidden: true, limit: 10 })
+}
+
+/**
+ * For admin management - returns courses with relevancy data preserved
+ * This ensures the management tool shows exactly what course pages display
+ */
+export async function getCoursesByTagWithRelevancy(
+  tag: CourseTag,
+  options: { includeHidden?: boolean; limit?: number } = {}
+): Promise<CourseWithRelevancy[]> {
+  const { includeHidden = false, limit = 10 } = options
+  const relevancyColumn = getRelevancyColumn(tag)
+  
+  try {
+    console.log(`🏷️ getCoursesByTagWithRelevancy: Fetching courses for tag "${tag}" with relevancy data...`)
+    
+    // Build query - same logic as getCoursesByTagInternal but preserve relevancy data
+    let query = supabase
+      .from('courses')
+      .select('*')
+      .eq('tag', tag)
+    
+    if (!includeHidden) {
+      query = query.eq('signup_enabled', true)
+    }
+    
+    query = query.order(relevancyColumn || 'priority', { ascending: true, nullsLast: true })
+    
+    if (limit) {
+      query = query.limit(limit)
+    }
+    
+    const { data, error } = await query
+    
+    if (error) {
+      console.error('❌ getCoursesByTagWithRelevancy DATABASE ERROR:', error)
+      // Fallback to priority-based ordering
+      let fallbackQuery = supabase
+        .from('courses')
+        .select('*')
+        .eq('tag', tag)
+      
+      if (!includeHidden) {
+        fallbackQuery = fallbackQuery.eq('signup_enabled', true)
+      }
+      
+      fallbackQuery = fallbackQuery.order('priority', { ascending: true, nullsLast: true })
+      
+      if (limit) {
+        fallbackQuery = fallbackQuery.limit(limit)
+      }
+      
+      const { data: fallbackData, error: fallbackError } = await fallbackQuery
+      
+      if (fallbackError) {
+        console.error('❌ Fallback query also failed:', fallbackError)
+        return []
+      }
+      
+      // Transform with relevancy data preserved
+      const coursesWithRelevancy = (fallbackData || []).map(row => ({
+        ...transformCourse(row),
+        business_relevancy: row.business_relevancy ?? null,
+        restaurant_relevancy: row.restaurant_relevancy ?? null,
+        fleet_relevancy: row.fleet_relevancy ?? null,
+      })) as CourseWithRelevancy[]
+      
+      // Enforce limit
+      const result = limit && coursesWithRelevancy.length > limit 
+        ? coursesWithRelevancy.slice(0, limit)
+        : coursesWithRelevancy
+      
+      console.log(`🏷️ getCoursesByTagWithRelevancy (fallback): Returned ${result.length} courses`)
+      return result
+    }
+    
+    if (!data || data.length === 0) {
+      console.warn(`⚠️ getCoursesByTagWithRelevancy: No courses found for tag "${tag}"`)
+      return []
+    }
+    
+    // Transform courses and PRESERVE relevancy data from raw database rows
+    // This maintains the exact order from the database query
+    let coursesWithRelevancy = data.map(row => ({
+      ...transformCourse(row),
+      business_relevancy: row.business_relevancy ?? null,
+      restaurant_relevancy: row.restaurant_relevancy ?? null,
+      fleet_relevancy: row.fleet_relevancy ?? null,
+    })) as CourseWithRelevancy[]
+    
+    // Enforce limit
+    if (limit && coursesWithRelevancy.length > limit) {
+      console.warn(`⚠️ WARNING: Database returned ${coursesWithRelevancy.length} courses but limit is ${limit}. Truncating to ${limit}.`)
+      coursesWithRelevancy = coursesWithRelevancy.slice(0, limit)
+    }
+    
+    console.log(`🏷️ getCoursesByTagWithRelevancy: Successfully returned ${coursesWithRelevancy.length} courses for tag "${tag}"`)
+    return coursesWithRelevancy
+  } catch (error: any) {
+    console.error('❌ getCoursesByTagWithRelevancy EXCEPTION:', error)
+    return []
+  }
+}
+
+/**
+ * For admin management - returns all courses (visible + hidden) for management
+ */
+export async function getCoursesByTagForManagement(tag: CourseTag): Promise<Course[]> {
+  return getCoursesByTagInternal(tag, { includeHidden: true, limit: 100 })
 }
 
 /**
@@ -281,10 +449,12 @@ export async function getFeaturedCourses(): Promise<Course[]> {
     console.log('⭐ getFeaturedCourses: Fetching featured courses from database...')
     
     // Query database directly for featured courses
+    // Only show courses where signup_enabled is true (visible courses)
     const { data, error } = await supabase
       .from('courses')
       .select('*')
       .eq('is_featured', true)
+      .eq('signup_enabled', true)
       .order('priority', { ascending: true, nullsFirst: false })
 
     if (error) {

@@ -153,8 +153,8 @@ export default function CourseDetailPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <div style={{ backgroundColor: '#F3F6FC', height: '463px' }}>
-        <div className="mx-auto max-w-7xl py-16" style={{ paddingLeft: '0', paddingRight: '24px' }}>
+      <div style={{ backgroundColor: '#F3F6FC', minHeight: '463px', paddingBottom: '0px', overflow: 'visible', position: 'relative' }}>
+        <div className="mx-auto max-w-7xl py-16" style={{ paddingLeft: '0', paddingRight: '24px', overflow: 'visible', height: '537px' }}>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Left side - Hero content (2/3 width) */}
             <div className="lg:col-span-2" style={{ marginLeft: '-24px', paddingLeft: '24px' }}>
@@ -195,6 +195,20 @@ export default function CourseDetailPage() {
                 </p>
               )}
 
+              {/* Instructor */}
+              {course.instructors && (
+                <p 
+                  className="mb-8 text-gray-700"
+                  style={{
+                    fontSize: '16px',
+                    fontFamily: '"Source Sans Pro", Arial, sans-serif',
+                    fontWeight: 400
+                  }}
+                >
+                  Instructor: <span style={{ textDecoration: 'underline' }}>{course.instructors}</span>
+                </p>
+              )}
+
               {/* Sign Up Button */}
               <div className="mb-8">
                 {course.external_url ? (
@@ -202,16 +216,16 @@ export default function CourseDetailPage() {
                     href={course.external_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block rounded-lg text-center text-base font-bold text-white shadow-lg transition-all hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#0156D2] focus:ring-offset-2"
-                    style={{ backgroundColor: '#0156D2', width: '285px', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    className="block rounded-lg text-center font-bold text-white shadow-lg transition-all hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#0156D2] focus:ring-offset-2"
+                    style={{ backgroundColor: '#0156D2', width: '285px', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}
                   >
                     Enroll Now
                   </a>
                 ) : course.signup_enabled ? (
                   <Link
                     href={`/signup/${course.id}`}
-                    className="block rounded-lg text-center text-base font-bold text-white shadow-lg transition-all hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#0156D2] focus:ring-offset-2"
-                    style={{ backgroundColor: '#0156D2', width: '285px', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    className="block rounded-lg text-center font-bold text-white shadow-lg transition-all hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#0156D2] focus:ring-offset-2"
+                    style={{ backgroundColor: '#0156D2', width: '285px', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}
                   >
                     Sign Up Now
                   </Link>
@@ -231,41 +245,41 @@ export default function CourseDetailPage() {
           </div>
           
           {/* Meta Info Card - Single white card with dividers - Full width */}
-          <div className="rounded-lg bg-white p-6 shadow-sm mb-8" style={{ marginLeft: '-24px', paddingLeft: '24px', marginRight: '-24px', paddingRight: '24px' }}>
+          <div className="rounded-lg bg-white p-6 mb-0 relative z-10" style={{ marginLeft: '-24px', paddingLeft: '24px', marginRight: '-24px', paddingRight: '24px', marginBottom: '0', position: 'absolute', top: '478px', width: '1342px', height: '116px', boxShadow: '0 12px 40px rgba(0, 0, 0, 0.18), 0 6px 16px rgba(0, 0, 0, 0.12)' }}>
             <div className="flex flex-wrap items-center divide-x divide-gray-200">
               {course.duration && (
                 <div className="flex-1 min-w-[150px] px-4 first:pl-0">
-                  <div className="text-base font-bold text-gray-900 mb-1">{course.duration}</div>
-                  <div className="text-sm text-gray-500">Duration</div>
+                  <div className="font-bold text-gray-900 mb-1" style={{ fontSize: '20px' }}>{course.duration}</div>
+                  <div className="text-gray-500" style={{ fontSize: '14px' }}>Duration</div>
                 </div>
               )}
               {course.level && (
                 <div className="flex-1 min-w-[150px] px-4">
-                  <div className="text-base font-bold text-gray-900 mb-1">{course.level}</div>
-                  <div className="text-sm text-gray-500">Level</div>
+                  <div className="font-bold text-gray-900 mb-1" style={{ fontSize: '20px' }}>{course.level}</div>
+                  <div className="text-gray-500" style={{ fontSize: '14px' }}>Level</div>
                 </div>
               )}
               {course.rating && (
                 <div className="flex-1 min-w-[150px] px-4">
-                  <div className="flex items-center gap-1 text-base font-bold text-gray-900 mb-1">
+                  <div className="flex items-center gap-1 font-bold text-gray-900 mb-1" style={{ fontSize: '20px' }}>
                     <span className="text-blue-500">★</span>
                     {course.rating.toFixed(1)}
                   </div>
-                  <div className="text-sm text-gray-500">
+                  <div className="text-gray-500" style={{ fontSize: '14px' }}>
                     {course.reviews ? `(${course.reviews} reviews)` : 'Rating'}
                   </div>
                 </div>
               )}
               {course.effort && (
                 <div className="flex-1 min-w-[150px] px-4">
-                  <div className="text-base font-bold text-gray-900 mb-1">{course.effort}</div>
-                  <div className="text-sm text-gray-500">Effort</div>
+                  <div className="font-bold text-gray-900 mb-1" style={{ fontSize: '20px' }}>{course.effort}</div>
+                  <div className="text-gray-500" style={{ fontSize: '14px' }}>Effort</div>
                 </div>
               )}
               {course.price_label && (
                 <div className="flex-1 min-w-[150px] px-4">
-                  <div className="text-base font-bold text-gray-900 mb-1">{course.price_label}</div>
-                  <div className="text-sm text-gray-500">Price</div>
+                  <div className="font-bold text-gray-900 mb-1" style={{ fontSize: '20px' }}>{course.price_label}</div>
+                  <div className="text-gray-500" style={{ fontSize: '14px' }}>Price</div>
                 </div>
               )}
             </div>
@@ -274,13 +288,13 @@ export default function CourseDetailPage() {
       </div>
 
       {/* Main Content Section */}
-      <div className="bg-white w-full">
+      <div className="bg-white w-full relative" style={{ marginTop: '0', paddingTop: '24px' }}>
         <div className="mx-auto max-w-7xl py-12" style={{ paddingLeft: '0', paddingRight: '24px' }}>
           <div className="grid grid-cols-1 gap-8">
             {/* Main Content (full width) */}
             <div style={{ marginLeft: '-24px', paddingLeft: '24px' }}>
             {/* Tab Navigation */}
-            <div className="mb-6 border-b border-gray-200 sticky top-[95px] bg-white z-30 pb-0">
+            <div className="mb-6 border-b border-gray-200 bg-white pb-0" style={{ marginTop: '20px' }}>
               <nav className="flex space-x-1" aria-label="Tabs">
                 <button
                   onClick={() => scrollToSection('section-about', 'about')}
@@ -345,7 +359,7 @@ export default function CourseDetailPage() {
             <div className="space-y-8">
               {/* About Section */}
               <section id="section-about" className="scroll-mt-24">
-                <h2 className="mb-6 text-3xl font-bold text-gray-900">
+                <h2 className="mb-6 text-3xl font-bold text-gray-900" style={{ fontSize: '20px' }}>
                   About This Course
                 </h2>
                 <div className="prose prose-lg max-w-none">
@@ -364,7 +378,7 @@ export default function CourseDetailPage() {
               {/* What You'll Learn Section */}
               {keySkills.length > 0 && (
                 <section id="section-learn" className="scroll-mt-24">
-                  <h2 className="mb-6 text-3xl font-bold text-gray-900">
+                  <h2 className="mb-6 text-3xl font-bold text-gray-900" style={{ fontSize: '20px' }}>
                     What You'll Learn
                   </h2>
                   <div className="space-y-3">
@@ -393,7 +407,7 @@ export default function CourseDetailPage() {
               {/* Curriculum Section */}
               {modules.length > 0 && (
                 <section id="section-curriculum" className="scroll-mt-24">
-                  <h2 className="mb-6 text-3xl font-bold text-gray-900">
+                  <h2 className="mb-6 text-3xl font-bold text-gray-900" style={{ fontSize: '20px' }}>
                     Course Curriculum
                   </h2>
                   <div className="space-y-4">
@@ -417,32 +431,52 @@ export default function CourseDetailPage() {
               {/* Information Section */}
               {(course.instructors || course.effort || course.languages || course.free_trial) && (
                 <section id="section-information" className="scroll-mt-24">
-                  <h2 className="mb-6 text-3xl font-bold text-gray-900">
+                  <h2 className="mb-6 text-3xl font-bold text-gray-900" style={{ fontSize: '20px' }}>
                     Course Information
                   </h2>
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     {course.instructors && (
-                      <div>
-                        <div className="mb-1 text-sm font-semibold text-gray-600">Instructors</div>
-                        <div className="text-gray-900">{course.instructors}</div>
+                      <div className="flex items-start gap-3">
+                        <svg className="w-5 h-5 text-gray-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        <div className="flex-1">
+                          <div className="mb-1 text-sm font-semibold text-gray-600">Instructors</div>
+                          <div className="text-gray-900">{course.instructors}</div>
+                        </div>
                       </div>
                     )}
                     {course.effort && (
-                      <div>
-                        <div className="mb-1 text-sm font-semibold text-gray-600">Effort Required</div>
-                        <div className="text-gray-900">{course.effort}</div>
+                      <div className="flex items-start gap-3">
+                        <svg className="w-5 h-5 text-gray-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div className="flex-1">
+                          <div className="mb-1 text-sm font-semibold text-gray-600">Effort Required</div>
+                          <div className="text-gray-900">{course.effort}</div>
+                        </div>
                       </div>
                     )}
                     {course.languages && (
-                      <div>
-                        <div className="mb-1 text-sm font-semibold text-gray-600">Languages</div>
-                        <div className="text-gray-900">{course.languages}</div>
+                      <div className="flex items-start gap-3">
+                        <svg className="w-5 h-5 text-gray-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                        </svg>
+                        <div className="flex-1">
+                          <div className="mb-1 text-sm font-semibold text-gray-600">Languages</div>
+                          <div className="text-gray-900">{course.languages}</div>
+                        </div>
                       </div>
                     )}
                     {course.free_trial && (
-                      <div>
-                        <div className="mb-1 text-sm font-semibold text-gray-600">Free Trial</div>
-                        <div className="text-gray-900">{course.free_trial}</div>
+                      <div className="flex items-start gap-3">
+                        <svg className="w-5 h-5 text-gray-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div className="flex-1">
+                          <div className="mb-1 text-sm font-semibold text-gray-600">Free Trial</div>
+                          <div className="text-gray-900">{course.free_trial}</div>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -451,7 +485,7 @@ export default function CourseDetailPage() {
 
               {/* Details Section */}
               <section id="section-details" className="scroll-mt-24">
-                <h2 className="mb-6 text-3xl font-bold text-gray-900">
+                <h2 className="mb-6 text-3xl font-bold text-gray-900" style={{ fontSize: '20px' }}>
                   Course Details
                 </h2>
                 {/* Price Display */}
