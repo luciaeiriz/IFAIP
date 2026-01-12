@@ -298,30 +298,20 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-white overflow-hidden">
-      {/* Split Layout Section */}
-      <section className="relative h-[calc(100vh-4rem)] w-full">
+      {/* Hero Section */}
+      <section className="relative w-full h-[60vh] md:h-[70vh] lg:h-[calc(100vh-107px)] min-h-[400px] md:min-h-[500px]">
         {/* Full-width Video Background */}
         <div 
           className="absolute inset-0 w-full h-full overflow-hidden"
         >
           {/* Background Video - Zoomed in to fill space */}
-          <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute inset-0 overflow-hidden hero-video-container w-full h-full">
             <video
               autoPlay
               loop
               muted
               playsInline
-              className="absolute"
-              style={{ 
-                width: '150%', 
-                height: '150%', 
-                objectFit: 'cover',
-                objectPosition: 'center',
-                top: '-25%',
-                left: '-25%',
-                minWidth: '100%',
-                minHeight: '100%'
-              }}
+              className="absolute hero-video"
             >
               <source src="/hero_video.mp4" type="video/mp4" />
             </video>
@@ -330,13 +320,13 @@ export default function HomePage() {
           </div>
           
           {/* Content Overlay - Positioned on left side */}
-          <div className="relative z-10 flex flex-col items-start justify-center h-full px-6 sm:px-8 lg:px-12 xl:px-16 py-16 lg:py-24 text-left" style={{ maxWidth: '750px', transform: 'translateY(-30px)' }}>
+          <div className="relative z-10 flex flex-col items-start justify-center h-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-8 md:py-12 lg:py-24 text-left lg:max-w-[750px] lg:-translate-y-[30px]">
             {/* Main Mission Statement */}
             <h1 
-              className="text-white leading-[1.1] mb-8 w-full"
+              className="text-white leading-[1.1] mb-6 md:mb-8 w-full"
               style={{ 
                 fontFamily: '"Neue Haas Unica Pro", Helvetica, sans-serif',
-                fontSize: '36px',
+                fontSize: 'clamp(24px, 5vw, 36px)',
                 fontWeight: 400,
                 letterSpacing: '-0.02em',
                 textAlign: 'left'
@@ -349,7 +339,7 @@ export default function HomePage() {
             <a
               href="#courses"
               onClick={scrollToCourses}
-              className="inline-flex items-center justify-center bg-black text-white px-6 py-3 text-base font-medium hover:bg-gray-800 transition-colors"
+              className="inline-flex items-center justify-center bg-white text-black px-6 py-3 text-sm md:text-base font-medium hover:bg-gray-100 transition-colors"
               style={{ 
                 fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
               }}
@@ -357,107 +347,180 @@ export default function HomePage() {
               Learn more
             </a>
           </div>
-        </div>
 
-        {/* Right Section - Blue Background with Feature Cards - Overlaid on top */}
-        <div 
-          className="absolute top-0 right-0 w-full lg:w-[50%] h-full py-16 lg:py-24 flex flex-col justify-center z-20"
-          style={{ 
-            backgroundColor: '#030EF9',
-            clipPath: 'polygon(50% 0, 100% 0, 100% 100%, 0 100%, 15% 30%)',
-          }}
-        >
-          <div className="space-y-10" style={{ position: 'absolute', right: '50px', top: '220px', width: '483px' }}>
-            {featureCards.map((card, index) => (
-              <Link
-                key={index}
-                href={card.href}
-                className="block p-6 sm:p-8 hover:shadow-xl transition-all duration-300 overflow-hidden relative cursor-pointer"
-                style={{ 
-                  fontFamily: '"Helvetica Roman", Helvetica, sans-serif',
-                  transform: 'translateZ(0)',
-                  width: '483px',
-                  height: '200px',
-                  backgroundColor: '#353DFC',
-                  zIndex: 10,
-                }}
-              >
-                <div style={{ transform: 'translateY(-20px)', paddingTop: '10px' }}>
-                  <div className="mb-2">
-                    <span 
-                      className="text-sm text-white uppercase tracking-wider"
+          {/* Right Section - Blue Background with Feature Cards - Overlaid on desktop only */}
+          <div 
+            className="hidden lg:block absolute top-0 right-0 w-[50%] h-full py-16 lg:py-24 flex flex-col justify-center z-20 bg-[#030EF9]"
+            style={{ 
+              clipPath: 'polygon(50% 0, 100% 0, 100% 100%, 0 100%, 15% 30%)',
+            }}
+          >
+            <div className="space-y-10" style={{ position: 'absolute', right: '200px', top: '300px', width: '483px' }}>
+              {featureCards.map((card, index) => (
+                <Link
+                  key={index}
+                  href={card.href}
+                  className="block p-6 sm:p-8 hover:shadow-xl transition-all duration-300 overflow-hidden relative cursor-pointer"
+                  style={{ 
+                    fontFamily: '"Helvetica Roman", Helvetica, sans-serif',
+                    transform: 'translateZ(0)',
+                    width: '483px',
+                    height: '200px',
+                    backgroundColor: '#353DFC',
+                    zIndex: 10,
+                  }}
+                >
+                  <div style={{ transform: 'translateY(-20px)', paddingTop: '10px' }}>
+                    <div className="mb-2">
+                      <span 
+                        className="text-sm text-white uppercase tracking-wider"
+                        style={{ 
+                          fontFamily: '"Helvetica Roman", Helvetica, sans-serif',
+                          letterSpacing: '0.1em',
+                          fontWeight: 400
+                        }}
+                      >
+                        {card.label}
+                      </span>
+                    </div>
+                    <h2 
+                      className="text-sm text-white mb-3 leading-tight"
                       style={{ 
                         fontFamily: '"Helvetica Roman", Helvetica, sans-serif',
-                        letterSpacing: '0.1em',
+                        fontWeight: 700
+                      }}
+                    >
+                      {card.title}
+                    </h2>
+                    <p 
+                      className="text-sm text-white mb-3 leading-relaxed"
+                      style={{ 
+                        fontFamily: '"Helvetica Roman", Helvetica, sans-serif',
+                        lineHeight: '1.6',
                         fontWeight: 400
                       }}
                     >
-                      {card.label}
-                    </span>
+                      {card.description}
+                    </p>
+                    <div className="flex items-center justify-between pt-2 border-t border-white/30">
+                      <span 
+                        className="text-sm text-white/90"
+                        style={{ 
+                          fontFamily: '"Helvetica Roman", Helvetica, sans-serif',
+                          fontWeight: 400
+                        }}
+                      >
+                        {card.date}
+                      </span>
+                      <svg
+                        className="h-5 w-5 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2.5}
+                          d="M17 8l4 4m0 0l-4 4m4-4H3"
+                        />
+                      </svg>
+                    </div>
                   </div>
-                  <h2 
-                    className="text-sm text-white mb-3 leading-tight"
-                    style={{ 
-                      fontFamily: '"Helvetica Roman", Helvetica, sans-serif',
-                      fontWeight: 700
-                    }}
-                  >
-                    {card.title}
-                  </h2>
-                  <p 
-                    className="text-sm text-white mb-3 leading-relaxed"
-                    style={{ 
-                      fontFamily: '"Helvetica Roman", Helvetica, sans-serif',
-                      lineHeight: '1.6',
-                      fontWeight: 400
-                    }}
-                  >
-                    {card.description}
-                  </p>
-                  <div className="flex items-center justify-between pt-2 border-t border-white/30">
-                    <span 
-                      className="text-sm text-white/90"
-                      style={{ 
-                        fontFamily: '"Helvetica Roman", Helvetica, sans-serif',
-                        fontWeight: 400
-                      }}
-                    >
-                      {card.date}
-                    </span>
-                    {/* Arrow aligned with date */}
-                    <svg
-                      className="h-5 w-5 text-white"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-                        strokeWidth={2.5}
-                        d="M17 8l4 4m0 0l-4 4m4-4H3"
-          />
-        </svg>
-                  </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
+      {/* Blue Section - Feature Cards - Below hero on mobile/tablet */}
+      <section className="lg:hidden relative w-full py-12 md:py-16 flex flex-col justify-center bg-[#030EF9]">
+        <div className="space-y-6 md:space-y-8 px-4 sm:px-6 md:px-8 max-w-2xl mx-auto">
+          {featureCards.map((card, index) => (
+            <Link
+              key={index}
+              href={card.href}
+              className="block p-6 sm:p-8 hover:shadow-xl transition-all duration-300 overflow-hidden relative cursor-pointer w-full min-h-[180px]"
+              style={{ 
+                fontFamily: '"Helvetica Roman", Helvetica, sans-serif',
+                transform: 'translateZ(0)',
+                backgroundColor: '#353DFC',
+                zIndex: 10,
+              }}
+            >
+              <div>
+                <div className="mb-2">
+                  <span 
+                    className="text-sm text-white uppercase tracking-wider"
+                    style={{ 
+                      fontFamily: '"Helvetica Roman", Helvetica, sans-serif',
+                      letterSpacing: '0.1em',
+                      fontWeight: 400
+                    }}
+                  >
+                    {card.label}
+                  </span>
+                </div>
+                <h2 
+                  className="text-base md:text-lg text-white mb-3 leading-tight"
+                  style={{ 
+                    fontFamily: '"Helvetica Roman", Helvetica, sans-serif',
+                    fontWeight: 700
+                  }}
+                >
+                  {card.title}
+                </h2>
+                <p 
+                  className="text-sm md:text-base text-white mb-3 leading-relaxed"
+                  style={{ 
+                    fontFamily: '"Helvetica Roman", Helvetica, sans-serif',
+                    lineHeight: '1.6',
+                    fontWeight: 400
+                  }}
+                >
+                  {card.description}
+                </p>
+                <div className="flex items-center justify-between pt-2 border-t border-white/30">
+                  <span 
+                    className="text-sm text-white/90"
+                    style={{ 
+                      fontFamily: '"Helvetica Roman", Helvetica, sans-serif',
+                      fontWeight: 400
+                    }}
+                  >
+                    {card.date}
+                  </span>
+                  <svg
+                    className="h-5 w-5 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2.5}
+                      d="M17 8l4 4m0 0l-4 4m4-4H3"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       {/* Our courses and training Section */}
-      <section id="courses" className="bg-white py-16 lg:py-24 scroll-mt-24">
-        <div className="mx-auto" style={{ maxWidth: '100%', paddingLeft: '0', paddingRight: '0' }}>
+      <section id="courses" className="bg-white py-12 md:py-16 lg:py-24 scroll-mt-24">
+        <div className="mx-auto px-4 sm:px-6 md:px-8" style={{ maxWidth: '100%' }}>
           {/* Header */}
           <div 
-            className="mb-8" 
+            className="mb-6 md:mb-8" 
             style={{ 
               maxWidth: '1320px',
               marginLeft: 'auto',
-              marginRight: 'auto',
-              paddingLeft: '0',
-              paddingRight: '0'
+              marginRight: 'auto'
             }}
           >
             <div 
@@ -469,17 +532,17 @@ export default function HomePage() {
               }}
             />
             <h2 
-              className="font-bold text-black mb-6"
+              className="font-bold text-black mb-4 md:mb-6"
               style={{ 
                 fontFamily: '"Neue Haas Unica Pro", Helvetica, sans-serif',
-                fontSize: '32px'
+                fontSize: 'clamp(24px, 5vw, 32px)'
               }}
             >
               Latest
             </h2>
             
             {/* Navigation Tabs */}
-            <div className="flex flex-wrap items-baseline gap-4 border-b border-gray-200 pb-4" style={{ alignItems: 'baseline' }}>
+            <div className="flex flex-wrap items-baseline gap-2 md:gap-4 border-b border-gray-200 pb-3 md:pb-4 overflow-x-auto" style={{ alignItems: 'baseline' }}>
               <button 
                 className="text-sm font-medium text-gray-600 hover:text-black transition-colors cursor-pointer border-b-2 border-transparent pb-1"
                 style={{ 
@@ -593,13 +656,8 @@ export default function HomePage() {
 
           {/* Cards Grid */}
           <div 
-            className="grid grid-cols-1 md:grid-cols-2" 
+            className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 lg:gap-6" 
             style={{ 
-              gap: '20px', 
-              paddingLeft: '0', 
-              paddingRight: '0', 
-              margin: '0',
-              width: '100%',
               maxWidth: '1320px',
               marginLeft: 'auto',
               marginRight: 'auto'
@@ -609,32 +667,21 @@ export default function HomePage() {
               <Link 
                 key={card.id}
                 href={card.href}
-                className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow overflow-hidden flex relative group"
+                className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col md:flex-row relative group w-full"
                 style={{ 
                   backgroundColor: '#F2F2F2',
-                  width: '650px',
-                  height: '209px'
+                  minHeight: '209px'
                 }}
               >
                 <div 
-                  className="bg-gray-200 relative overflow-hidden"
-                  style={{
-                    width: '325px',
-                    height: '209px'
-                  }}
+                  className="bg-gray-200 relative overflow-hidden w-full md:w-1/2 flex-shrink-0 min-h-[150px] md:min-h-[209px]"
                 >
                   <div className={`absolute inset-0 bg-gradient-to-br ${card.imageColor} flex items-center justify-center`}>
-                    <span className="text-white text-sm font-medium">{card.label} Image</span>
+                    <span className="text-white text-xs md:text-sm font-medium">{card.label} Image</span>
                   </div>
                 </div>
                 <div 
-                  className="flex flex-col justify-end relative"
-                  style={{
-                    width: '325px',
-                    height: '209px',
-                    padding: '16px',
-                    boxSizing: 'border-box'
-                  }}
+                  className="flex flex-col justify-end relative w-full md:w-1/2 p-4 min-h-[150px] md:min-h-[209px]"
                 >
                   <div style={{ width: '100%', textAlign: 'left' }}>
                     <span 

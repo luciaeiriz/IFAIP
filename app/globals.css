@@ -48,3 +48,43 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Mobile/Tablet hero video - ensure it fills without dead spaces */
+@media (max-width: 1023px) {
+  .hero-video {
+    width: 120% !important;
+    height: 120% !important;
+    min-width: 100% !important;
+    min-height: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    top: -10% !important;
+    left: -10% !important;
+    position: absolute !important;
+  }
+  
+  .hero-video-container {
+    width: 100% !important;
+    height: 100% !important;
+    overflow: hidden !important;
+    position: relative !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .blue-section-desktop {
+    clip-path: polygon(50% 0, 100% 0, 100% 100%, 0 100%, 15% 30%);
+  }
+  
+  .hero-video {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    transform: scale(1.5) !important;
+    top: 0 !important;
+    left: 0 !important;
+    min-width: 100% !important;
+    min-height: 100% !important;
+  }
+}
+
