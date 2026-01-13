@@ -34,6 +34,7 @@ function transformCourse(row: DatabaseCourse): Course {
     is_featured: Boolean(row.is_featured ?? false),
     price_label: row.price_label || null,
     free_trial: row.free_trial || null,
+    logo_url: row.logo_url || null,
     created_at: row.created_at || null,
     updated_at: row.updated_at || null,
   }
