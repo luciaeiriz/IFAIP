@@ -27,6 +27,7 @@ export interface Course {
   is_featured: boolean
   price_label: string | null
   free_trial: string | null
+  logo_url: string | null  // Cached Logo.dev API URL for provider logo
   created_at: string | null
   updated_at: string | null
 }
@@ -56,6 +57,7 @@ export interface DatabaseCourse {
   signup_enabled: boolean
   is_featured: boolean
   price_label: string | null
+  logo_url: string | null  // Cached Logo.dev API URL for provider logo
   business_relevancy: number | null  // Relevancy rank for business owners (lower = higher relevancy)
   restaurant_relevancy: number | null  // Relevancy rank for restaurant owners (lower = higher relevancy)
   fleet_relevancy: number | null  // Relevancy rank for fleet managers (lower = higher relevancy)

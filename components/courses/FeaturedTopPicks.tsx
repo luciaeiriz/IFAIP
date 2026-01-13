@@ -27,9 +27,17 @@ export default function FeaturedTopPicks({ courses }: FeaturedTopPicksProps) {
   }
 
   // Generate logo URL from provider name or external_url
-  // Priority: Provider name first (more accurate), then external_url domain
-  const getLogoUrl = (provider: string | null, externalUrl: string | null): string | null => {
-    // First, try provider name mapping (most accurate)
+  // Priority: 1. logo_url from database (cached), 2. provider name mapping, 3. external_url domain
+  const getLogoUrl = (course: Course): string | null => {
+    // Priority 1: Use cached logo_url from database if available
+    if (course.logo_url && course.logo_url.trim() !== '') {
+      return course.logo_url
+    }
+    
+    const provider = course.provider
+    const externalUrl = course.external_url
+    
+    // Priority 2: Try provider name mapping (most accurate)
     if (provider && provider.trim() !== '') {
       // Normalize provider name: lowercase, trim, remove extra spaces
       const normalizedProvider = provider.toLowerCase().trim().replace(/\s+/g, ' ')
@@ -209,7 +217,7 @@ export default function FeaturedTopPicks({ courses }: FeaturedTopPicksProps) {
                     <div style={{ marginLeft: isMostPopular ? '-13px' : '-13px' }}>
                       <ProviderLogo 
                         provider={course.provider}
-                        logoUrl={getLogoUrl(course.provider, course.external_url)}
+                        logoUrl={getLogoUrl(course)}
                       />
                     </div>
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 
 async function getFallbackLogo(): Promise<Buffer> {
   try {
@@ -68,6 +69,60 @@ export async function GET(
   }
 
   try {
+    // Step 1: Check database for existing logo_url for this domain
+    // Find courses that match this domain (via external_url or provider)
+    console.log(`[Logo API] Checking database for cached logo_url for domain: ${domain}`)
+    
+    const { data: coursesWithLogo, error: dbError } = await supabaseAdmin
+      .from('courses')
+      .select('id, logo_url, external_url, provider')
+      .or(`external_url.ilike.%${domain}%,provider.ilike.%${domain}%`)
+      .not('logo_url', 'is', null)
+      .limit(1)
+    
+    if (dbError) {
+      console.warn(`[Logo API] Database query error (non-fatal):`, dbError)
+    }
+    
+    // If we found a cached logo_url, use it
+    if (coursesWithLogo && coursesWithLogo.length > 0 && coursesWithLogo[0].logo_url) {
+      const cachedLogoUrl = coursesWithLogo[0].logo_url
+      console.log(`[Logo API] ✅ Found cached logo_url in database: ${cachedLogoUrl.substring(0, 50)}...`)
+      
+      // Fetch the logo from the cached URL (Logo.dev CDN will handle caching)
+      try {
+        const cachedResponse = await fetch(cachedLogoUrl, {
+          signal: AbortSignal.timeout(10000),
+          headers: {
+            'User-Agent': 'IFAIP-Logo-Fetcher/1.0',
+          },
+        })
+        
+        if (cachedResponse.ok) {
+          const imageBuffer = await cachedResponse.arrayBuffer()
+          const contentType = cachedResponse.headers.get('content-type') || 'image/png'
+          const imageSize = imageBuffer.byteLength
+          
+          console.log(`[Logo API] ✅ Successfully fetched logo from cache (${imageSize} bytes / ${(imageSize / 1024).toFixed(2)}KB)`)
+          return new NextResponse(imageBuffer, {
+            status: 200,
+            headers: {
+              'Content-Type': contentType,
+              'Cache-Control': 'public, max-age=31536000, immutable', // Cache for 1 year
+            },
+          })
+        } else {
+          console.log(`[Logo API] ⚠️ Cached URL returned ${cachedResponse.status}, fetching fresh logo`)
+        }
+      } catch (cacheError) {
+        console.warn(`[Logo API] ⚠️ Error fetching cached logo (non-fatal):`, cacheError)
+        // Continue to fetch fresh logo below
+      }
+    } else {
+      console.log(`[Logo API] No cached logo_url found in database, fetching fresh logo`)
+    }
+    
+    // Step 2: Fetch fresh logo from Logo.dev API
     // Construct Logo.dev URL
     // Logo.dev uses 'token' parameter for both public (pk_) and secret (sk_) keys
     const logoUrl = `https://img.logo.dev/${domain}?token=${keyToUse}&size=128&format=png&theme=light&fallback=404`
@@ -169,6 +224,37 @@ export async function GET(
     const imageSize = imageBuffer.byteLength
     
     console.log(`[Logo API] ✅ Successfully fetched logo for domain: ${domain} (${imageSize} bytes / ${(imageSize / 1024).toFixed(2)}KB)`)
+    
+    // Step 3: Save logo_url to database for all courses matching this domain
+    // This avoids future API calls for the same domain
+    try {
+      // Find all courses that match this domain
+      const { data: matchingCourses, error: findError } = await supabaseAdmin
+        .from('courses')
+        .select('id, external_url, provider')
+        .or(`external_url.ilike.%${domain}%,provider.ilike.%${domain}%`)
+      
+      if (!findError && matchingCourses && matchingCourses.length > 0) {
+        // Update all matching courses with the logo_url
+        const courseIds = matchingCourses.map(c => c.id)
+        const { error: updateError } = await supabaseAdmin
+          .from('courses')
+          .update({ logo_url: logoUrl })
+          .in('id', courseIds)
+        
+        if (updateError) {
+          console.warn(`[Logo API] ⚠️ Failed to save logo_url to database (non-fatal):`, updateError)
+        } else {
+          console.log(`[Logo API] ✅ Saved logo_url to ${matchingCourses.length} course(s) in database`)
+        }
+      } else if (findError) {
+        console.warn(`[Logo API] ⚠️ Error finding courses to update (non-fatal):`, findError)
+      }
+    } catch (saveError) {
+      console.warn(`[Logo API] ⚠️ Error saving logo_url to database (non-fatal):`, saveError)
+      // Don't fail the request if saving fails - logo still works
+    }
+    
     console.log(`[Logo API] ===== REQUEST COMPLETE =====`)
     
     // Return the image with proper headers

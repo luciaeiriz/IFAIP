@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getCoursesByTag } from '@/src/data/courses'
 import { CourseTag } from '@/types/course'
 
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
