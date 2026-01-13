@@ -355,7 +355,7 @@ export default function HomePage() {
               clipPath: 'polygon(50% 0, 100% 0, 100% 100%, 0 100%, 15% 30%)',
             }}
           >
-            <div className="space-y-10" style={{ position: 'absolute', right: '200px', top: '300px', width: '483px' }}>
+            <div className="space-y-10" style={{ position: 'absolute', right: '130px', top: '250px', width: '483px' }}>
               {featureCards.map((card, index) => (
                 <Link
                   key={index}
