@@ -6,17 +6,17 @@ import { createLead, getUTMParams } from '@/lib/leads'
 import { CourseTag } from '@/types/course'
 
 interface EmailCaptureCTAProps {
-  tag?: CourseTag
+  tag?: CourseTag | string
 }
 
 export default function EmailCaptureCTA({ tag: tagProp }: EmailCaptureCTAProps = {}) {
   const searchParams = useSearchParams()
-  const [tag, setTag] = useState<CourseTag>(tagProp || 'Business')
+  const [tag, setTag] = useState<CourseTag>(tagProp && ['Business', 'Restaurant', 'Fleet'].includes(tagProp) ? tagProp as CourseTag : 'Business')
 
   useEffect(() => {
     // If tag prop is provided, use it; otherwise check search params
-    if (tagProp) {
-      setTag(tagProp)
+    if (tagProp && ['Business', 'Restaurant', 'Fleet'].includes(tagProp)) {
+      setTag(tagProp as CourseTag)
     } else {
       const tagParam = searchParams?.get('tag')
       if (tagParam && ['Business', 'Restaurant', 'Fleet'].includes(tagParam)) {
