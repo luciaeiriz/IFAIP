@@ -13,6 +13,7 @@ interface LandingPage {
   href: string
   description: string
   bgColor: string
+  heroTitle?: string | null
 }
 
 export default function Header() {
