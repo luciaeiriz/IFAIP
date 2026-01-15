@@ -113,10 +113,10 @@ export async function DELETE(
       // Try batch update first - update all courses at once
       // Note: We update ALL courses, setting the relevancy column to null
       // This is safe because NULL means "no relevancy score" for that landing page
-      const { error: updateError, count } = await supabaseAdmin
+      const { data: updatedCourses, error: updateError } = await supabaseAdmin
         .from('courses')
         .update(updateObj)
-        .select('id', { count: 'exact', head: true })
+        .select('id')
 
       if (updateError) {
         console.error(`⚠️ Batch update failed, trying individual updates:`, updateError)
@@ -150,7 +150,8 @@ export async function DELETE(
           console.error(`⚠️ Error fetching courses:`, fetchError)
         }
       } else {
-        console.log(`✅ Cleared relevancy scores for ${count || 'all'} courses`)
+        const updatedCount = updatedCourses?.length || 0
+        console.log(`✅ Cleared relevancy scores for ${updatedCount} courses`)
       }
     } catch (clearError: any) {
       console.error(`⚠️ Error clearing relevancy scores (continuing with deletion):`, clearError)
