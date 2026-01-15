@@ -387,7 +387,7 @@ export default function Header() {
                             landingPages.map((page) => {
                               // Use description field (NOT heroTitle) - truncate to consistent length (max 145 characters)
                               // Get description - handle null, undefined, empty string, or whitespace-only
-                              let description = page.description
+                              let description: string | null = page.description
                               if (description && typeof description === 'string') {
                                 description = description.trim()
                               } else {
@@ -718,7 +718,7 @@ export default function Header() {
                             landingPages.map((page) => {
                               // Use description field (NOT heroTitle) - truncate to consistent length (max 145 characters)
                               // Get description - handle null, undefined, empty string, or whitespace-only
-                              let description = page.description
+                              let description: string | null = page.description
                               if (description && typeof description === 'string') {
                                 description = description.trim()
                               } else {
