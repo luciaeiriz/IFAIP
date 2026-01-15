@@ -13,20 +13,33 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate tag
-    if (!['Business', 'Restaurant', 'Fleet'].includes(tag)) {
-      return NextResponse.json(
-        { error: 'Invalid tag. Must be Business, Restaurant, or Fleet' },
-        { status: 400 }
-      )
-    }
+    // Get relevancy column from landing_pages table (supports both legacy and dynamic tags)
+    let relevancyColumn: string
+    
+    // Check if it's a legacy tag
+    if (tag === 'Business') {
+      relevancyColumn = 'business_relevancy'
+    } else if (tag === 'Restaurant') {
+      relevancyColumn = 'restaurant_relevancy'
+    } else if (tag === 'Fleet') {
+      relevancyColumn = 'fleet_relevancy'
+    } else {
+      // For dynamic tags, fetch from landing_pages table
+      const { data: landingPage, error: landingPageError } = await supabaseAdmin
+        .from('landing_pages')
+        .select('relevancy_column')
+        .eq('tag', tag.toLowerCase())
+        .single()
 
-    // Get relevancy column
-    const relevancyColumn = tag === 'Business' 
-      ? 'business_relevancy' 
-      : tag === 'Restaurant' 
-      ? 'restaurant_relevancy' 
-      : 'fleet_relevancy'
+      if (landingPageError || !landingPage) {
+        return NextResponse.json(
+          { error: `Landing page not found for tag: ${tag}` },
+          { status: 404 }
+        )
+      }
+
+      relevancyColumn = landingPage.relevancy_column
+    }
 
     console.log(`💾 API: Saving order for ${tag} page`)
     console.log(`💾 API: Relevancy column: ${relevancyColumn}`)

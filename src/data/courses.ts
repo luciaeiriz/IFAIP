@@ -165,13 +165,31 @@ export async function getAllCourses(): Promise<Course[]> {
 
 /**
  * Helper function to get the relevancy column name for a given tag
+ * Supports both legacy tags (Business, Restaurant, Fleet) and dynamic tags from landing_pages table
  */
-export function getRelevancyColumn(tag: CourseTag): string {
-  return tag === 'Business' 
-    ? 'business_relevancy' 
-    : tag === 'Restaurant' 
-    ? 'restaurant_relevancy' 
-    : 'fleet_relevancy'
+export async function getRelevancyColumn(tag: string): Promise<string> {
+  // Check if it's a legacy tag
+  if (tag === 'Business') return 'business_relevancy'
+  if (tag === 'Restaurant') return 'restaurant_relevancy'
+  if (tag === 'Fleet') return 'fleet_relevancy'
+  
+  // For new tags, fetch from landing_pages table
+  try {
+    const { data } = await supabase
+      .from('landing_pages')
+      .select('relevancy_column')
+      .eq('tag', tag.toLowerCase())
+      .single()
+    
+    if (data?.relevancy_column) {
+      return data.relevancy_column
+    }
+  } catch (error) {
+    console.warn(`Could not fetch relevancy column for tag "${tag}":`, error)
+  }
+  
+  // Fallback: generate column name from tag
+  return `${tag.toLowerCase()}_relevancy`
 }
 
 /**
@@ -180,7 +198,7 @@ export function getRelevancyColumn(tag: CourseTag): string {
  * Returns courses with relevancy data preserved (even though Course type doesn't include it)
  */
 async function getCoursesByTagInternal(
-  tag: CourseTag, 
+  tag: CourseTag | string, 
   options: {
     includeHidden?: boolean
     limit?: number
@@ -188,7 +206,7 @@ async function getCoursesByTagInternal(
 ): Promise<Course[]> {
   try {
     const { includeHidden = false, limit } = options
-    const relevancyColumn = getRelevancyColumn(tag)
+    const relevancyColumn = await getRelevancyColumn(tag)
     
     console.log(`🏷️ getCoursesByTagInternal: Fetching courses for tag "${tag}" (includeHidden: ${includeHidden}, limit: ${limit || 'none'})...`)
     console.log(`🏷️ IMPORTANT: NO tag filter, NO signup_enabled filter - getting ALL courses sorted by ${relevancyColumn}`)
@@ -297,7 +315,7 @@ export interface CourseWithRelevancy extends Course {
 /**
  * For course pages - returns exactly 10 courses sorted by relevancy (no signup_enabled filter)
  */
-export async function getCoursesByTag(tag: CourseTag): Promise<Course[]> {
+export async function getCoursesByTag(tag: CourseTag | string): Promise<Course[]> {
   return getCoursesByTagInternal(tag, { includeHidden: true, limit: 10 })
 }
 
@@ -406,7 +424,7 @@ export async function getCoursesByTagWithRelevancy(
 /**
  * For admin management - returns all courses (visible + hidden) for management
  */
-export async function getCoursesByTagForManagement(tag: CourseTag): Promise<Course[]> {
+export async function getCoursesByTagForManagement(tag: CourseTag | string): Promise<Course[]> {
   return getCoursesByTagInternal(tag, { includeHidden: true, limit: 100 })
 }
 

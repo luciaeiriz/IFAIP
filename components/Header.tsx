@@ -7,11 +7,13 @@ import { usePathname } from 'next/navigation'
 import Logo from './Logo'
 import AdvertiserDisclosureModal from './ui/AdvertiserDisclosureModal'
 
-const courseCategories = [
-  { name: 'Business', href: '/courses/business' },
-  { name: 'Restaurant', href: '/courses/restaurant' },
-  { name: 'Fleet', href: '/courses/fleet' },
-]
+interface LandingPage {
+  tag: string
+  name: string
+  href: string
+  description: string
+  bgColor: string
+}
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -19,7 +21,65 @@ export default function Header() {
   const [breadcrumbCoursesDropdownOpen, setBreadcrumbCoursesDropdownOpen] = useState(false)
   const [disclosureModalOpen, setDisclosureModalOpen] = useState(false)
   const [coursesDropdownTimeout, setCoursesDropdownTimeout] = useState<NodeJS.Timeout | null>(null)
+  const [landingPages, setLandingPages] = useState<LandingPage[]>([])
   const pathname = usePathname()
+
+  // Fetch enabled landing pages
+  useEffect(() => {
+    const fetchLandingPages = async () => {
+      try {
+        // Add cache-busting query parameter to ensure fresh data
+        const response = await fetch(`/api/landing-pages?t=${Date.now()}`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        })
+        if (response.ok) {
+          const data = await response.json()
+          console.log('📋 Header: Fetched landing pages:', data.landingPages)
+          data.landingPages?.forEach((page: any) => {
+            console.log(`  - ${page.name}: description="${page.description}" (type: ${typeof page.description}, length: ${page.description?.length || 0})`)
+          })
+          setLandingPages(data.landingPages || [])
+        }
+      } catch (error) {
+        console.error('Error fetching landing pages:', error)
+      }
+    }
+    
+    // Initial fetch
+    fetchLandingPages()
+    
+    // Refetch when window gains focus (user switches back to tab)
+    // This helps catch changes made in another tab or after admin updates
+    const handleFocus = () => {
+      console.log('🔄 Header: Window focused, refreshing landing pages...')
+      fetchLandingPages()
+    }
+    
+    // Poll for changes every 5 seconds when tab is active
+    // This ensures admin changes are reflected quickly
+    const pollInterval = setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        fetchLandingPages()
+      }
+    }, 5000) // Poll every 5 seconds
+    
+    window.addEventListener('focus', handleFocus)
+    window.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        console.log('🔄 Header: Tab became visible, refreshing landing pages...')
+        fetchLandingPages()
+      }
+    })
+    
+    return () => {
+      clearInterval(pollInterval)
+      window.removeEventListener('focus', handleFocus)
+    }
+  }, [])
   
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -42,20 +102,31 @@ export default function Header() {
     ]
     
     if (pathname.startsWith('/courses')) {
-      items.push({ label: 'Courses', href: '/courses/business' })
+      const firstLandingPage = landingPages.length > 0 ? landingPages[0] : null
+      items.push({ label: 'Courses', href: firstLandingPage?.href || '/courses' })
       
-      // Check if it's a category page
-      if (pathname === '/courses/business') {
-        items.push({ label: 'Business', href: '/courses/business' })
-      } else if (pathname === '/courses/restaurant') {
-        items.push({ label: 'Restaurant', href: '/courses/restaurant' })
-      } else if (pathname === '/courses/fleet') {
-        items.push({ label: 'Fleet', href: '/courses/fleet' })
+      // Check if it's a landing page (category page)
+      const pathParts = pathname.split('/')
+      if (pathParts.length === 3 && pathParts[1] === 'courses') {
+        const tag = pathParts[2]
+        const landingPage = landingPages.find(lp => lp.tag === tag)
+        if (landingPage) {
+          items.push({ label: landingPage.name, href: landingPage.href })
+        } else {
+          // Legacy support for Business/Restaurant/Fleet
+          const legacyNames: Record<string, string> = {
+            business: 'Business',
+            restaurant: 'Restaurant',
+            fleet: 'Fleet',
+          }
+          const legacyName = legacyNames[tag.toLowerCase()]
+          if (legacyName) {
+            items.push({ label: legacyName, href: pathname })
+          }
+        }
       } else if (pathname.startsWith('/courses/') && pathname !== '/courses') {
         // It's a course detail page - extract category from path or use generic
-        const pathParts = pathname.split('/')
         if (pathParts.length > 2) {
-          // Try to determine category from URL or use "Course"
           items.push({ label: 'Course', href: pathname })
         }
       }
@@ -146,24 +217,38 @@ export default function Header() {
                           <div className="absolute left-0 top-full pt-2 w-40 z-50">
                             <div className="rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 border border-gray-200">
                               <div className="py-1">
-                                <Link
-                                  href="/courses/business"
-                                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                >
-                                  Business
-                                </Link>
-                                <Link
-                                  href="/courses/restaurant"
-                                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                >
-                                  Restaurant
-                                </Link>
-                                <Link
-                                  href="/courses/fleet"
-                                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                >
-                                  Fleet
-                                </Link>
+                                {landingPages.length > 0 ? (
+                                  landingPages.map((page) => (
+                                    <Link
+                                      key={page.tag}
+                                      href={page.href}
+                                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    >
+                                      {page.name}
+                                    </Link>
+                                  ))
+                                ) : (
+                                  <>
+                                    <Link
+                                      href="/courses/business"
+                                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    >
+                                      Business
+                                    </Link>
+                                    <Link
+                                      href="/courses/restaurant"
+                                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    >
+                                      Restaurant
+                                    </Link>
+                                    <Link
+                                      href="/courses/fleet"
+                                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    >
+                                      Fleet
+                                    </Link>
+                                  </>
+                                )}
                               </div>
                             </div>
                           </div>
@@ -294,54 +379,101 @@ export default function Header() {
                     <div className="shadow-2xl" style={{ backgroundColor: '#1C1C1C', clipPath: 'polygon(0 0, 100% 0, 95% 100%, 0 100%)' }}>
                       <div className="p-12">
                         {/* Course Cards - Horizontal Layout */}
-                        <div className="grid grid-cols-3 gap-6" style={{ maxWidth: '900px', margin: '0 auto' }}>
-                          {/* Business Card */}
-                          <Link
-                            href="/courses/business"
-                            className="group block"
-                          >
-                            <div className="rounded overflow-hidden relative" style={{ backgroundColor: '#2663EB', height: '100px', width: '100%' }}>
-                              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></div>
-                              <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
-                                <h4 className="text-base font-semibold mb-1">Business</h4>
-                                <p className="text-sm text-white/90 line-clamp-2">
-                                  AI certification programs for business owners and entrepreneurs
-                                </p>
-                              </div>
-                            </div>
-                          </Link>
-
-                          {/* Restaurant Card */}
-                          <Link
-                            href="/courses/restaurant"
-                            className="group block"
-                          >
-                            <div className="rounded overflow-hidden relative" style={{ backgroundColor: '#16A349', height: '100px', width: '100%' }}>
-                              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></div>
-                              <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
-                                <h4 className="text-base font-semibold mb-1">Restaurant</h4>
-                                <p className="text-sm text-white/90 line-clamp-2">
-                                  Specialized AI training for restaurant operations and customer experience
-                                </p>
-                              </div>
-                            </div>
-                          </Link>
-
-                          {/* Fleet Card */}
-                          <Link
-                            href="/courses/fleet"
-                            className="group block"
-                          >
-                            <div className="rounded overflow-hidden relative" style={{ backgroundColor: '#9333EA', height: '100px', width: '100%' }}>
-                              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></div>
-                              <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
-                                <h4 className="text-base font-semibold mb-1">Fleet</h4>
-                                <p className="text-sm text-white/90 line-clamp-2">
-                                  AI certification courses for fleet managers and logistics optimization
-                                </p>
-                              </div>
-                            </div>
-                          </Link>
+                        <div 
+                          className={`grid gap-6 ${landingPages.length === 1 ? 'grid-cols-1' : landingPages.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`} 
+                          style={{ maxWidth: '900px', margin: '0 auto' }}
+                        >
+                          {landingPages.length > 0 ? (
+                            landingPages.map((page) => {
+                              // Use description field (NOT heroTitle) - truncate to consistent length (max 145 characters)
+                              // Get description - handle null, undefined, empty string, or whitespace-only
+                              let description = page.description
+                              if (description && typeof description === 'string') {
+                                description = description.trim()
+                              } else {
+                                description = null
+                              }
+                              
+                              // Only use fallback if description is truly empty/null
+                              const truncatedDescription = description && description.length > 0
+                                ? (description.length > 145 ? description.substring(0, 145).trim() + '...' : description)
+                                : 'AI certification programs'
+                              
+                              // Debug log
+                              if (page.tag === 'healthcare') {
+                                console.log(`🏥 Healthcare card:`, {
+                                  rawDescription: page.description,
+                                  processedDescription: description,
+                                  truncatedDescription,
+                                  heroTitle: page.heroTitle
+                                })
+                              }
+                              
+                              return (
+                                <Link
+                                  key={page.tag}
+                                  href={page.href}
+                                  className="group block"
+                                >
+                                  <div className="rounded overflow-hidden relative" style={{ backgroundColor: page.bgColor || '#2663EB', height: '100px', width: '100%' }}>
+                                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></div>
+                                    <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
+                                      <h4 className="text-base font-semibold mb-1">{page.name}</h4>
+                                      <p className="text-sm text-white/90 line-clamp-2">
+                                        {truncatedDescription}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </Link>
+                              )
+                            })
+                          ) : (
+                            <>
+                              {/* Fallback to legacy pages if API fails */}
+                              <Link
+                                href="/courses/business"
+                                className="group block"
+                              >
+                                <div className="rounded overflow-hidden relative" style={{ backgroundColor: '#2663EB', height: '100px', width: '100%' }}>
+                                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></div>
+                                  <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
+                                    <h4 className="text-base font-semibold mb-1">Business</h4>
+                                    <p className="text-sm text-white/90 line-clamp-2">
+                                      AI certification programs designed for business owners and entrepreneurs looking to leverage artificial intelligence to grow their business.
+                                    </p>
+                                  </div>
+                                </div>
+                              </Link>
+                              <Link
+                                href="/courses/restaurant"
+                                className="group block"
+                              >
+                                <div className="rounded overflow-hidden relative" style={{ backgroundColor: '#16A349', height: '100px', width: '100%' }}>
+                                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></div>
+                                  <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
+                                    <h4 className="text-base font-semibold mb-1">Restaurant</h4>
+                                    <p className="text-sm text-white/90 line-clamp-2">
+                                      Specialized AI training for restaurant owners to optimize operations, improve customer experience, and increase profitability.
+                                    </p>
+                                  </div>
+                                </div>
+                              </Link>
+                              <Link
+                                href="/courses/fleet"
+                                className="group block"
+                              >
+                                <div className="rounded overflow-hidden relative" style={{ backgroundColor: '#9333EA', height: '100px', width: '100%' }}>
+                                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></div>
+                                  <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
+                                    <h4 className="text-base font-semibold mb-1">Fleet</h4>
+                                    <p className="text-sm text-white/90 line-clamp-2">
+                                      AI certification courses tailored for fleet managers to enhance logistics, reduce costs, and improve operational efficiency.
+                                    </p>
+                                  </div>
+                                </div>
+                              </Link>
+                            </>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -578,54 +710,101 @@ export default function Header() {
                     <div className="shadow-2xl" style={{ backgroundColor: '#1C1C1C', clipPath: 'polygon(0 0, 100% 0, 95% 100%, 0 100%)' }}>
                       <div className="p-12">
                         {/* Course Cards - Horizontal Layout */}
-                        <div className="grid grid-cols-3 gap-6" style={{ maxWidth: '900px', margin: '0 auto' }}>
-                          {/* Business Card */}
-                          <Link
-                            href="/courses/business"
-                            className="group block"
-                          >
-                            <div className="rounded overflow-hidden relative" style={{ backgroundColor: '#2663EB', height: '100px', width: '100%' }}>
-                              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></div>
-                              <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
-                                <h4 className="text-base font-semibold mb-1">Business</h4>
-                                <p className="text-sm text-white/90 line-clamp-2">
-                                  AI certification programs for business owners and entrepreneurs
-                                </p>
-                              </div>
-                            </div>
-                          </Link>
-
-                          {/* Restaurant Card */}
-                          <Link
-                            href="/courses/restaurant"
-                            className="group block"
-                          >
-                            <div className="rounded overflow-hidden relative" style={{ backgroundColor: '#16A349', height: '100px', width: '100%' }}>
-                              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></div>
-                              <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
-                                <h4 className="text-base font-semibold mb-1">Restaurant</h4>
-                                <p className="text-sm text-white/90 line-clamp-2">
-                                  Specialized AI training for restaurant operations and customer experience
-                                </p>
-                              </div>
-                            </div>
-                          </Link>
-
-                          {/* Fleet Card */}
-                          <Link
-                            href="/courses/fleet"
-                            className="group block"
-                          >
-                            <div className="rounded overflow-hidden relative" style={{ backgroundColor: '#9333EA', height: '100px', width: '100%' }}>
-                              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></div>
-                              <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
-                                <h4 className="text-base font-semibold mb-1">Fleet</h4>
-                                <p className="text-sm text-white/90 line-clamp-2">
-                                  AI certification courses for fleet managers and logistics optimization
-                                </p>
-                              </div>
-                            </div>
-                          </Link>
+                        <div 
+                          className={`grid gap-6 ${landingPages.length === 1 ? 'grid-cols-1' : landingPages.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`} 
+                          style={{ maxWidth: '900px', margin: '0 auto' }}
+                        >
+                          {landingPages.length > 0 ? (
+                            landingPages.map((page) => {
+                              // Use description field (NOT heroTitle) - truncate to consistent length (max 145 characters)
+                              // Get description - handle null, undefined, empty string, or whitespace-only
+                              let description = page.description
+                              if (description && typeof description === 'string') {
+                                description = description.trim()
+                              } else {
+                                description = null
+                              }
+                              
+                              // Only use fallback if description is truly empty/null
+                              const truncatedDescription = description && description.length > 0
+                                ? (description.length > 145 ? description.substring(0, 145).trim() + '...' : description)
+                                : 'AI certification programs'
+                              
+                              // Debug log
+                              if (page.tag === 'healthcare') {
+                                console.log(`🏥 Healthcare card:`, {
+                                  rawDescription: page.description,
+                                  processedDescription: description,
+                                  truncatedDescription,
+                                  heroTitle: page.heroTitle
+                                })
+                              }
+                              
+                              return (
+                                <Link
+                                  key={page.tag}
+                                  href={page.href}
+                                  className="group block"
+                                >
+                                  <div className="rounded overflow-hidden relative" style={{ backgroundColor: page.bgColor || '#2663EB', height: '100px', width: '100%' }}>
+                                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></div>
+                                    <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
+                                      <h4 className="text-base font-semibold mb-1">{page.name}</h4>
+                                      <p className="text-sm text-white/90 line-clamp-2">
+                                        {truncatedDescription}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </Link>
+                              )
+                            })
+                          ) : (
+                            <>
+                              {/* Fallback to legacy pages if API fails */}
+                              <Link
+                                href="/courses/business"
+                                className="group block"
+                              >
+                                <div className="rounded overflow-hidden relative" style={{ backgroundColor: '#2663EB', height: '100px', width: '100%' }}>
+                                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></div>
+                                  <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
+                                    <h4 className="text-base font-semibold mb-1">Business</h4>
+                                    <p className="text-sm text-white/90 line-clamp-2">
+                                      AI certification programs designed for business owners and entrepreneurs looking to leverage artificial intelligence to grow their business.
+                                    </p>
+                                  </div>
+                                </div>
+                              </Link>
+                              <Link
+                                href="/courses/restaurant"
+                                className="group block"
+                              >
+                                <div className="rounded overflow-hidden relative" style={{ backgroundColor: '#16A349', height: '100px', width: '100%' }}>
+                                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></div>
+                                  <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
+                                    <h4 className="text-base font-semibold mb-1">Restaurant</h4>
+                                    <p className="text-sm text-white/90 line-clamp-2">
+                                      Specialized AI training for restaurant owners to optimize operations, improve customer experience, and increase profitability.
+                                    </p>
+                                  </div>
+                                </div>
+                              </Link>
+                              <Link
+                                href="/courses/fleet"
+                                className="group block"
+                              >
+                                <div className="rounded overflow-hidden relative" style={{ backgroundColor: '#9333EA', height: '100px', width: '100%' }}>
+                                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></div>
+                                  <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
+                                    <h4 className="text-base font-semibold mb-1">Fleet</h4>
+                                    <p className="text-sm text-white/90 line-clamp-2">
+                                      AI certification courses tailored for fleet managers to enhance logistics, reduce costs, and improve operational efficiency.
+                                    </p>
+                                  </div>
+                                </div>
+                              </Link>
+                            </>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -682,16 +861,42 @@ export default function Header() {
                 </button>
                 {coursesDropdownOpen && (
                   <div className="mt-2 space-y-1 pl-6">
-                    {courseCategories.map((category) => (
-                      <Link
-                        key={category.name}
-                        href={category.href}
-                        className="block px-3 py-2 text-sm text-gray-300 hover:text-white"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        {category.name}
-                      </Link>
-                    ))}
+                    {landingPages.length > 0 ? (
+                      landingPages.map((page) => (
+                        <Link
+                          key={page.tag}
+                          href={page.href}
+                          className="block px-3 py-2 text-sm text-gray-300 hover:text-white"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          {page.name}
+                        </Link>
+                      ))
+                    ) : (
+                      <>
+                        <Link
+                          href="/courses/business"
+                          className="block px-3 py-2 text-sm text-gray-300 hover:text-white"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          Business
+                        </Link>
+                        <Link
+                          href="/courses/restaurant"
+                          className="block px-3 py-2 text-sm text-gray-300 hover:text-white"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          Restaurant
+                        </Link>
+                        <Link
+                          href="/courses/fleet"
+                          className="block px-3 py-2 text-sm text-gray-300 hover:text-white"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          Fleet
+                        </Link>
+                      </>
+                    )}
                 <Link
                   href="/courses/business"
                   className="block px-3 py-2 text-sm text-gray-300 hover:text-white"

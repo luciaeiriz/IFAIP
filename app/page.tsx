@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 
@@ -20,6 +20,8 @@ interface LatestCard {
 
 export default function HomePage() {
   const [activeFilter, setActiveFilter] = useState<FilterType>('all')
+  const [latestCards, setLatestCards] = useState<LatestCard[]>([])
+  const [isLoadingNews, setIsLoadingNews] = useState(true)
 
   // Feature cards data (similar to news cards in Turing Institute)
   const featureCards = [
@@ -39,8 +41,8 @@ export default function HomePage() {
     },
   ]
 
-  // Latest section cards data
-  const latestCards: LatestCard[] = [
+  // Mock data as fallback
+  const mockLatestCards: LatestCard[] = [
     {
       id: '1',
       category: 'news',
@@ -234,6 +236,42 @@ export default function HomePage() {
       imageColor: 'from-cyan-600 to-cyan-800'
     },
   ]
+
+  // Fetch real news on component mount
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        setIsLoadingNews(true)
+        const response = await fetch(`/api/news?limit=20`)
+        
+        if (response.ok) {
+          const newsArticles = await response.json()
+          
+          // If we have news articles from database, use them
+          // Otherwise, fall back to mock data
+          if (newsArticles && newsArticles.length > 0) {
+            setLatestCards(newsArticles)
+          } else {
+            // Database is empty, use mock data as fallback
+            console.warn('No news items in database, using mock data')
+            setLatestCards(mockLatestCards)
+          }
+        } else {
+          // Fallback to mock data if API fails
+          console.warn('Failed to fetch news, using mock data')
+          setLatestCards(mockLatestCards)
+        }
+      } catch (error) {
+        console.error('Failed to fetch news:', error)
+        // Fallback to mock data on error
+        setLatestCards(mockLatestCards)
+      } finally {
+        setIsLoadingNews(false)
+      }
+    }
+
+    fetchNews()
+  }, [])
 
   // Filter cards based on active filter
   const filteredCards = (activeFilter === 'all' 
@@ -663,10 +701,43 @@ export default function HomePage() {
               marginRight: 'auto'
             }}
           >
-            {filteredCards.map((card) => (
+            {isLoadingNews && filteredCards.length === 0 ? (
+              // Loading skeleton
+              Array.from({ length: 4 }).map((_, index) => (
+                <div
+                  key={`loading-${index}`}
+                  className="border border-gray-200 shadow-sm overflow-hidden flex flex-col md:flex-row relative w-full animate-pulse"
+                  style={{ 
+                    backgroundColor: '#F2F2F2',
+                    minHeight: '209px'
+                  }}
+                >
+                  <div className="bg-gray-300 w-full md:w-1/2 flex-shrink-0 min-h-[150px] md:min-h-[209px]" />
+                  <div className="flex flex-col justify-end relative w-full md:w-1/2 p-4 min-h-[150px] md:min-h-[209px]">
+                    <div className="h-3 bg-gray-300 rounded w-16 mb-3" />
+                    <div className="h-5 bg-gray-300 rounded w-full mb-2" />
+                    <div className="h-4 bg-gray-300 rounded w-3/4 mb-3" />
+                    <div className="h-3 bg-gray-300 rounded w-24" />
+                  </div>
+                </div>
+              ))
+            ) : filteredCards.length === 0 ? (
+              // Empty state
+              <div 
+                className="col-span-2 text-center py-12"
+                style={{ 
+                  fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+                }}
+              >
+                <p className="text-gray-500">No articles found for this filter.</p>
+              </div>
+            ) : (
+              filteredCards.map((card) => (
               <Link 
                 key={card.id}
                 href={card.href}
+                target={card.href.startsWith('http') ? '_blank' : undefined}
+                rel={card.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                 className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col md:flex-row relative group w-full"
                 style={{ 
                   backgroundColor: '#F2F2F2',
@@ -769,7 +840,8 @@ export default function HomePage() {
         </svg>
             </div>
               </Link>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </section>

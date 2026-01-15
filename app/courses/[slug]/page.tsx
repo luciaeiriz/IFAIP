@@ -1,29 +1,130 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, Suspense } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { getCourseById } from '@/src/data/courses'
-import { Course } from '@/types/course'
+import { getCourseById, getCoursesByTag, getFeaturedCourses } from '@/src/data/courses'
+import { Course, CourseTag } from '@/types/course'
+import ForbesHeroSection from '@/components/courses/ForbesHeroSection'
+import FeaturedTopPicks from '@/components/courses/FeaturedTopPicks'
+import AllCoursesGrid from '@/components/courses/AllCoursesGrid'
+import EmailCaptureCTA from '@/components/courses/EmailCaptureCTA'
+import { getLandingPageByTag } from '@/lib/landing-pages'
+
+// UUID regex pattern
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+// Legacy tags that don't require database lookup
+const LEGACY_TAGS = ['business', 'restaurant', 'fleet']
 
 type TabType = 'about' | 'learn' | 'curriculum' | 'information' | 'details'
 
-export default function CourseDetailPage() {
+function CourseDetailContent() {
   const params = useParams()
   const router = useRouter()
-  const courseId = params.id as string
+  const slug = params.slug as string
 
   const [course, setCourse] = useState<Course | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<TabType>('about')
+  const [isCourseDetail, setIsCourseDetail] = useState<boolean | null>(null)
+
+  // Determine if slug is a UUID (course ID) or a tag
+  useEffect(() => {
+    if (!slug) return
+
+    const isUUID = UUID_REGEX.test(slug)
+    setIsCourseDetail(isUUID)
+
+    if (isUUID) {
+      // It's a course ID - fetch course detail
+      fetchCourseDetail(slug)
+    } else {
+      // It's a tag - fetch landing page
+      fetchLandingPage(slug)
+    }
+  }, [slug])
+
+  const fetchCourseDetail = async (courseId: string) => {
+    setIsLoading(true)
+    setError(null)
+    try {
+      const courseData = await getCourseById(courseId)
+      if (courseData) {
+        setCourse(courseData)
+      } else {
+        setError('Course not found')
+      }
+    } catch (err) {
+      console.error('Error fetching course:', err)
+      setError('Failed to load course')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const fetchLandingPage = async (tag: string) => {
+    setIsLoading(true)
+    setError(null)
+    try {
+      const normalizedTag = tag.toLowerCase()
+      console.log(`🔍 === FETCHING LANDING PAGE FOR TAG: "${normalizedTag}" ===`)
+      
+      // Fetch landing page metadata
+      const pageData = await getLandingPageByTag(normalizedTag)
+      console.log(`📄 Landing page data:`, pageData)
+      
+      if (!pageData) {
+        // Check if it's a legacy tag
+        if (!LEGACY_TAGS.includes(normalizedTag)) {
+          console.error(`❌ Landing page not found for tag: "${normalizedTag}"`)
+          setError('Landing page not found')
+          setIsLoading(false)
+          return
+        }
+      } else if (!pageData.is_enabled) {
+        console.warn(`⚠️ Landing page "${normalizedTag}" exists but is disabled`)
+        if (!LEGACY_TAGS.includes(normalizedTag)) {
+          setError('Landing page is disabled')
+          setIsLoading(false)
+          return
+        }
+      }
+
+      // Fetch courses
+      const tagForCourses = pageData?.tag || normalizedTag
+      console.log(`📚 Fetching courses for tag: "${tagForCourses}"`)
+      
+      const [courses, featured] = await Promise.all([
+        getCoursesByTag(tagForCourses),
+        getFeaturedCourses(),
+      ])
+      
+      console.log(`✅ Found ${courses.length} courses for tag "${tagForCourses}"`)
+      
+      const featuredForTag = featured.filter(c => 
+        c.tags.includes(tagForCourses as CourseTag) || 
+        c.tags.some(t => t.toLowerCase() === tagForCourses.toLowerCase())
+      )
+      
+      // Store courses in a way that the landing page component can use
+      // We'll render the landing page view
+      setCourse(null) // Not a course detail page
+      setIsLoading(false)
+    } catch (err: any) {
+      console.error('❌ Error fetching landing page:', err)
+      setError('Failed to load landing page')
+      setIsLoading(false)
+    }
+  }
 
   const scrollToSection = (sectionId: string, tabType: TabType) => {
     const element = document.getElementById(sectionId)
     if (element) {
       setActiveTab(tabType)
-      const offset = 100 // Offset for sticky header
+      const offset = 100
       const elementPosition = element.getBoundingClientRect().top
       const offsetPosition = elementPosition + window.pageYOffset - offset
 
@@ -34,61 +135,181 @@ export default function CourseDetailPage() {
     }
   }
 
-  // Track which section is in view on scroll
+  // Render course detail page (UUID)
+  if (isCourseDetail === true) {
+    return <CourseDetailView 
+      course={course} 
+      isLoading={isLoading} 
+      error={error}
+      activeTab={activeTab}
+      setActiveTab={setActiveTab}
+      scrollToSection={scrollToSection}
+    />
+  }
+
+  // Render landing page (tag)
+  if (isCourseDetail === false) {
+    return <LandingPageView slug={slug} />
+  }
+
+  // Loading state
+  return (
+    <div className="mx-auto max-w-7xl py-16">
+      <div className="text-center">Loading...</div>
+    </div>
+  )
+}
+
+// Landing page view component
+function LandingPageView({ slug }: { slug: string }) {
+  const [allCourses, setAllCourses] = useState<Course[]>([])
+  const [featuredCourses, setFeaturedCourses] = useState<Course[]>([])
+  const [landingPage, setLandingPage] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [notFoundError, setNotFoundError] = useState(false)
+
   useEffect(() => {
-    const handleScroll = () => {
-      const sections = [
-        { id: 'section-about', tab: 'about' as TabType },
-        { id: 'section-learn', tab: 'learn' as TabType },
-        { id: 'section-curriculum', tab: 'curriculum' as TabType },
-        { id: 'section-information', tab: 'information' as TabType },
-        { id: 'section-details', tab: 'details' as TabType },
-      ]
-
-      const scrollPosition = window.scrollY + 150 // Offset for sticky header
-
-      for (let i = sections.length - 1; i >= 0; i--) {
-        const section = document.getElementById(sections[i].id)
-        if (section) {
-          const sectionTop = section.offsetTop
-          if (scrollPosition >= sectionTop) {
-            setActiveTab(sections[i].tab)
-            break
-          }
-        }
-      }
-    }
-
-    window.addEventListener('scroll', handleScroll)
-    handleScroll() // Check on mount
-
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
-  useEffect(() => {
-    const fetchCourse = async () => {
+    const fetchData = async () => {
       setIsLoading(true)
-      setError(null)
+      setNotFoundError(false)
+      
       try {
-        const courseData = await getCourseById(courseId)
-        if (courseData) {
-          setCourse(courseData)
+        const normalizedTag = slug.toLowerCase()
+        console.log(`🔍 === FETCHING DATA FOR TAG: "${normalizedTag}" ===`)
+        
+        // Fetch landing page metadata
+        const pageData = await getLandingPageByTag(normalizedTag)
+        console.log(`📄 Landing page data:`, pageData)
+        
+        if (!pageData) {
+          if (!LEGACY_TAGS.includes(normalizedTag)) {
+            console.error(`❌ Landing page not found for tag: "${normalizedTag}"`)
+            setNotFoundError(true)
+            setIsLoading(false)
+            return
+          }
+        } else if (!pageData.is_enabled) {
+          if (!LEGACY_TAGS.includes(normalizedTag)) {
+            setNotFoundError(true)
+            setIsLoading(false)
+            return
+          }
         } else {
-          setError('Course not found')
+          console.log(`✅ Landing page found and enabled:`, pageData.name)
+          setLandingPage(pageData)
         }
-      } catch (err) {
-        console.error('Error fetching course:', err)
-        setError('Failed to load course')
+
+        // Fetch courses - use pageData.tag if available, otherwise use normalizedTag
+        const tagForCourses = pageData?.tag || normalizedTag
+        console.log(`📚 Fetching courses for tag: "${tagForCourses}"`)
+        
+        const [courses, featured] = await Promise.all([
+          getCoursesByTag(tagForCourses),
+          getFeaturedCourses(),
+        ])
+        
+        console.log(`✅ Found ${courses.length} courses for tag "${tagForCourses}"`)
+        
+        const featuredForTag = featured.filter(c => 
+          c.tags.includes(tagForCourses as CourseTag) || 
+          c.tags.some(t => t.toLowerCase() === tagForCourses.toLowerCase())
+        )
+        
+        setAllCourses(courses)
+        setFeaturedCourses(featuredForTag)
+      } catch (err: any) {
+        console.error('❌ Error fetching courses:', err)
+        setAllCourses([])
+        setFeaturedCourses([])
       } finally {
         setIsLoading(false)
       }
     }
 
-    if (courseId) {
-      fetchCourse()
+    if (slug) {
+      fetchData()
     }
-  }, [courseId])
+  }, [slug])
 
+  const featuredTopPicks = useMemo(() => {
+    return allCourses.slice(0, 3)
+  }, [allCourses])
+
+  if (notFoundError) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">404</h1>
+          <p className="text-lg text-gray-600 mb-4">Landing page not found</p>
+          <Link href="/courses" className="text-[#36498C] hover:underline">
+            Back to Courses
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <div className="mx-auto max-w-7xl py-16">
+        <div className="text-center">Loading courses...</div>
+      </div>
+    )
+  }
+
+  if (allCourses.length === 0 && !isLoading) {
+    return (
+      <div className="min-h-screen bg-white">
+        <ForbesHeroSection 
+          tag={landingPage?.name || slug} 
+          heroTitle={landingPage?.hero_title}
+        />
+        <FeaturedTopPicks courses={featuredTopPicks} />
+        <div className="mx-auto max-w-7xl py-16">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">No courses found</h2>
+            <p className="text-gray-600 mb-4">
+              There are no {slug.toLowerCase()} courses available at the moment.
+            </p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-white">
+      <ForbesHeroSection 
+        tag={landingPage?.name || slug} 
+        heroTitle={landingPage?.hero_title}
+      />
+      <FeaturedTopPicks courses={featuredTopPicks} />
+      {allCourses.length > 0 && (
+        <div className="bg-white pt-4 pb-12">
+          <AllCoursesGrid courses={allCourses} />
+        </div>
+      )}
+      <EmailCaptureCTA tag={slug} />
+    </div>
+  )
+}
+
+// Course detail view component (from original [id]/page.tsx)
+function CourseDetailView({ 
+  course, 
+  isLoading, 
+  error,
+  activeTab,
+  setActiveTab,
+  scrollToSection
+}: {
+  course: Course | null
+  isLoading: boolean
+  error: string | null
+  activeTab: TabType
+  setActiveTab: (tab: TabType) => void
+  scrollToSection: (sectionId: string, tabType: TabType) => void
+}) {
   const getLevelBadgeColor = (level: string | null) => {
     switch (level) {
       case 'Beginner':
@@ -109,7 +330,6 @@ export default function CourseDetailPage() {
 
   const parseModules = (modules: string | null): string[] => {
     if (!modules) return []
-    // Try to parse as comma-separated or newline-separated
     return modules
       .split(/[,\n]/)
       .map((module) => module.trim())
@@ -148,7 +368,6 @@ export default function CourseDetailPage() {
 
   const keySkills = parseKeySkills(course.key_skills)
   const modules = parseModules(course.modules)
-  const isOurCourse = !course.external_url
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -244,7 +463,7 @@ export default function CourseDetailPage() {
             <div className="lg:col-span-1"></div>
           </div>
           
-          {/* Meta Info Card - Single white card with dividers - Full width */}
+          {/* Meta Info Card */}
           <div className="rounded-lg bg-white p-6 mb-0 relative z-10" style={{ marginLeft: '-24px', paddingLeft: '24px', marginRight: '-24px', paddingRight: '24px', marginBottom: '0', position: 'absolute', top: '478px', width: '1342px', height: '116px', boxShadow: '0 12px 40px rgba(0, 0, 0, 0.18), 0 6px 16px rgba(0, 0, 0, 0.12)' }}>
             <div className="flex flex-wrap items-center divide-x divide-gray-200">
               {course.duration && (
@@ -291,7 +510,6 @@ export default function CourseDetailPage() {
       <div className="bg-white w-full relative" style={{ marginTop: '0', paddingTop: '24px' }}>
         <div className="mx-auto max-w-7xl py-12" style={{ paddingLeft: '0', paddingRight: '24px' }}>
           <div className="grid grid-cols-1 gap-8">
-            {/* Main Content (full width) */}
             <div style={{ marginLeft: '-24px', paddingLeft: '24px' }}>
             {/* Tab Navigation */}
             <div className="mb-6 border-b border-gray-200 bg-white pb-0" style={{ marginTop: '20px' }}>
@@ -315,7 +533,7 @@ export default function CourseDetailPage() {
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                     }`}
                   >
-                    What You'll Learn
+                    What You&apos;ll Learn
                   </button>
                 )}
                 {modules.length > 0 && (
@@ -355,7 +573,7 @@ export default function CourseDetailPage() {
               </nav>
             </div>
 
-            {/* All Content Sections - All displayed at once */}
+            {/* All Content Sections */}
             <div className="space-y-8">
               {/* About Section */}
               <section id="section-about" className="scroll-mt-24">
@@ -379,7 +597,7 @@ export default function CourseDetailPage() {
               {keySkills.length > 0 && (
                 <section id="section-learn" className="scroll-mt-24">
                   <h2 className="mb-6 text-3xl font-bold text-gray-900" style={{ fontSize: '20px' }}>
-                    What You'll Learn
+                    What You&apos;ll Learn
                   </h2>
                   <div className="space-y-3">
                     {keySkills.map((skill, index) => (
@@ -488,7 +706,6 @@ export default function CourseDetailPage() {
                 <h2 className="mb-6 text-3xl font-bold text-gray-900" style={{ fontSize: '20px' }}>
                   Course Details
                 </h2>
-                {/* Price Display */}
                 {course.price_label && (
                   <div className="mb-8 text-center">
                     <div className="mb-2 text-sm font-medium text-gray-600">Price</div>
@@ -497,7 +714,6 @@ export default function CourseDetailPage() {
                     </div>
                   </div>
                 )}
-                {/* Course Details List */}
                 <div className="space-y-4 border-t border-gray-200 pt-6">
                   <dl className="space-y-4 text-sm">
                     {course.provider && (
@@ -567,5 +783,17 @@ export default function CourseDetailPage() {
       </div>
       </div>
     </div>
+  )
+}
+
+export default function CoursesSlugPage() {
+  return (
+    <Suspense fallback={
+      <div className="mx-auto max-w-7xl py-16">
+        <div className="text-center">Loading...</div>
+      </div>
+    }>
+      <CourseDetailContent />
+    </Suspense>
   )
 }

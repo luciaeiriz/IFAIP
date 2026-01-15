@@ -6,11 +6,32 @@ import AdvertiserDisclosureModal from '../ui/AdvertiserDisclosureModal'
 
 interface ForbesHeroSectionProps {
   tag: string
+  heroTitle?: string | null
 }
 
-export default function ForbesHeroSection({ tag }: ForbesHeroSectionProps) {
+export default function ForbesHeroSection({ tag, heroTitle }: ForbesHeroSectionProps) {
   const [disclosureModalOpen, setDisclosureModalOpen] = useState(false)
   const getTitle = () => {
+    // Use custom hero title if provided
+    if (heroTitle) {
+      // Split by <br> or newlines and render as JSX
+      const parts = heroTitle.split(/<br\s*\/?>|\n/).filter(Boolean)
+      if (parts.length > 1) {
+        return (
+          <>
+            {parts.map((part, index) => (
+              <span key={index}>
+                {part}
+                {index < parts.length - 1 && <br />}
+              </span>
+            ))}
+          </>
+        )
+      }
+      return heroTitle
+    }
+    
+    // Fallback to legacy logic
     if (tag === 'Business') {
       return (
         <>
@@ -25,11 +46,19 @@ export default function ForbesHeroSection({ tag }: ForbesHeroSectionProps) {
           for Restaurant Owners
         </>
       )
-    } else {
+    } else if (tag === 'Fleet') {
       return (
         <>
           The Best AI Certification<br />
           for Fleet Manager
+        </>
+      )
+    } else {
+      // Generic fallback for new tags
+      return (
+        <>
+          The Best AI Certification<br />
+          for {tag}
         </>
       )
     }
@@ -52,7 +81,7 @@ export default function ForbesHeroSection({ tag }: ForbesHeroSectionProps) {
         }}
       >
         {/* Main Title */}
-        <div className="w-full lg:w-[600px]">
+        <div className="w-full lg:w-[900px] max-w-[900px]">
           <h1 
             className="text-2xl sm:text-3xl md:text-4xl lg:text-[48px] mb-2 text-left"
             style={{ 
