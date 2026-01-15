@@ -29,7 +29,7 @@ export async function DELETE(
       // Fetch by ID
       const { data, error: fetchError } = await supabaseAdmin
         .from('landing_pages')
-        .select('id, tag, relevancy_column')
+        .select('id, tag, name, relevancy_column')
         .eq('id', slug)
         .single()
 
@@ -44,7 +44,7 @@ export async function DELETE(
       // Fetch by tag
       const { data, error: fetchError } = await supabaseAdmin
         .from('landing_pages')
-        .select('id, tag, relevancy_column')
+        .select('id, tag, name, relevancy_column')
         .eq('tag', slug)
         .single()
 
