@@ -328,7 +328,7 @@ export async function getCoursesByTagWithRelevancy(
   options: { includeHidden?: boolean; limit?: number } = {}
 ): Promise<CourseWithRelevancy[]> {
   const { includeHidden = false, limit = 10 } = options
-  const relevancyColumn = getRelevancyColumn(tag)
+  const relevancyColumn = await getRelevancyColumn(tag)
   
   try {
     console.log(`🏷️ getCoursesByTagWithRelevancy: Fetching courses for tag "${tag}" with relevancy data...`)
