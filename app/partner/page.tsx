@@ -17,24 +17,24 @@ export default function PartnerPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section - Light Background */}
-      <section className="relative" style={{ backgroundColor: '#bfbfbf', backgroundImage: 'url(/partner_header.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
-        <div className="mx-auto max-w-7xl flex flex-col justify-end" style={{ height: '562px', paddingBottom: '40px', paddingLeft: '0px', paddingRight: '72px' }}>
+      <section className="relative partner-hero-section" style={{ backgroundColor: '#bfbfbf', backgroundImage: 'url(/partner_header.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+        <div className="mx-auto max-w-7xl flex flex-col justify-end partner-hero-container" style={{ height: '562px', paddingBottom: '40px', paddingLeft: '0px', paddingRight: '72px' }}>
           {/* Breadcrumb */}
-          <div className="mb-6" style={{ marginTop: '200px' }}>
+          <div className="mb-4 sm:mb-5 lg:mb-6 partner-breadcrumb" style={{ marginTop: '200px' }}>
             <Link 
               href="/" 
-              className="text-gray-900 hover:text-gray-700 transition-colors text-sm"
+              className="text-gray-900 hover:text-gray-700 transition-colors text-xs sm:text-sm lg:text-sm"
             >
               Home
             </Link>
           </div>
           
           {/* Separator Line */}
-          <div className="bg-gray-900 mb-8" style={{ width: '100%', height: '5px' }}></div>
+          <div className="bg-gray-900 mb-6 sm:mb-7 lg:mb-8 partner-separator" style={{ width: '100%', height: '5px' }}></div>
           
           {/* Main Heading */}
           <h1 
-            className="mb-6 leading-tight text-gray-900"
+            className="mb-4 sm:mb-5 lg:mb-6 leading-tight text-gray-900 partner-hero-title"
             style={{ 
               fontSize: '55px',
               fontFamily: '"Neue Haas Unica Pro", Helvetica, sans-serif',
@@ -46,7 +46,7 @@ export default function PartnerPage() {
           
           {/* Description */}
           <p 
-            className="mb-8 leading-relaxed text-gray-700"
+            className="mb-6 sm:mb-7 lg:mb-8 leading-relaxed text-gray-700 partner-hero-description"
             style={{ 
               fontSize: '25px',
               fontFamily: '"Neue Haas Unica Pro", Helvetica, sans-serif'
@@ -58,7 +58,7 @@ export default function PartnerPage() {
           {/* Learn More Button */}
           <button
             onClick={() => scrollToSection('partnership-opportunities')}
-            className="inline-flex items-center justify-center gap-2 bg-gray-900 text-white font-semibold hover:bg-gray-800 transition-colors border border-gray-900"
+            className="inline-flex items-center justify-center gap-2 bg-gray-900 text-white font-semibold hover:bg-gray-800 transition-colors border border-gray-900 partner-hero-button"
             style={{ width: '156px', height: '48px' }}
           >
             Learn more
@@ -80,17 +80,17 @@ export default function PartnerPage() {
       </section>
 
       {/* Content Section - Two Column Layout */}
-      <section className="bg-white">
-        <div className="mx-auto max-w-7xl" style={{ paddingLeft: '0px', paddingRight: '72px', paddingTop: '40px', paddingBottom: '96px' }}>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+      <section className="bg-white partner-content-section">
+        <div className="mx-auto max-w-7xl partner-content-container" style={{ paddingLeft: '0px', paddingRight: '72px', paddingTop: '40px', paddingBottom: '96px' }}>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 sm:gap-10 lg:gap-12">
             {/* Left Column - Main Content */}
-            <div className="lg:col-span-2 space-y-16">
+            <div className="lg:col-span-2 space-y-12 sm:space-y-14 lg:space-y-16 partner-main-content">
               {/* Partnership Opportunities Section */}
-              <section id="partnership-opportunities" className="scroll-mt-24">
+              <section id="partnership-opportunities" className="scroll-mt-24 partner-section">
                 <div>
-                  <div className="bg-gray-900 mb-6" style={{ width: '64px', height: '4px' }}></div>
-                  <h2 className="font-bold text-gray-900 mb-6" style={{ fontSize: '32px', marginTop: '-10px' }}>Partnership Opportunities</h2>
-                  <div className="space-y-4 text-gray-700 leading-relaxed" style={{ fontSize: '16px' }}>
+                  <div className="bg-gray-900 mb-4 sm:mb-5 lg:mb-6 partner-section-divider" style={{ width: '64px', height: '4px' }}></div>
+                  <h2 className="font-bold text-gray-900 mb-4 sm:mb-5 lg:mb-6 partner-section-title" style={{ fontSize: '32px', marginTop: '-10px' }}>Partnership Opportunities</h2>
+                  <div className="space-y-3 sm:space-y-4 text-gray-700 leading-relaxed partner-section-text" style={{ fontSize: '16px' }}>
                     <p>
                       IFAIP collaborates with leading organizations, educational institutions, technology companies, 
                       and industry leaders to advance AI education and professional development. We offer various 
@@ -105,11 +105,11 @@ export default function PartnerPage() {
               </section>
 
               {/* Types of Partnerships Section */}
-              <section id="types-of-partnerships" className="scroll-mt-24">
+              <section id="types-of-partnerships" className="scroll-mt-24 partner-section">
                 <div>
-                  <div className="bg-gray-900 mb-6" style={{ width: '64px', height: '4px' }}></div>
-                  <h2 className="font-bold text-gray-900 mb-6" style={{ fontSize: '32px' }}>Types of Partnerships</h2>
-                  <div className="space-y-6 text-gray-700">
+                  <div className="bg-gray-900 mb-4 sm:mb-5 lg:mb-6 partner-section-divider" style={{ width: '64px', height: '4px' }}></div>
+                  <h2 className="font-bold text-gray-900 mb-4 sm:mb-5 lg:mb-6 partner-section-title" style={{ fontSize: '32px' }}>Types of Partnerships</h2>
+                  <div className="space-y-4 sm:space-y-5 lg:space-y-6 text-gray-700 partner-section-text">
                     <div>
                       <h3 className="text-xl font-semibold text-gray-900 mb-2">Course Provider Partnerships</h3>
                       <p className="leading-relaxed">
@@ -200,11 +200,11 @@ export default function PartnerPage() {
               </section>
 
               {/* How to Partner Section */}
-              <section id="how-to-partner" className="scroll-mt-24">
+              <section id="how-to-partner" className="scroll-mt-24 partner-section">
                 <div>
-                  <div className="bg-gray-900 mb-6" style={{ width: '64px', height: '4px' }}></div>
-                  <h2 className="font-bold text-gray-900 mb-6" style={{ fontSize: '32px' }}>How to Partner with Us</h2>
-                  <div className="space-y-4 text-gray-700 leading-relaxed" style={{ fontSize: '16px' }}>
+                  <div className="bg-gray-900 mb-4 sm:mb-5 lg:mb-6 partner-section-divider" style={{ width: '64px', height: '4px' }}></div>
+                  <h2 className="font-bold text-gray-900 mb-4 sm:mb-5 lg:mb-6 partner-section-title" style={{ fontSize: '32px' }}>How to Partner with Us</h2>
+                  <div className="space-y-3 sm:space-y-4 text-gray-700 leading-relaxed partner-section-text" style={{ fontSize: '16px' }}>
                     <p>
                       We're always looking for innovative partners who share our commitment to advancing AI education. 
                       To explore partnership opportunities:
@@ -275,8 +275,34 @@ export default function PartnerPage() {
             </div>
 
             {/* Right Column - Jump to Navigation */}
-            <div className="lg:col-span-1 flex justify-end">
-              <div className="sticky top-24" style={{ width: '317px', height: '450px', marginRight: '-72px' }}>
+            <div className="lg:col-span-1 flex justify-start lg:justify-end partner-sidebar">
+              {/* Dropdown for Mobile/Tablet */}
+              <div className="w-full lg:hidden partner-dropdown-container mb-6">
+                <label htmlFor="partner-jump-to-select" className="block text-sm font-bold text-gray-900 mb-2" style={{ fontFamily: 'sans-serif' }}>
+                  Jump to
+                </label>
+                <select
+                  id="partner-jump-to-select"
+                  value={activeSection || ''}
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      scrollToSection(e.target.value)
+                    }
+                  }}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-md bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent partner-dropdown-select"
+                  style={{ fontFamily: 'sans-serif', fontWeight: 400 }}
+                >
+                  <option value="">Select a section...</option>
+                  <option value="partnership-opportunities">Partnership Opportunities</option>
+                  <option value="types-of-partnerships">Types of Partnerships</option>
+                  <option value="benefits">Benefits of Partnership</option>
+                  <option value="how-to-partner">How to Partner with Us</option>
+                  <option value="contact">Get Started</option>
+                </select>
+              </div>
+
+              {/* Sidebar for Desktop */}
+              <div className="hidden lg:block sticky top-24 partner-sidebar-content" style={{ width: '317px', height: '450px', marginRight: '-72px' }}>
                 {/* Thick black line above title */}
                 <div className="bg-gray-900 mb-4" style={{ width: '100%', height: '4px' }}></div>
                 <h3 className="text-lg font-bold text-gray-900 mb-6" style={{ fontFamily: 'sans-serif' }}>Jump to</h3>

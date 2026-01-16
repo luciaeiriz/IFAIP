@@ -89,34 +89,34 @@ export default function EmailCaptureCTA({ tag: tagProp }: EmailCaptureCTAProps =
   }
 
   return (
-    <section className="bg-primary-600 py-12">
+    <section className="bg-primary-600 py-8 sm:py-10 lg:py-12">
       <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
-          <h2 className="mb-4 text-3xl font-bold text-white sm:text-4xl">
+          <h2 className="mb-3 sm:mb-4 text-2xl sm:text-3xl lg:text-4xl font-bold text-white">
             Get Personalised Course Recommendations
           </h2>
-          <p className="mb-8 text-lg text-white/90">
+          <p className="mb-6 sm:mb-7 lg:mb-8 text-base sm:text-lg text-white/90">
             Tell us your email and we'll send you courses tailored to your needs
           </p>
         </div>
 
         <form
           onSubmit={handleSubmit}
-          className="rounded-lg bg-white p-8 shadow-lg"
+          className="rounded-lg bg-white p-6 sm:p-7 lg:p-8 shadow-lg"
         >
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <input
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email address"
-              className="flex-1 rounded-md border border-gray-300 px-4 py-3 focus:border-primary-500 focus:ring-primary-500"
+              className="flex-1 rounded-md border border-gray-300 px-4 py-2.5 sm:py-3 text-sm sm:text-base focus:border-primary-500 focus:ring-primary-500"
             />
             <button
               type="submit"
               disabled={isSubmitting}
-              className="rounded-md bg-primary-600 px-8 py-3 text-base font-semibold text-white transition-colors hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50"
+              className="rounded-md bg-primary-600 px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base font-semibold text-white transition-colors hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 w-full sm:w-auto"
             >
               {isSubmitting ? 'Submitting...' : 'Get Recommendations'}
             </button>

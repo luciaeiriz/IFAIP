@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Course } from '@/types/course'
 
 interface FeaturedTopPicksProps {
@@ -8,6 +8,38 @@ interface FeaturedTopPicksProps {
 }
 
 export default function FeaturedTopPicks({ courses }: FeaturedTopPicksProps) {
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([])
+  
+  useEffect(() => {
+    const updateDesktopStyles = () => {
+      if (typeof window !== 'undefined' && window.innerWidth >= 1024) {
+        cardRefs.current.forEach((card, index) => {
+          if (!card) return
+          const cardWidth = index === 1 ? '450px' : (index === 2 ? '415px' : '413px')
+          const cardHeight = index === 0 ? '157px' : (index === 1 ? '185px' : '150px')
+          const cardMarginTop = index === 0 ? '14px' : (index === 2 ? '18px' : '0px')
+          const isMostPopular = index === 1 && courses.length >= 3
+          card.style.width = cardWidth
+          card.style.height = cardHeight
+          card.style.marginTop = cardMarginTop
+          card.style.padding = isMostPopular ? '20px 20px 0px 33px' : '20px 20px 0px 20px'
+          card.style.borderWidth = isMostPopular ? '5px' : '1px'
+        })
+      } else {
+        cardRefs.current.forEach((card) => {
+          if (!card) return
+          card.style.width = '100%'
+          card.style.height = 'auto'
+          card.style.marginTop = '0'
+        })
+      }
+    }
+    
+    updateDesktopStyles()
+    window.addEventListener('resize', updateDesktopStyles)
+    return () => window.removeEventListener('resize', updateDesktopStyles)
+  }, [courses.length])
+  
   if (courses.length === 0) return null
 
   // Get top 3 courses (already sorted by priority, so index 0 = #1, index 1 = #2, index 2 = #3)
@@ -108,33 +140,34 @@ export default function FeaturedTopPicks({ courses }: FeaturedTopPicksProps) {
   }
 
   return (
-    <section className="hidden lg:block" style={{ backgroundColor: '#F6F7FF', width: '100%', padding: '16px 0 32px 0', marginLeft: '0', marginRight: '0', height: '249px' }}>
-      <div style={{ width: '100%', paddingLeft: '80px', paddingRight: '80px', boxSizing: 'border-box' }}>
-        <h2 className="mb-6" style={{ fontSize: '18px', color: '#181716', fontFamily: 'EuclidCircularB, sans-serif', marginTop: '-8px' }}>
+    <section className="block py-6 sm:py-8 md:py-8 lg:py-8" style={{ backgroundColor: '#F6F7FF', width: '100%', marginLeft: '0', marginRight: '0', minHeight: '249px' }}>
+      <div className="px-4 sm:px-6 md:px-8 lg:px-20" style={{ width: '100%', boxSizing: 'border-box' }}>
+        <h2 className="mb-4 sm:mb-5 md:mb-6 lg:mb-6 text-base sm:text-lg md:text-lg lg:text-lg" style={{ fontSize: '18px', color: '#181716', fontFamily: 'EuclidCircularB, sans-serif', marginTop: '0' }}>
           Our Top 3 Providers
         </h2>
 
-        <div className="flex justify-start" style={{ gap: '24px', flexWrap: 'nowrap', width: '100%', maxWidth: '100%', alignItems: 'flex-start', boxSizing: 'border-box', marginTop: '-10px' }}>
+        <div className="flex flex-col md:flex-row justify-start gap-4 sm:gap-4 md:gap-4 lg:gap-6" style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', marginTop: '0' }}>
           {top3.map((course, index) => {
             // The middle card (index 1) is always the #1 ranked course (highest priority)
             // Only show "MOST POPULAR" badge if we have all 3 courses and this is the middle one
             const isMostPopular = index === 1 && courses.length >= 3
-            // Card dimensions: left (0) = 413×157, middle (1) = 450×185, right (2) = 415×150
+            // Card dimensions: Desktop - left (0) = 413×157, middle (1) = 450×185, right (2) = 415×150
+            // Mobile/Tablet - full width (mobile) or flex (tablet), auto height
             const cardWidth = index === 1 ? '450px' : (index === 2 ? '415px' : '413px')
             const cardHeight = index === 0 ? '157px' : (index === 1 ? '185px' : '150px')
-            // Center left and right cards vertically with middle card (185px height)
-            // Left: (185 - 157) / 2 = 14px, Right: (185 - 150) / 2 = 17.5px
             const cardMarginTop = index === 0 ? '14px' : (index === 2 ? '18px' : '0px')
             return (
               <div
                 key={course.id}
-                className="relative bg-white shadow-sm transition-shadow hover:shadow-md"
+                ref={(el) => { cardRefs.current[index] = el }}
+                className="relative bg-white shadow-sm transition-shadow hover:shadow-md w-full md:flex-1 lg:w-auto featured-top-pick-card"
                 style={{ 
-                  width: cardWidth,
-                  height: cardHeight,
-                  marginTop: cardMarginTop,
-                  padding: isMostPopular ? '20px 20px 0px 33px' : '20px 20px 0px 20px',
-                  border: isMostPopular ? '5px solid #36498C' : '1px solid #E0E0E0',
+                  width: '100%',
+                  height: 'auto',
+                  minHeight: '150px',
+                  marginTop: '0',
+                  padding: isMostPopular ? '16px 16px 80px 20px' : '16px 16px 80px 16px',
+                  border: isMostPopular ? '3px solid #36498C' : '1px solid #E0E0E0',
                   boxShadow: isMostPopular ? 'none' : '0 1px 3px rgba(184, 197, 224, 0.3), 0 1px 2px rgba(184, 197, 224, 0.2)',
                   borderRadius: '0px',
                   display: 'flex',

@@ -17,24 +17,24 @@ export default function TermsPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section - Light Background */}
-      <section className="relative" style={{ backgroundColor: '#bfbfbf', backgroundImage: 'url(/terms_header.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
-        <div className="mx-auto max-w-7xl flex flex-col justify-end" style={{ height: '562px', paddingBottom: '40px', paddingLeft: '0px', paddingRight: '72px' }}>
+      <section className="relative terms-hero-section" style={{ backgroundColor: '#bfbfbf', backgroundImage: 'url(/terms_header.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+        <div className="mx-auto max-w-7xl flex flex-col justify-end terms-hero-container" style={{ height: '562px', paddingBottom: '40px', paddingLeft: '0px', paddingRight: '72px' }}>
           {/* Breadcrumb */}
-          <div className="mb-6" style={{ marginTop: '200px' }}>
+          <div className="mb-4 sm:mb-5 lg:mb-6 terms-breadcrumb" style={{ marginTop: '200px' }}>
             <Link 
               href="/" 
-              className="text-gray-900 hover:text-gray-700 transition-colors text-sm"
+              className="text-gray-900 hover:text-gray-700 transition-colors text-xs sm:text-sm lg:text-sm"
             >
               Home
             </Link>
           </div>
           
           {/* Separator Line */}
-          <div className="bg-gray-900 mb-8" style={{ width: '100%', height: '5px' }}></div>
+          <div className="bg-gray-900 mb-6 sm:mb-7 lg:mb-8 terms-separator" style={{ width: '100%', height: '5px' }}></div>
           
           {/* Main Heading */}
           <h1 
-            className="mb-6 leading-tight text-gray-900"
+            className="mb-4 sm:mb-5 lg:mb-6 leading-tight text-gray-900 terms-hero-title"
             style={{ 
               fontSize: '55px',
               fontFamily: '"Neue Haas Unica Pro", Helvetica, sans-serif',
@@ -46,7 +46,7 @@ export default function TermsPage() {
           
           {/* Description */}
           <p 
-            className="mb-8 leading-relaxed text-gray-700"
+            className="mb-6 sm:mb-7 lg:mb-8 leading-relaxed text-gray-700 terms-hero-description"
             style={{ 
               fontSize: '25px',
               fontFamily: '"Neue Haas Unica Pro", Helvetica, sans-serif'
@@ -58,7 +58,7 @@ export default function TermsPage() {
           {/* Learn More Button */}
           <button
             onClick={() => scrollToSection('introduction')}
-            className="inline-flex items-center justify-center gap-2 bg-gray-900 text-white font-semibold hover:bg-gray-800 transition-colors border border-gray-900"
+            className="inline-flex items-center justify-center gap-2 bg-gray-900 text-white font-semibold hover:bg-gray-800 transition-colors border border-gray-900 terms-hero-button"
             style={{ width: '156px', height: '48px' }}
           >
             Learn more
@@ -80,17 +80,17 @@ export default function TermsPage() {
       </section>
 
       {/* Content Section - Two Column Layout */}
-      <section className="bg-white">
-        <div className="mx-auto max-w-7xl" style={{ paddingLeft: '0px', paddingRight: '72px', paddingTop: '40px', paddingBottom: '96px' }}>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+      <section className="bg-white terms-content-section">
+        <div className="mx-auto max-w-7xl terms-content-container" style={{ paddingLeft: '0px', paddingRight: '72px', paddingTop: '40px', paddingBottom: '96px' }}>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 sm:gap-10 lg:gap-12">
             {/* Left Column - Main Content */}
-            <div className="lg:col-span-2 space-y-16">
+            <div className="lg:col-span-2 space-y-12 sm:space-y-14 lg:space-y-16 terms-main-content">
               {/* Introduction Section */}
-              <section id="introduction" className="scroll-mt-24">
+              <section id="introduction" className="scroll-mt-24 terms-section">
                 <div>
-                  <div className="bg-gray-900 mb-6" style={{ width: '64px', height: '4px' }}></div>
-                  <h2 className="font-bold text-gray-900 mb-6" style={{ fontSize: '32px', marginTop: '-10px' }}>Introduction</h2>
-                  <div className="space-y-4 text-gray-700 leading-relaxed" style={{ fontSize: '16px' }}>
+                  <div className="bg-gray-900 mb-4 sm:mb-5 lg:mb-6 terms-section-divider" style={{ width: '64px', height: '4px' }}></div>
+                  <h2 className="font-bold text-gray-900 mb-4 sm:mb-5 lg:mb-6 terms-section-title" style={{ fontSize: '32px', marginTop: '-10px' }}>Introduction</h2>
+                  <div className="space-y-3 sm:space-y-4 text-gray-700 leading-relaxed terms-section-text" style={{ fontSize: '16px' }}>
                     <p>
                       <strong>Last updated:</strong> {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                     </p>
@@ -104,11 +104,11 @@ export default function TermsPage() {
               </section>
 
               {/* Acceptance of Terms Section */}
-              <section id="acceptance" className="scroll-mt-24">
+              <section id="acceptance" className="scroll-mt-24 terms-section">
                 <div>
-                  <div className="bg-gray-900 mb-6" style={{ width: '64px', height: '4px' }}></div>
-                  <h2 className="font-bold text-gray-900 mb-6" style={{ fontSize: '32px' }}>1. Acceptance of Terms</h2>
-                  <div className="space-y-4 text-gray-700 leading-relaxed" style={{ fontSize: '16px' }}>
+                  <div className="bg-gray-900 mb-4 sm:mb-5 lg:mb-6 terms-section-divider" style={{ width: '64px', height: '4px' }}></div>
+                  <h2 className="font-bold text-gray-900 mb-4 sm:mb-5 lg:mb-6 terms-section-title" style={{ fontSize: '32px' }}>1. Acceptance of Terms</h2>
+                  <div className="space-y-3 sm:space-y-4 text-gray-700 leading-relaxed terms-section-text" style={{ fontSize: '16px' }}>
                     <p>
                       By accessing and using the IFAIP platform, you accept and agree to be bound by the terms 
                       and provision of this agreement. If you do not agree to abide by the above, please do not 
@@ -141,11 +141,11 @@ export default function TermsPage() {
               </section>
 
               {/* Course Enrollment Section */}
-              <section id="course-enrollment" className="scroll-mt-24">
+              <section id="course-enrollment" className="scroll-mt-24 terms-section">
                 <div>
-                  <div className="bg-gray-900 mb-6" style={{ width: '64px', height: '4px' }}></div>
-                  <h2 className="font-bold text-gray-900 mb-6" style={{ fontSize: '32px' }}>3. Course Enrollment</h2>
-                  <div className="space-y-4 text-gray-700 leading-relaxed" style={{ fontSize: '16px' }}>
+                  <div className="bg-gray-900 mb-4 sm:mb-5 lg:mb-6 terms-section-divider" style={{ width: '64px', height: '4px' }}></div>
+                  <h2 className="font-bold text-gray-900 mb-4 sm:mb-5 lg:mb-6 terms-section-title" style={{ fontSize: '32px' }}>3. Course Enrollment</h2>
+                  <div className="space-y-3 sm:space-y-4 text-gray-700 leading-relaxed terms-section-text" style={{ fontSize: '16px' }}>
                     <p>
                       When you enroll in a course through IFAIP, you agree to:
                     </p>
@@ -186,11 +186,11 @@ export default function TermsPage() {
               </section>
 
               {/* Intellectual Property Section */}
-              <section id="intellectual-property" className="scroll-mt-24">
+              <section id="intellectual-property" className="scroll-mt-24 terms-section">
                 <div>
-                  <div className="bg-gray-900 mb-6" style={{ width: '64px', height: '4px' }}></div>
-                  <h2 className="font-bold text-gray-900 mb-6" style={{ fontSize: '32px' }}>5. Intellectual Property</h2>
-                  <div className="space-y-4 text-gray-700 leading-relaxed" style={{ fontSize: '16px' }}>
+                  <div className="bg-gray-900 mb-4 sm:mb-5 lg:mb-6 terms-section-divider" style={{ width: '64px', height: '4px' }}></div>
+                  <h2 className="font-bold text-gray-900 mb-4 sm:mb-5 lg:mb-6 terms-section-title" style={{ fontSize: '32px' }}>5. Intellectual Property</h2>
+                  <div className="space-y-3 sm:space-y-4 text-gray-700 leading-relaxed terms-section-text" style={{ fontSize: '16px' }}>
                     <p>
                       All course materials, content, and resources available through IFAIP are the property of 
                       IFAIP, its content providers, or course instructors and are protected by copyright and 
@@ -207,11 +207,11 @@ export default function TermsPage() {
               </section>
 
               {/* Disclaimers Section */}
-              <section id="disclaimers" className="scroll-mt-24">
+              <section id="disclaimers" className="scroll-mt-24 terms-section">
                 <div>
-                  <div className="bg-gray-900 mb-6" style={{ width: '64px', height: '4px' }}></div>
-                  <h2 className="font-bold text-gray-900 mb-6" style={{ fontSize: '32px' }}>6. Disclaimers</h2>
-                  <div className="space-y-4 text-gray-700 leading-relaxed" style={{ fontSize: '16px' }}>
+                  <div className="bg-gray-900 mb-4 sm:mb-5 lg:mb-6 terms-section-divider" style={{ width: '64px', height: '4px' }}></div>
+                  <h2 className="font-bold text-gray-900 mb-4 sm:mb-5 lg:mb-6 terms-section-title" style={{ fontSize: '32px' }}>6. Disclaimers</h2>
+                  <div className="space-y-3 sm:space-y-4 text-gray-700 leading-relaxed terms-section-text" style={{ fontSize: '16px' }}>
                     <p>
                       <strong>No Warranty:</strong> The materials on IFAIP's website are provided on an 'as is' 
                       basis. IFAIP makes no warranties, expressed or implied, and hereby disclaims and negates 
@@ -234,11 +234,11 @@ export default function TermsPage() {
               </section>
 
               {/* Limitation of Liability Section */}
-              <section id="limitation-liability" className="scroll-mt-24">
+              <section id="limitation-liability" className="scroll-mt-24 terms-section">
                 <div>
-                  <div className="bg-gray-900 mb-6" style={{ width: '64px', height: '4px' }}></div>
-                  <h2 className="font-bold text-gray-900 mb-6" style={{ fontSize: '32px' }}>7. Limitation of Liability</h2>
-                  <div className="space-y-4 text-gray-700 leading-relaxed" style={{ fontSize: '16px' }}>
+                  <div className="bg-gray-900 mb-4 sm:mb-5 lg:mb-6 terms-section-divider" style={{ width: '64px', height: '4px' }}></div>
+                  <h2 className="font-bold text-gray-900 mb-4 sm:mb-5 lg:mb-6 terms-section-title" style={{ fontSize: '32px' }}>7. Limitation of Liability</h2>
+                  <div className="space-y-3 sm:space-y-4 text-gray-700 leading-relaxed terms-section-text" style={{ fontSize: '16px' }}>
                     <p>
                       In no event shall IFAIP or its suppliers be liable for any damages (including, without 
                       limitation, damages for loss of data or profit, or due to business interruption) arising 
@@ -251,11 +251,11 @@ export default function TermsPage() {
               </section>
 
               {/* Refund Policy Section */}
-              <section id="refund-policy" className="scroll-mt-24">
+              <section id="refund-policy" className="scroll-mt-24 terms-section">
                 <div>
-                  <div className="bg-gray-900 mb-6" style={{ width: '64px', height: '4px' }}></div>
-                  <h2 className="font-bold text-gray-900 mb-6" style={{ fontSize: '32px' }}>8. Refund Policy</h2>
-                  <div className="space-y-4 text-gray-700 leading-relaxed" style={{ fontSize: '16px' }}>
+                  <div className="bg-gray-900 mb-4 sm:mb-5 lg:mb-6 terms-section-divider" style={{ width: '64px', height: '4px' }}></div>
+                  <h2 className="font-bold text-gray-900 mb-4 sm:mb-5 lg:mb-6 terms-section-title" style={{ fontSize: '32px' }}>8. Refund Policy</h2>
+                  <div className="space-y-3 sm:space-y-4 text-gray-700 leading-relaxed terms-section-text" style={{ fontSize: '16px' }}>
                     <p>
                       Refund policies vary by course provider. Please review the specific refund policy for 
                       each course before enrollment. IFAIP facilitates course enrollment but does not control 
@@ -267,11 +267,11 @@ export default function TermsPage() {
               </section>
 
               {/* Changes to Terms Section */}
-              <section id="changes-terms" className="scroll-mt-24">
+              <section id="changes-terms" className="scroll-mt-24 terms-section">
                 <div>
-                  <div className="bg-gray-900 mb-6" style={{ width: '64px', height: '4px' }}></div>
-                  <h2 className="font-bold text-gray-900 mb-6" style={{ fontSize: '32px' }}>9. Changes to Terms</h2>
-                  <div className="space-y-4 text-gray-700 leading-relaxed" style={{ fontSize: '16px' }}>
+                  <div className="bg-gray-900 mb-4 sm:mb-5 lg:mb-6 terms-section-divider" style={{ width: '64px', height: '4px' }}></div>
+                  <h2 className="font-bold text-gray-900 mb-4 sm:mb-5 lg:mb-6 terms-section-title" style={{ fontSize: '32px' }}>9. Changes to Terms</h2>
+                  <div className="space-y-3 sm:space-y-4 text-gray-700 leading-relaxed terms-section-text" style={{ fontSize: '16px' }}>
                     <p>
                       IFAIP may revise these Terms of Service at any time without notice. By using this website, 
                       you are agreeing to be bound by the then current version of these Terms of Service.
@@ -296,14 +296,46 @@ export default function TermsPage() {
             </div>
 
             {/* Right Column - Jump to Navigation */}
-            <div className="lg:col-span-1 flex justify-end">
-              <div className="sticky top-24" style={{ width: '317px', height: '450px', marginRight: '-72px' }}>
+            <div className="lg:col-span-1 flex justify-start lg:justify-end terms-sidebar">
+              {/* Dropdown for Mobile/Tablet */}
+              <div className="w-full lg:hidden terms-dropdown-container mb-6">
+                <label htmlFor="jump-to-select" className="block text-sm font-bold text-gray-900 mb-2" style={{ fontFamily: 'sans-serif' }}>
+                  Jump to
+                </label>
+                <select
+                  id="jump-to-select"
+                  value={activeSection || ''}
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      scrollToSection(e.target.value)
+                    }
+                  }}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-md bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent terms-dropdown-select"
+                  style={{ fontFamily: 'sans-serif', fontWeight: 400 }}
+                >
+                  <option value="">Select a section...</option>
+                  <option value="introduction">Introduction</option>
+                  <option value="acceptance">Acceptance of Terms</option>
+                  <option value="use-license">Use License</option>
+                  <option value="course-enrollment">Course Enrollment</option>
+                  <option value="user-responsibilities">User Responsibilities</option>
+                  <option value="intellectual-property">Intellectual Property</option>
+                  <option value="disclaimers">Disclaimers</option>
+                  <option value="limitation-liability">Limitation of Liability</option>
+                  <option value="refund-policy">Refund Policy</option>
+                  <option value="changes-terms">Changes to Terms</option>
+                  <option value="contact">Contact Information</option>
+                </select>
+              </div>
+
+              {/* Sidebar for Desktop */}
+              <div className="hidden lg:block sticky top-24 terms-sidebar-content" style={{ width: '317px', height: '450px', marginRight: '-72px' }}>
                 {/* Thick black line above title */}
                 <div className="bg-gray-900 mb-4" style={{ width: '100%', height: '4px' }}></div>
                 <h3 className="text-lg font-bold text-gray-900 mb-6" style={{ fontFamily: 'sans-serif' }}>Jump to</h3>
                 {/* Light divider below title */}
                 <div className="bg-gray-200 mb-6" style={{ width: '100%', height: '1px' }}></div>
-                <nav className="space-y-0">
+                <nav className="space-y-0 terms-sidebar-nav">
                   <button
                     onClick={() => scrollToSection('introduction')}
                     className="block text-left text-gray-900 hover:text-gray-700 transition-colors w-full text-sm py-2 border-b border-gray-200"

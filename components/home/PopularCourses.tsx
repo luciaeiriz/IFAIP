@@ -59,10 +59,10 @@ export default function PopularCourses() {
   }
 
   return (
-    <section className="bg-homepage-white py-20 lg:py-28">
+    <section className="bg-homepage-white py-16 md:py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-12 flex items-center justify-between">
-          <h2 className="text-3xl font-bold text-homepage-dark sm:text-4xl lg:text-5xl tracking-tight">
+        <div className="mb-10 sm:mb-12 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-homepage-dark tracking-tight">
             Popular Courses
           </h2>
           <Link
@@ -76,22 +76,22 @@ export default function PopularCourses() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-5 sm:gap-6 md:grid-cols-2 md:gap-6 lg:grid-cols-4">
           {courses.map((course) => {
             const ratingInfo = getRatingLabel(course.rating)
             return (
               <Link
                 key={course.id}
                 href={`/courses/${course.id}`}
-                className="group rounded-2xl border border-homepage-accentLight/50 bg-homepage-white p-6 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1"
+                className="group rounded-2xl border border-homepage-accentLight/50 bg-homepage-white p-5 sm:p-6 md:p-6 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1"
               >
-                <div className="mb-2 text-sm font-medium text-homepage-dark/60">
+                <div className="mb-2 text-xs sm:text-sm font-medium text-homepage-dark/60">
                   {course.provider}
                 </div>
-                <h3 className="mb-2 text-lg font-bold text-homepage-dark group-hover:text-homepage-accentDark">
+                <h3 className="mb-2 text-base sm:text-lg md:text-lg font-bold text-homepage-dark group-hover:text-homepage-accentDark">
                   {course.title}
                 </h3>
-                <p className="mb-4 line-clamp-2 text-sm text-homepage-dark/70">
+                <p className="mb-4 line-clamp-2 text-xs sm:text-sm md:text-sm text-homepage-dark/70">
                   {course.description}
                 </p>
                 {course.rating && (

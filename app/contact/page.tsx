@@ -50,24 +50,24 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section - Light Background */}
-      <section className="relative" style={{ backgroundColor: '#bfbfbf', backgroundImage: 'url(/contact_header.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
-        <div className="mx-auto max-w-7xl flex flex-col justify-end" style={{ height: '562px', paddingBottom: '40px', paddingLeft: '0px', paddingRight: '72px' }}>
+      <section className="relative contact-hero-section" style={{ backgroundColor: '#bfbfbf', backgroundImage: 'url(/contact_header.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+        <div className="mx-auto max-w-7xl flex flex-col justify-end contact-hero-container" style={{ height: '562px', paddingBottom: '40px', paddingLeft: '0px', paddingRight: '72px' }}>
           {/* Breadcrumb */}
-          <div className="mb-6" style={{ marginTop: '200px' }}>
+          <div className="mb-4 sm:mb-5 lg:mb-6 contact-breadcrumb" style={{ marginTop: '200px' }}>
             <Link 
               href="/" 
-              className="text-gray-900 hover:text-gray-700 transition-colors text-sm"
+              className="text-gray-900 hover:text-gray-700 transition-colors text-xs sm:text-sm lg:text-sm"
             >
               Home
             </Link>
           </div>
           
           {/* Separator Line */}
-          <div className="bg-gray-900 mb-8" style={{ width: '100%', height: '5px' }}></div>
+          <div className="bg-gray-900 mb-6 sm:mb-7 lg:mb-8 contact-separator" style={{ width: '100%', height: '5px' }}></div>
           
           {/* Main Heading */}
           <h1 
-            className="mb-6 leading-tight text-gray-900"
+            className="mb-4 sm:mb-5 lg:mb-6 leading-tight text-gray-900 contact-hero-title"
             style={{ 
               fontSize: '55px',
               fontFamily: '"Neue Haas Unica Pro", Helvetica, sans-serif',
@@ -79,7 +79,7 @@ export default function ContactPage() {
           
           {/* Description */}
           <p 
-            className="mb-8 leading-relaxed text-gray-700"
+            className="mb-6 sm:mb-7 lg:mb-8 leading-relaxed text-gray-700 contact-hero-description"
             style={{ 
               fontSize: '25px',
               fontFamily: '"Neue Haas Unica Pro", Helvetica, sans-serif'
@@ -91,7 +91,7 @@ export default function ContactPage() {
           {/* Learn More Button */}
           <button
             onClick={() => scrollToSection('contact-form')}
-            className="inline-flex items-center justify-center gap-2 bg-gray-900 text-white font-semibold hover:bg-gray-800 transition-colors border border-gray-900"
+            className="inline-flex items-center justify-center gap-2 bg-gray-900 text-white font-semibold hover:bg-gray-800 transition-colors border border-gray-900 contact-hero-button"
             style={{ width: '156px', height: '48px' }}
           >
             Contact form
@@ -113,17 +113,17 @@ export default function ContactPage() {
       </section>
 
       {/* Content Section - Two Column Layout */}
-      <section className="bg-white">
-        <div className="mx-auto max-w-7xl" style={{ paddingLeft: '0px', paddingRight: '72px', paddingTop: '40px', paddingBottom: '96px' }}>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+      <section className="bg-white contact-content-section">
+        <div className="mx-auto max-w-7xl contact-content-container" style={{ paddingLeft: '0px', paddingRight: '72px', paddingTop: '40px', paddingBottom: '96px' }}>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 sm:gap-10 lg:gap-12">
             {/* Left Column - Main Content */}
-            <div className="lg:col-span-2 space-y-16">
+            <div className="lg:col-span-2 space-y-12 sm:space-y-14 lg:space-y-16 contact-main-content">
               {/* Contact Form Section */}
-              <section id="contact-form" className="scroll-mt-24">
+              <section id="contact-form" className="scroll-mt-24 contact-section">
                 <div>
-                  <div className="bg-gray-900 mb-6" style={{ width: '64px', height: '4px' }}></div>
-                  <h2 className="font-bold text-gray-900 mb-6" style={{ fontSize: '32px', marginTop: '-10px' }}>Contact Form</h2>
-                  <div className="space-y-6 text-gray-700 leading-relaxed" style={{ fontSize: '16px' }}>
+                  <div className="bg-gray-900 mb-4 sm:mb-5 lg:mb-6 contact-section-divider" style={{ width: '64px', height: '4px' }}></div>
+                  <h2 className="font-bold text-gray-900 mb-4 sm:mb-5 lg:mb-6 contact-section-title" style={{ fontSize: '32px', marginTop: '-10px' }}>Contact Form</h2>
+                  <div className="space-y-4 sm:space-y-5 lg:space-y-6 text-gray-700 leading-relaxed contact-section-text" style={{ fontSize: '16px' }}>
                     <form onSubmit={handleSubmit} className="space-y-6">
                       <div>
                         <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
@@ -210,7 +210,7 @@ export default function ContactPage() {
                       <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="inline-flex items-center justify-center gap-2 bg-gray-900 text-white font-semibold hover:bg-gray-800 transition-colors border border-gray-900 px-8 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="inline-flex items-center justify-center gap-2 bg-gray-900 text-white font-semibold hover:bg-gray-800 transition-colors border border-gray-900 px-6 sm:px-7 lg:px-8 py-2.5 sm:py-2.5 lg:py-3 disabled:opacity-50 disabled:cursor-not-allowed contact-submit-button"
                         style={{ width: '156px', height: '48px' }}
                       >
                         {isSubmitting ? 'Sending...' : 'Send Message'}
@@ -221,12 +221,12 @@ export default function ContactPage() {
               </section>
 
               {/* Contact Information Section */}
-              <section id="contact-info" className="scroll-mt-24">
+              <section id="contact-info" className="scroll-mt-24 contact-section">
                 <div>
-                  <div className="bg-gray-900 mb-6" style={{ width: '64px', height: '4px' }}></div>
-                  <h2 className="font-bold text-gray-900 mb-6" style={{ fontSize: '32px' }}>Contact Information</h2>
-                  <div className="space-y-4 text-gray-700 leading-relaxed" style={{ fontSize: '16px' }}>
-                    <div className="bg-gray-50 p-6 rounded-lg">
+                  <div className="bg-gray-900 mb-4 sm:mb-5 lg:mb-6 contact-section-divider" style={{ width: '64px', height: '4px' }}></div>
+                  <h2 className="font-bold text-gray-900 mb-4 sm:mb-5 lg:mb-6 contact-section-title" style={{ fontSize: '32px' }}>Contact Information</h2>
+                  <div className="space-y-3 sm:space-y-4 text-gray-700 leading-relaxed contact-section-text" style={{ fontSize: '16px' }}>
+                    <div className="bg-gray-50 p-4 sm:p-5 lg:p-6 rounded-lg">
                       <p className="mb-2">
                         <strong>Email:</strong> contact@ifaip.org
                       </p>
@@ -248,11 +248,11 @@ export default function ContactPage() {
               </section>
 
               {/* Office Hours Section */}
-              <section id="office-hours" className="scroll-mt-24">
+              <section id="office-hours" className="scroll-mt-24 contact-section">
                 <div>
-                  <div className="bg-gray-900 mb-6" style={{ width: '64px', height: '4px' }}></div>
-                  <h2 className="font-bold text-gray-900 mb-6" style={{ fontSize: '32px' }}>Office Hours</h2>
-                  <div className="space-y-4 text-gray-700 leading-relaxed" style={{ fontSize: '16px' }}>
+                  <div className="bg-gray-900 mb-4 sm:mb-5 lg:mb-6 contact-section-divider" style={{ width: '64px', height: '4px' }}></div>
+                  <h2 className="font-bold text-gray-900 mb-4 sm:mb-5 lg:mb-6 contact-section-title" style={{ fontSize: '32px' }}>Office Hours</h2>
+                  <div className="space-y-3 sm:space-y-4 text-gray-700 leading-relaxed contact-section-text" style={{ fontSize: '16px' }}>
                     <p>
                       Our team is available to assist you during the following hours:
                     </p>
@@ -270,11 +270,11 @@ export default function ContactPage() {
               </section>
 
               {/* FAQ Section */}
-              <section id="faq" className="scroll-mt-24">
+              <section id="faq" className="scroll-mt-24 contact-section">
                 <div>
-                  <div className="bg-gray-900 mb-6" style={{ width: '64px', height: '4px' }}></div>
-                  <h2 className="font-bold text-gray-900 mb-6" style={{ fontSize: '32px' }}>Frequently Asked Questions</h2>
-                  <div className="space-y-6 text-gray-700 leading-relaxed" style={{ fontSize: '16px' }}>
+                  <div className="bg-gray-900 mb-4 sm:mb-5 lg:mb-6 contact-section-divider" style={{ width: '64px', height: '4px' }}></div>
+                  <h2 className="font-bold text-gray-900 mb-4 sm:mb-5 lg:mb-6 contact-section-title" style={{ fontSize: '32px' }}>Frequently Asked Questions</h2>
+                  <div className="space-y-4 sm:space-y-5 lg:space-y-6 text-gray-700 leading-relaxed contact-section-text" style={{ fontSize: '16px' }}>
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900 mb-2">How do I enroll in a course?</h3>
                       <p>
@@ -309,8 +309,33 @@ export default function ContactPage() {
             </div>
 
             {/* Right Column - Jump to Navigation */}
-            <div className="lg:col-span-1 flex justify-end">
-              <div className="sticky top-24" style={{ width: '317px', height: '450px', marginRight: '-72px' }}>
+            <div className="lg:col-span-1 flex justify-start lg:justify-end contact-sidebar">
+              {/* Dropdown for Mobile/Tablet */}
+              <div className="w-full lg:hidden contact-dropdown-container mb-6">
+                <label htmlFor="contact-jump-to-select" className="block text-sm font-bold text-gray-900 mb-2" style={{ fontFamily: 'sans-serif' }}>
+                  Jump to
+                </label>
+                <select
+                  id="contact-jump-to-select"
+                  value={activeSection || ''}
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      scrollToSection(e.target.value)
+                    }
+                  }}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-md bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent contact-dropdown-select"
+                  style={{ fontFamily: 'sans-serif', fontWeight: 400 }}
+                >
+                  <option value="">Select a section...</option>
+                  <option value="contact-form">Contact Form</option>
+                  <option value="contact-info">Contact Information</option>
+                  <option value="office-hours">Office Hours</option>
+                  <option value="faq">Frequently Asked Questions</option>
+                </select>
+              </div>
+
+              {/* Sidebar for Desktop */}
+              <div className="hidden lg:block sticky top-24 contact-sidebar-content" style={{ width: '317px', height: '450px', marginRight: '-72px' }}>
                 {/* Thick black line above title */}
                 <div className="bg-gray-900 mb-4" style={{ width: '100%', height: '4px' }}></div>
                 <h3 className="text-lg font-bold text-gray-900 mb-6" style={{ fontFamily: 'sans-serif' }}>Jump to</h3>

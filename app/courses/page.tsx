@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { getCoursesByTag } from '@/src/data/courses'
 
@@ -17,6 +17,8 @@ export default function CoursesPage() {
   const [landingPages, setLandingPages] = useState<LandingPage[]>([])
   const [courseCounts, setCourseCounts] = useState<Record<string, number>>({})
   const [isLoading, setIsLoading] = useState(true)
+  const gridRef = useRef<HTMLDivElement>(null)
+  const heroTitleRef = useRef<HTMLHeadingElement>(null)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -130,6 +132,52 @@ export default function CoursesPage() {
     }
   }, [])
 
+  // Update clip path CSS variable for desktop when landing pages change
+  useEffect(() => {
+    const updateClipPath = () => {
+      if (typeof document !== 'undefined' && typeof window !== 'undefined') {
+        const section = document.getElementById('courses')
+        if (section && window.innerWidth >= 1024) {
+          section.style.setProperty('--courses-clip-path', getClipPath())
+        }
+      }
+    }
+    
+    updateClipPath()
+    window.addEventListener('resize', updateClipPath)
+    return () => window.removeEventListener('resize', updateClipPath)
+  }, [landingPages.length])
+  
+  // Update grid columns for mobile/tablet only
+  useEffect(() => {
+    const updateGridColumns = () => {
+      if (gridRef.current && typeof window !== 'undefined' && window.innerWidth < 1024) {
+        gridRef.current.style.gridTemplateColumns = '1fr'
+      }
+    }
+    
+    updateGridColumns()
+    window.addEventListener('resize', updateGridColumns)
+    return () => window.removeEventListener('resize', updateGridColumns)
+  }, [])
+  
+  // Set hero title font size to 60px on desktop
+  useEffect(() => {
+    const updateHeroTitle = () => {
+      if (heroTitleRef.current && typeof window !== 'undefined') {
+        if (window.innerWidth >= 1024) {
+          heroTitleRef.current.style.fontSize = '60px'
+        } else {
+          heroTitleRef.current.style.fontSize = ''
+        }
+      }
+    }
+    
+    updateHeroTitle()
+    window.addEventListener('resize', updateHeroTitle)
+    return () => window.removeEventListener('resize', updateHeroTitle)
+  }, [])
+
   // Calculate dynamic section height based on number of enabled landing pages
   // Cards are now wider (600px max), so we get fewer per row (typically 2-3 max)
   const calculateSectionHeight = () => {
@@ -173,18 +221,19 @@ export default function CoursesPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* White Hero Section */}
-      <section className="bg-white h-[calc(100vh-4rem)] flex items-center">
+      <section className="bg-white min-h-[60vh] sm:min-h-[70vh] md:min-h-[80vh] lg:h-[calc(100vh-4rem)] flex items-center py-12 sm:py-16 md:py-20 lg:py-0">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full">
           <div className="max-w-3xl">
             {/* Breadcrumb */}
-            <div className="mb-4">
-              <span className="text-sm text-gray-600">Courses</span>
-              <div className="mt-2 h-px w-16 bg-black" />
+            <div className="mb-3 sm:mb-4 lg:mb-4">
+              <span className="text-xs sm:text-sm lg:text-sm text-gray-600">Courses</span>
+              <div className="mt-2 h-px w-12 sm:w-16 lg:w-16 bg-black" />
             </div>
             
             {/* Title */}
             <h1 
-              className="text-4xl font-bold tracking-tight text-black sm:text-5xl md:text-6xl mb-6"
+              ref={heroTitleRef}
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-4xl font-bold tracking-tight text-black mb-4 sm:mb-5 md:mb-6 lg:mb-6 courses-hero-title"
               style={{ 
                 fontFamily: '"Neue Haas Unica Pro", Helvetica, sans-serif',
                 fontWeight: 700,
@@ -196,14 +245,14 @@ export default function CoursesPage() {
             </h1>
             
             {/* Description */}
-            <p className="text-lg text-gray-700 mb-8 leading-relaxed">
+            <p className="text-base sm:text-lg md:text-lg lg:text-lg text-gray-700 mb-6 sm:mb-7 md:mb-8 lg:mb-8 leading-relaxed">
               Delivering real-world impact through data science and AI. Our comprehensive training programs are designed to advance your career in artificial intelligence.
             </p>
             
             {/* Learn More Button */}
             <Link
               href="#courses"
-              className="inline-flex items-center justify-center bg-black text-white px-6 py-3 text-base font-medium hover:bg-gray-800 transition-colors"
+              className="inline-flex items-center justify-center bg-black text-white px-5 py-2.5 sm:px-6 sm:py-3 lg:px-6 lg:py-3 text-sm sm:text-base lg:text-base font-medium hover:bg-gray-800 transition-colors"
             >
               Learn more
             </Link>
@@ -214,25 +263,21 @@ export default function CoursesPage() {
       {/* Dynamic Cards Section - Adapts to number of enabled landing pages */}
       <section 
         id="courses" 
-        className="relative flex items-start" 
+        className="relative flex items-start courses-cards-section"
         style={{ 
           backgroundColor: '#1C1C1C', 
           minHeight: calculateSectionHeight(),
           height: 'auto',
-          paddingBottom: '200px',
-          clipPath: getClipPath(), 
-          paddingTop: '100px' 
         }}
       >
-        <div className="mx-auto w-full flex flex-col" style={{ maxWidth: '1400px', paddingLeft: '16px', paddingRight: '16px' }}>
+        <div className="mx-auto w-full flex flex-col px-4 sm:px-6 md:px-8 courses-cards-container" style={{ maxWidth: '1400px' }}>
           {/* Title and Subtitle */}
-          <div className="text-left mb-12 w-full">
+          <div className="text-left mb-8 sm:mb-10 md:mb-12 courses-title-container" style={{ width: '100%' }}>
             <h2 
-              className="font-bold text-white mb-4"
+              className="font-bold text-white mb-3 sm:mb-4 courses-section-title"
               style={{ 
                 fontFamily: '"Neue Haas Unica Pro", Helvetica, sans-serif',
                 fontWeight: 700,
-                fontSize: '30px',
                 lineHeight: '1.2',
                 letterSpacing: '-0.02em',
               }}
@@ -240,7 +285,7 @@ export default function CoursesPage() {
               Our courses and training
             </h2>
             <p 
-              className="text-lg text-white/90 max-w-2xl"
+              className="text-sm sm:text-base md:text-lg text-white/90 max-w-2xl courses-section-subtitle"
               style={{ 
                 fontFamily: '"Neue Haas Unica Pro", Helvetica, sans-serif',
                 lineHeight: '1.6'
@@ -269,7 +314,8 @@ export default function CoursesPage() {
             </div>
           )}
           <div 
-            className="grid gap-6"
+            ref={gridRef}
+            className="grid gap-4 sm:gap-5 md:gap-6 lg:gap-6 courses-grid"
             style={{
               gridTemplateColumns: landingPages.length > 0 
                 ? `repeat(auto-fit, minmax(400px, ${landingPages.length <= 2 ? '600px' : 'min(600px, calc((100% - 48px) / ' + Math.min(landingPages.length, 3) + '))'}))`
@@ -285,7 +331,7 @@ export default function CoursesPage() {
                 <Link
                   key={page.tag}
                   href={page.href}
-                  className="group relative overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 flex flex-col"
+                  className="group relative overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 flex flex-col courses-card"
                   style={{ 
                     backgroundColor: page.bgColor,
                     width: '100%',
@@ -296,11 +342,11 @@ export default function CoursesPage() {
                     margin: '0 auto'
                   }}
                 >
-                  <div className="p-8 h-full flex flex-col text-white">
+                  <div className="p-5 sm:p-6 md:p-7 lg:p-8 h-full flex flex-col text-white courses-card-content">
                     {/* Subtitle */}
-                    <div className="mb-2">
+                    <div className="mb-1 sm:mb-2 courses-card-subtitle-container">
                       <span 
-                        className="text-sm uppercase tracking-wider"
+                        className="text-xs sm:text-sm courses-card-subtitle uppercase tracking-wider"
                         style={{ 
                           fontFamily: '"Neue Haas Unica Pro", Helvetica, sans-serif',
                           opacity: 0.9
@@ -312,7 +358,7 @@ export default function CoursesPage() {
 
                     {/* Title */}
                     <h2 
-                      className="text-3xl font-bold mb-3"
+                      className="text-xl sm:text-2xl md:text-2xl courses-card-title font-bold mb-2 sm:mb-3"
                       style={{ 
                         fontFamily: '"Neue Haas Unica Pro", Helvetica, sans-serif',
                         fontWeight: 700,
@@ -324,13 +370,13 @@ export default function CoursesPage() {
 
                     {/* Description */}
                     <p 
-                      className="text-base mb-3 leading-relaxed"
+                      className="text-sm sm:text-base courses-card-description mb-3 leading-relaxed"
                       style={{ 
                         fontFamily: '"Neue Haas Unica Pro", Helvetica, sans-serif',
                         opacity: 0.95,
                         lineHeight: '1.5',
                         display: '-webkit-box',
-                        WebkitLineClamp: 3,
+                        WebkitLineClamp: 4,
                         WebkitBoxOrient: 'vertical',
                         overflow: 'hidden',
                         flex: '1 1 auto'
@@ -340,22 +386,22 @@ export default function CoursesPage() {
                     </p>
 
                     {/* Course Count and Button Row */}
-                    <div className="mt-auto flex items-center justify-between pt-2">
+                    <div className="mt-auto flex flex-col sm:flex-row items-start sm:items-center justify-between pt-2 gap-2 sm:gap-0 courses-card-footer">
                       {!isLoading && courseCount > 0 && (
-                        <div className="text-sm opacity-90">
+                        <div className="text-xs sm:text-sm courses-card-count opacity-90">
                           {courseCount} {courseCount === 1 ? 'course' : 'courses'} available
                         </div>
                       )}
                       <div className={!isLoading && courseCount > 0 ? '' : 'ml-auto'}>
                         <div 
-                          className="inline-flex items-center justify-center bg-white text-black px-6 py-2.5 text-sm font-semibold rounded transition-all duration-300 group-hover:bg-gray-100"
+                          className="inline-flex items-center justify-center bg-white text-black px-4 py-2 sm:px-5 sm:py-2 courses-card-button font-semibold rounded transition-all duration-300 group-hover:bg-gray-100"
                           style={{ 
                             fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
                           }}
                         >
                           Learn More
                           <svg
-                            className="ml-2 h-4 w-4"
+                            className="ml-2 h-3 w-3 sm:h-4 sm:w-4 courses-card-button-icon"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -379,12 +425,12 @@ export default function CoursesPage() {
       </section>
       
       {/* White Section Below Diagonal Cut */}
-      <section className="relative bg-white" style={{ clipPath: 'polygon(0 30%, 100% 0, 100% 100%, 0 100%)', marginTop: '-1px', minHeight: '600px' }}>
-        <div className="absolute left-0" style={{ top: '35%', width: '100%', paddingLeft: '40px', paddingBottom: '60px', paddingRight: '40px' }}>
+      <section className="relative bg-white courses-bottom-section" style={{ marginTop: '-1px' }}>
+        <div className="absolute left-0 px-4 sm:px-6 md:px-8 courses-bottom-content" style={{ width: '100%' }}>
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl">
             <h2 
-              className="text-4xl font-bold text-black mb-6"
+              className="text-2xl sm:text-3xl md:text-4xl font-bold text-black mb-4 sm:mb-5 md:mb-6 courses-bottom-title"
               style={{ 
                 fontFamily: '"Neue Haas Unica Pro", Helvetica, sans-serif',
                 fontWeight: 700,
@@ -395,7 +441,7 @@ export default function CoursesPage() {
               Fundamental Research
             </h2>
             <p 
-              className="text-lg text-black mb-6 leading-relaxed"
+              className="text-sm sm:text-base md:text-lg text-black mb-4 sm:mb-5 md:mb-6 leading-relaxed courses-bottom-text"
               style={{ 
                 fontFamily: '"Neue Haas Unica Pro", Helvetica, sans-serif',
                 lineHeight: '1.6'
@@ -404,7 +450,7 @@ export default function CoursesPage() {
               Realising the possibilities of data science and AI will require advancing the tools, methods and theory that underpin these technologies. Cutting across our science and innovation activity, our Fundamental Research capability is democratising access to fundamental tools and enabling the application of AI methodology across new domains.
             </p>
             <p 
-              className="text-lg text-black mb-8 leading-relaxed"
+              className="text-sm sm:text-base md:text-lg text-black mb-6 sm:mb-7 md:mb-8 leading-relaxed courses-bottom-text"
               style={{ 
                 fontFamily: '"Neue Haas Unica Pro", Helvetica, sans-serif',
                 lineHeight: '1.6'

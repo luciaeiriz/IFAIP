@@ -142,9 +142,9 @@ export default function Header() {
     
     return (
       <>
-        <header className="sticky top-0 z-50 bg-white relative border-b border-gray-200">
+        <header className="sticky top-0 z-50 bg-white relative border-b border-gray-200 header-courses-page">
           <nav className="mx-auto relative" style={{ maxWidth: '912px', height: '50px', paddingLeft: '0' }}>
-            <div className="flex h-full items-center justify-start" style={{ marginLeft: '-220px' }}>
+            <div className="flex h-full items-center justify-start header-logo-container" style={{ marginLeft: '-220px' }}>
               <Link 
                 href="/"
                 className="transition-opacity hover:opacity-80 flex items-center"
@@ -165,9 +165,9 @@ export default function Header() {
           />
         </header>
         {/* Breadcrumb Subheader */}
-        <div className="sticky top-[50px] z-40 bg-white border-b border-gray-200">
+        <div className="sticky top-[50px] z-40 bg-white border-b border-gray-200 header-breadcrumb">
           <nav className="mx-auto" style={{ maxWidth: '912px', height: '45px', paddingLeft: '0' }}>
-            <div className="flex h-full items-center" style={{ marginLeft: '-200px' }}>
+            <div className="flex h-full items-center header-breadcrumb-container" style={{ marginLeft: '-200px' }}>
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 {breadcrumbs.map((crumb, index) => (
                   <div key={index} className="flex items-center gap-2">
@@ -308,7 +308,7 @@ export default function Header() {
         <nav className="mx-auto max-w-7xl relative">
           <div className="flex items-center justify-between" style={{ height: '107px' }}>
             {/* Left - Logo */}
-            <div className="flex items-center pl-0 sm:pl-1 lg:pl-2" style={{ marginLeft: '-8px' }}>
+            <div className="flex items-center pl-4 sm:pl-6 md:pl-6 lg:pl-2">
               <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
                 <Image 
                   src="/logo.png" 

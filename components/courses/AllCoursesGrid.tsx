@@ -132,11 +132,11 @@ export default function AllCoursesGrid({ courses }: AllCoursesGridProps) {
   }
 
   return (
-    <section className="bg-white">
-      <div className="w-full px-4 sm:px-6 md:px-8 lg:px-20 flex flex-col lg:flex-row gap-6 lg:gap-6 items-start">
+    <section className="bg-white py-4 sm:py-6 lg:py-0">
+      <div className="w-full px-4 sm:px-6 md:px-8 lg:px-20 flex flex-col lg:flex-row gap-4 sm:gap-5 lg:gap-6 items-start">
         {/* Left side - Courses section */}
         <div className="w-full lg:flex-1 lg:min-w-0">
-          <h2 style={{ 
+          <h2 className="text-lg sm:text-xl lg:text-xl mb-3 sm:mb-4 lg:mb-4" style={{ 
             fontSize: '20px', 
             fontFamily: 'EuclidCircularB, sans-serif', 
             fontWeight: 'bold', 
@@ -151,7 +151,7 @@ export default function AllCoursesGrid({ courses }: AllCoursesGridProps) {
               No courses found matching your criteria.
             </div>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-5 lg:space-y-6">
             {courses.map((course, index) => {
               const ratingInfo = getRatingLabel(course.rating)
               const rank = index + 1
@@ -160,7 +160,7 @@ export default function AllCoursesGrid({ courses }: AllCoursesGridProps) {
               return (
                 <div
                   key={course.id}
-                  className="relative rounded-lg bg-white transition-shadow cursor-pointer w-full"
+                  className="relative rounded-lg bg-white transition-shadow cursor-pointer w-full course-card-container"
                   style={{ 
                     border: '1px solid #E0E0E0',
                     boxShadow: '0 1px 3px rgba(184, 197, 224, 0.3), 0 1px 2px rgba(184, 197, 224, 0.2)',
@@ -168,8 +168,7 @@ export default function AllCoursesGrid({ courses }: AllCoursesGridProps) {
                     flexDirection: 'column',
                     gap: '16px',
                     padding: '20px 16px 12px 16px', 
-                    minHeight: '200px',
-                    overflow: 'hidden'
+                    minHeight: '200px'
                   }}
                   onClick={(e) => handleCardClick(course, e)}
                   onMouseEnter={(e) => {
@@ -184,10 +183,9 @@ export default function AllCoursesGrid({ courses }: AllCoursesGridProps) {
                   <>
                     {/* Orange tick to the left of the badge */}
                     <div
-                      className="absolute"
+                      className="absolute category-badge-tick"
                       style={{
                         top: '6px',
-                        left: '12px',
                         height: '19px',
                         display: 'flex',
                         alignItems: 'center',
@@ -201,10 +199,9 @@ export default function AllCoursesGrid({ courses }: AllCoursesGridProps) {
                       </svg>
                     </div>
                     <div
-                      className="absolute text-[9px] sm:text-[10px] lg:text-[11px]"
+                      className="absolute text-[9px] sm:text-[10px] lg:text-[11px] category-badge"
                       style={{
                         top: '6px',
-                        left: '32px',
                         height: '19px',
                         backgroundColor: '#FF8C00',
                         color: '#FFFFFF',
@@ -216,7 +213,6 @@ export default function AllCoursesGrid({ courses }: AllCoursesGridProps) {
                         alignItems: 'center',
                         whiteSpace: 'nowrap',
                         clipPath: 'polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%)',
-                        maxWidth: 'calc(100% - 50px)',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis'
                       }}
@@ -228,12 +224,35 @@ export default function AllCoursesGrid({ courses }: AllCoursesGridProps) {
 
                 {/* Mobile Layout: Stack vertically */}
                 <div className="flex flex-col lg:hidden gap-4">
+                  {/* Rating Box - Top Right Corner (Mobile Only) */}
+                  {course.rating && (
+                    <div className="absolute mobile-rating-box">
+                      <div className="inline-flex overflow-hidden mobile-rating-container" style={{ fontFamily: 'EuclidCircularB, sans-serif', fontSize: '11px', height: '32px', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.15)' }}>
+                        <div className="mobile-rating-score" style={{ backgroundColor: '#36498C', color: '#FFFFFF', fontWeight: '900', fontSize: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px 10px', minWidth: '38px' }}>
+                          {course.rating.toFixed(1)}
+                        </div>
+                        <div className="border border-gray-300 mobile-rating-label" style={{ backgroundColor: '#FFFFFF', color: '#000000', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4px 8px', gap: '3px' }}>
+                          <div style={{ fontSize: '8px', fontWeight: 'bold', textTransform: 'uppercase', fontFamily: 'EuclidCircularB, sans-serif', color: '#36498C', lineHeight: '1.1', letterSpacing: '0.5px' }}>
+                            {ratingInfo.label}
+                          </div>
+                          <div className="flex gap-0.5 items-center justify-center">
+                            {[...Array(5)].map((_, i) => (
+                              <svg key={i} className="h-2.5 w-2.5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                                <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                              </svg>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
                   {/* Ranking and Logo Row */}
-                  <div className="flex items-center gap-4">
-                    <div className="text-4xl sm:text-5xl font-black" style={{ fontFamily: 'EuclidCircularB, sans-serif', color: '#181716', lineHeight: '1' }}>
+                  <div className="flex items-center gap-3 sm:gap-4 mobile-rank-logo-row" style={{ marginTop: '40px' }}>
+                    <div className="text-4xl sm:text-5xl font-black mobile-rank-number" style={{ fontFamily: 'EuclidCircularB, sans-serif', color: '#181716', lineHeight: '1' }}>
                       {rank}
                     </div>
-                    <div>
+                    <div className="mobile-logo-container">
                       <ProviderLogo 
                         provider={course.provider}
                         logoUrl={logoUrl}
@@ -276,28 +295,8 @@ export default function AllCoursesGrid({ courses }: AllCoursesGridProps) {
                     </div>
                   )}
 
-                  {/* Rating and Button */}
+                  {/* Button */}
                   <div className="flex flex-col items-stretch gap-3">
-                    {course.rating && (
-                      <div className="inline-flex overflow-hidden w-full" style={{ fontFamily: 'EuclidCircularB, sans-serif', fontSize: '14px', height: '45px', borderRadius: '4px' }}>
-                        <div style={{ backgroundColor: '#36498C', color: '#FFFFFF', fontWeight: '900', fontSize: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 20px', width: '40%' }}>
-                          {course.rating.toFixed(1)}
-                        </div>
-                        <div className="border border-gray-300" style={{ backgroundColor: '#FFFFFF', color: '#000000', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '6px 12px', width: '60%', gap: '4px' }}>
-                          <div style={{ fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', fontFamily: 'EuclidCircularB, sans-serif', color: '#36498C' }}>
-                            {ratingInfo.label}
-                          </div>
-                          <div className="flex gap-0.5">
-                            {[...Array(5)].map((_, i) => (
-                              <svg key={i} className="h-3 w-3 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                                <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-                              </svg>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
                     <Link
                       href={course.external_url || `/courses/${course.id}`}
                       target={course.external_url ? '_blank' : undefined}
