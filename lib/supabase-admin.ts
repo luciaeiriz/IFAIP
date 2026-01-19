@@ -12,35 +12,20 @@ if (!supabaseUrl) {
   throw new Error('NEXT_PUBLIC_SUPABASE_URL is required')
 }
 
-if (!supabaseServiceRoleKey) {
-  if (process.env.NODE_ENV === 'production') {
-    const errorMessage = `
-❌ SUPABASE_SERVICE_ROLE_KEY is required in production!
-
-Admin operations (signups, leads, contact submissions) require the service role key to bypass RLS policies.
-
-To fix this:
-1. Go to your Supabase Dashboard → Settings → API
-2. Copy the "service_role" key (keep it secret!)
-3. Add it to your deployment platform's environment variables as SUPABASE_SERVICE_ROLE_KEY
-4. Redeploy your application
-
-For Vercel: Project Settings → Environment Variables → Add SUPABASE_SERVICE_ROLE_KEY
-For Netlify: Site Settings → Environment Variables → Add SUPABASE_SERVICE_ROLE_KEY
-    `.trim()
-    throw new Error(errorMessage)
-  } else {
-    // Development fallback - use anon key but warn
-    const fallbackKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    if (!fallbackKey) {
-      throw new Error('SUPABASE_SERVICE_ROLE_KEY or NEXT_PUBLIC_SUPABASE_ANON_KEY is required')
-    }
-    console.warn('⚠️ Using ANON_KEY as fallback for admin client. Set SUPABASE_SERVICE_ROLE_KEY for proper admin access.')
-  }
-}
+// Don't throw error at module load time - let runtime checks handle it
+// This allows the module to load even if env var isn't available at build time
+// The API routes will check and return proper errors if needed
 
 // Use service role key if available, otherwise fallback to anon key (dev only)
 const adminKey = supabaseServiceRoleKey || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+
+if (!adminKey) {
+  // Only warn, don't throw - allows module to load
+  console.warn('⚠️ Neither SUPABASE_SERVICE_ROLE_KEY nor NEXT_PUBLIC_SUPABASE_ANON_KEY is set. Admin operations may fail.')
+} else if (!supabaseServiceRoleKey && process.env.NODE_ENV !== 'production') {
+  // Warn in development if using anon key fallback
+  console.warn('⚠️ Using ANON_KEY as fallback for admin client. Set SUPABASE_SERVICE_ROLE_KEY for proper admin access.')
+}
 
 export const supabaseAdmin = createClient(supabaseUrl, adminKey, {
   auth: {

@@ -9,6 +9,13 @@ export async function GET(request: NextRequest) {
   const authError = await requireAdmin(request)
   if (authError) return authError
 
+  // Debug: Log environment variable status
+  console.log('Environment check:', {
+    hasServiceRoleKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+    serviceRoleKeyLength: process.env.SUPABASE_SERVICE_ROLE_KEY?.length || 0,
+    nodeEnv: process.env.NODE_ENV,
+  })
+
   // Verify service role key is being used
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
   if (!serviceRoleKey) {
@@ -18,7 +25,11 @@ export async function GET(request: NextRequest) {
       {
         success: false,
         error: errorMsg,
-        hint: 'Add SUPABASE_SERVICE_ROLE_KEY to your deployment platform environment variables (Vercel/Netlify/etc). Find it in Supabase Dashboard → Settings → API → Service Role Key'
+        hint: 'Add SUPABASE_SERVICE_ROLE_KEY to your deployment platform environment variables (Vercel/Netlify/etc). Find it in Supabase Dashboard → Settings → API → Service Role Key',
+        debug: {
+          nodeEnv: process.env.NODE_ENV,
+          availableEnvKeys: Object.keys(process.env).filter(k => k.includes('SUPABASE'))
+        }
       },
       { status: 500 }
     )
