@@ -14,33 +14,88 @@ function validateSupabaseUrl(supabaseUrl: string): boolean {
 }
 
 /**
+ * Try to get session from localStorage first to avoid network calls
+ * Falls back to getSession() if localStorage doesn't have a valid session
+ */
+export async function getSessionWithFallback(): Promise<{ session: any; error: any }> {
+  // First, try to get session from localStorage if available (client-side only)
+  if (typeof window !== 'undefined') {
+    try {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+      const projectRefMatch = supabaseUrl.match(/https?:\/\/([^.]+)\.supabase\.co/)
+      const projectRef = projectRefMatch?.[1] || ''
+      
+      if (projectRef) {
+        // Try to get session from Supabase's localStorage key
+        const storageKey = `sb-${projectRef}-auth-token`
+        const storedSession = localStorage.getItem(storageKey)
+        
+        if (storedSession) {
+          try {
+            const sessionData = JSON.parse(storedSession)
+            // Check if session exists and has access_token
+            if (sessionData?.access_token) {
+              // Validate token hasn't expired (basic check)
+              const expiresAt = sessionData?.expires_at
+              if (expiresAt && expiresAt * 1000 > Date.now()) {
+                // Return session from localStorage to avoid network call
+                return {
+                  session: {
+                    access_token: sessionData.access_token,
+                    refresh_token: sessionData.refresh_token,
+                    expires_at: sessionData.expires_at,
+                    expires_in: sessionData.expires_in,
+                    token_type: sessionData.token_type,
+                    user: sessionData.user,
+                  },
+                  error: null,
+                }
+              }
+            }
+          } catch (parseError) {
+            // If parsing fails, fall through to getSession()
+          }
+        }
+      }
+    } catch (localStorageError) {
+      // If localStorage access fails, fall through to getSession()
+    }
+  }
+  
+  // Fallback to getSession() with timeout
+  const sessionPromise = supabase.auth.getSession()
+  const sessionTimeoutPromise = new Promise<never>((_, reject) => 
+    setTimeout(() => reject(new Error('getSession timeout')), 15000) // 15 second timeout for network call
+  )
+  
+  try {
+    const result = await Promise.race([
+      sessionPromise,
+      sessionTimeoutPromise,
+    ]) as any
+    // Normalize Supabase's return format { data: { session }, error } to our format
+    return {
+      session: result.data?.session || null,
+      error: result.error || null,
+    }
+  } catch (timeoutError: any) {
+    if (timeoutError.message === 'getSession timeout') {
+      console.error('❌ getSession() timed out after 15 seconds - network may be unreachable')
+      return { session: null, error: timeoutError }
+    }
+    throw timeoutError
+  }
+}
+
+/**
  * Check if the current client-side user is an admin
  * Use this in client components
  * Calls a server-side API route to check admin status securely
  */
 export async function isAdminClient(): Promise<boolean> {
   try {
-    // Add timeout wrapper to getSession call
-    const sessionPromise = supabase.auth.getSession()
-    const sessionTimeoutPromise = new Promise<never>((_, reject) => 
-      setTimeout(() => reject(new Error('getSession timeout')), 30000)
-    )
-    
-    let session, sessionError
-    try {
-      const result = await Promise.race([
-        sessionPromise,
-        sessionTimeoutPromise,
-      ]) as any
-      session = result.data?.session
-      sessionError = result.error
-    } catch (timeoutError: any) {
-      if (timeoutError.message === 'getSession timeout') {
-        console.error('❌ getSession() timed out after 30 seconds in isAdminClient()')
-        return false
-      }
-      throw timeoutError
-    }
+    // Try localStorage first, then fallback to getSession() with timeout
+    const { session, error: sessionError } = await getSessionWithFallback()
 
     if (sessionError) {
       console.error('Error getting session:', sessionError)

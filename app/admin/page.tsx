@@ -48,29 +48,16 @@ export default function AdminPage() {
 
   const checkAuth = async () => {
     try {
-      // Add timeout to getSession call (increased to 30s to match fetch timeout)
-      // getSession() may need to refresh the session, which requires network calls
-      const sessionPromise = supabase.auth.getSession()
-      const sessionTimeoutPromise = new Promise<never>((_, reject) => 
-        setTimeout(() => reject(new Error('Session check timeout')), 30000)
-      )
+      // Use getSessionWithFallback to try localStorage first, avoiding network calls when possible
+      const { getSessionWithFallback } = await import('@/lib/admin-auth')
+      const { session, error: sessionError } = await getSessionWithFallback()
       
-      let session
-      try {
-        const result = await Promise.race([
-          sessionPromise,
-          sessionTimeoutPromise,
-        ]) as any
-        session = result.data?.session
-      } catch (sessionError: any) {
-        if (sessionError.message === 'Session check timeout') {
-          console.error('❌ Session check timed out after 30 seconds - this may indicate network/TLS issues')
-          setIsAuthenticated(false)
-          setIsAdmin(false)
-          setIsLoading(false)
-          return
-        }
-        throw sessionError
+      if (sessionError) {
+        console.error('❌ Session check failed:', sessionError.message || 'Unknown error')
+        setIsAuthenticated(false)
+        setIsAdmin(false)
+        setIsLoading(false)
+        return
       }
       
       if (session) {
