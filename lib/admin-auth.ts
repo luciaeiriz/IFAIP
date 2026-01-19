@@ -8,8 +8,17 @@ import { NextRequest } from 'next/server'
  * Calls a server-side API route to check admin status securely
  */
 export async function isAdminClient(): Promise<boolean> {
+  // #region agent log
+  fetch('http://127.0.0.1:7243/ingest/943b77db-b2c1-4974-a490-571bb73856af',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/admin-auth.ts:10',message:'isAdminClient entry',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+  // #endregion
   try {
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/943b77db-b2c1-4974-a490-571bb73856af',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/admin-auth.ts:13',message:'before getSession in isAdminClient',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+    // #endregion
     const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/943b77db-b2c1-4974-a490-571bb73856af',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/admin-auth.ts:15',message:'after getSession in isAdminClient',data:{hasSession:!!session,hasError:!!sessionError,hasUser:!!session?.user,hasToken:!!session?.access_token},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+    // #endregion
 
     if (sessionError) {
       console.error('Error getting session:', sessionError)
@@ -29,6 +38,9 @@ export async function isAdminClient(): Promise<boolean> {
     // Call server-side API route to check admin status
     // Pass the access token in Authorization header
     // This avoids exposing the service role key to the client
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/943b77db-b2c1-4974-a490-571bb73856af',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/admin-auth.ts:33',message:'before fetch to check-status',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+    // #endregion
     const response = await fetch('/api/admin/check-status', {
       method: 'GET',
       headers: {
@@ -37,6 +49,9 @@ export async function isAdminClient(): Promise<boolean> {
       },
       credentials: 'include', // Include cookies for session
     })
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/943b77db-b2c1-4974-a490-571bb73856af',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/admin-auth.ts:43',message:'after fetch to check-status',data:{ok:response.ok,status:response.status,statusText:response.statusText},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+    // #endregion
 
     if (!response.ok) {
       console.error('API route returned error:', response.status, response.statusText)
@@ -47,8 +62,14 @@ export async function isAdminClient(): Promise<boolean> {
 
     const data = await response.json()
     console.log('Admin check result:', data)
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/943b77db-b2c1-4974-a490-571bb73856af',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/admin-auth.ts:52',message:'isAdminClient exit',data:{isAdmin:data.isAdmin===true},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+    // #endregion
     return data.isAdmin === true
   } catch (error) {
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/943b77db-b2c1-4974-a490-571bb73856af',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/admin-auth.ts:55',message:'isAdminClient error',data:{errorMessage:error instanceof Error?error.message:String(error)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+    // #endregion
     console.error('Error checking admin status (client):', error)
     return false
   }
@@ -59,6 +80,9 @@ export async function isAdminClient(): Promise<boolean> {
  * Returns the authenticated user ID or null
  */
 async function getUserIdFromRequest(request: NextRequest): Promise<string | null> {
+  // #region agent log
+  fetch('http://127.0.0.1:7243/ingest/943b77db-b2c1-4974-a490-571bb73856af',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/admin-auth.ts:82',message:'getUserIdFromRequest entry',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+  // #endregion
   try {
     // Get environment variables once at the top
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
@@ -66,6 +90,9 @@ async function getUserIdFromRequest(request: NextRequest): Promise<string | null
     
     // First, try Authorization header (Bearer token)
     const authHeader = request.headers.get('authorization')
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/943b77db-b2c1-4974-a490-571bb73856af',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/admin-auth.ts:90',message:'checking auth header',data:{hasAuthHeader:!!authHeader,startsWithBearer:authHeader?.startsWith('Bearer ')},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+    // #endregion
     if (authHeader?.startsWith('Bearer ')) {
       const token = authHeader.substring(7)
       
@@ -82,7 +109,13 @@ async function getUserIdFromRequest(request: NextRequest): Promise<string | null
           },
         })
         
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/943b77db-b2c1-4974-a490-571bb73856af',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/admin-auth.ts:106',message:'before getUser from auth header',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+        // #endregion
         const { data: { user }, error } = await tempClient.auth.getUser(token)
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/943b77db-b2c1-4974-a490-571bb73856af',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/admin-auth.ts:108',message:'after getUser from auth header',data:{hasUser:!!user,hasError:!!error,errorMessage:error?.message},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+        // #endregion
         if (!error && user) {
           console.log('✅ Extracted user ID from Authorization header:', user.id)
           return user.id
@@ -160,8 +193,14 @@ async function getUserIdFromRequest(request: NextRequest): Promise<string | null
       }
     }
 
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/943b77db-b2c1-4974-a490-571bb73856af',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/admin-auth.ts:163',message:'getUserIdFromRequest returning null',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+    // #endregion
     return null
   } catch (error) {
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/943b77db-b2c1-4974-a490-571bb73856af',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/admin-auth.ts:166',message:'getUserIdFromRequest error',data:{errorMessage:error instanceof Error?error.message:String(error)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+    // #endregion
     console.error('Error extracting user ID from request:', error)
     return null
   }
@@ -172,8 +211,17 @@ async function getUserIdFromRequest(request: NextRequest): Promise<string | null
  * Use this in API routes and server components
  */
 export async function isAdminServer(request: NextRequest): Promise<boolean> {
+  // #region agent log
+  fetch('http://127.0.0.1:7243/ingest/943b77db-b2c1-4974-a490-571bb73856af',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/admin-auth.ts:174',message:'isAdminServer entry',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+  // #endregion
   try {
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/943b77db-b2c1-4974-a490-571bb73856af',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/admin-auth.ts:176',message:'before getUserIdFromRequest',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+    // #endregion
     const userId = await getUserIdFromRequest(request)
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/943b77db-b2c1-4974-a490-571bb73856af',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/admin-auth.ts:178',message:'after getUserIdFromRequest',data:{hasUserId:!!userId,userId:userId?.substring(0,8)+'...'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+    // #endregion
     
     if (!userId) {
       console.log('⚠️ No user ID found in request')
@@ -184,11 +232,17 @@ export async function isAdminServer(request: NextRequest): Promise<boolean> {
 
     // Check if user exists in admin_users table
     // Use .maybeSingle() instead of .single() to handle 0 rows gracefully
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/943b77db-b2c1-4974-a490-571bb73856af',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/admin-auth.ts:188',message:'before admin_users query',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+    // #endregion
     const { data, error } = await supabaseAdmin
       .from('admin_users')
       .select('id')
       .eq('user_id', userId)
       .maybeSingle()
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/943b77db-b2c1-4974-a490-571bb73856af',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/admin-auth.ts:194',message:'after admin_users query',data:{hasError:!!error,hasData:!!data,errorMessage:error?.message},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+    // #endregion
 
     if (error) {
       console.error('❌ Error querying admin_users:', error)
@@ -200,8 +254,14 @@ export async function isAdminServer(request: NextRequest): Promise<boolean> {
     if (!isAdmin) {
       console.log('💡 User ID not found in admin_users table. Make sure your user_id matches auth.users.id exactly.')
     }
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/943b77db-b2c1-4974-a490-571bb73856af',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/admin-auth.ts:203',message:'isAdminServer exit',data:{isAdmin},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+    // #endregion
     return isAdmin
   } catch (error) {
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/943b77db-b2c1-4974-a490-571bb73856af',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/admin-auth.ts:206',message:'isAdminServer error',data:{errorMessage:error instanceof Error?error.message:String(error)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+    // #endregion
     console.error('Error checking admin status (server):', error)
     return false
   }
