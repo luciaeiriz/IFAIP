@@ -42,7 +42,10 @@ export default function LeadsManagement() {
       }
 
       console.log('Fetched leads:', result.leads?.length || 0)
-      setLeads(result.leads || [])
+      console.log('API Response timestamp:', result.timestamp)
+      console.log('Total count from API:', result.count)
+      // Force state update even if data appears the same
+      setLeads([...(result.leads || [])])
     } catch (error: any) {
       console.error('Error fetching leads:', error)
       alert(`Failed to load leads: ${error?.message || 'Unknown error'}\n\nPlease check the browser console for more details.`)

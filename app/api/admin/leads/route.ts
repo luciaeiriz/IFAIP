@@ -4,6 +4,8 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+export const revalidate = 0
+export const fetchCache = 'force-no-store'
 
 export async function GET(request: NextRequest) {
   const authError = await requireAdmin(request)
@@ -70,12 +72,16 @@ export async function GET(request: NextRequest) {
       success: true,
       leads: data || [],
       count: count || 0,
+      timestamp: new Date().toISOString(), // Add timestamp to help debug caching
     })
     
-    // Prevent caching
-    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+    // Prevent all forms of caching - aggressive headers
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0, s-maxage=0')
     response.headers.set('Pragma', 'no-cache')
     response.headers.set('Expires', '0')
+    response.headers.set('X-Vercel-Cache-Control', 'no-cache') // Vercel-specific
+    response.headers.set('CDN-Cache-Control', 'no-cache') // CDN-specific
+    response.headers.set('Vary', '*') // Prevent any caching based on headers
     
     return response
   } catch (error) {

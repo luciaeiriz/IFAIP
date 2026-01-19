@@ -48,7 +48,10 @@ export default function SignupsManagement() {
       }
 
       console.log('Fetched signups:', result.signups?.length || 0)
-      setSignups(result.signups || [])
+      console.log('API Response timestamp:', result.timestamp)
+      console.log('Total count from API:', result.count)
+      // Force state update even if data appears the same
+      setSignups([...(result.signups || [])])
     } catch (error: any) {
       console.error('Error fetching signups:', error)
       alert(`Failed to load signups: ${error?.message || 'Unknown error'}\n\nPlease check the browser console for more details.`)

@@ -61,10 +61,13 @@ export default function ContactSubmissionsManagement() {
       const submissionsData = result.submissions || []
       console.log('Fetched contact submissions:', submissionsData.length, 'items')
       console.log('Total count from API:', result.count)
+      console.log('API Response timestamp:', result.timestamp)
+      console.log('Current time:', new Date().toISOString())
       if (submissionsData.length > 0) {
         console.log('Sample submission:', submissionsData[0])
       } else {
         console.log('No submissions in response - checking if table exists')
+        console.log('Full API response:', JSON.stringify(result, null, 2))
       }
       
       // Store debug info
@@ -73,10 +76,12 @@ export default function ContactSubmissionsManagement() {
         totalCount: result.count,
         sample: submissionsData[0],
         allData: submissionsData,
-        apiResponse: result
+        apiResponse: result,
+        timestamp: result.timestamp
       })
       
-      setSubmissions(submissionsData)
+      // Force state update even if data appears the same
+      setSubmissions([...submissionsData])
     } catch (error: any) {
       console.error('Error fetching contact submissions:', error)
       console.error('Error details:', {
