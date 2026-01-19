@@ -39,6 +39,14 @@ export default function ContactSubmissionsManagement() {
       
       const result = await response.json()
       console.log('Response data:', result)
+      console.log('API Response details:', {
+        ok: response.ok,
+        status: response.status,
+        success: result.success,
+        error: result.error,
+        count: result.count,
+        submissionsLength: result.submissions?.length
+      })
 
       if (!response.ok) {
         console.error('API returned error status:', response.status, result)
@@ -52,14 +60,20 @@ export default function ContactSubmissionsManagement() {
 
       const submissionsData = result.submissions || []
       console.log('Fetched contact submissions:', submissionsData.length, 'items')
-      console.log('Sample submission:', submissionsData[0])
+      console.log('Total count from API:', result.count)
+      if (submissionsData.length > 0) {
+        console.log('Sample submission:', submissionsData[0])
+      } else {
+        console.log('No submissions in response - checking if table exists')
+      }
       
       // Store debug info
       setDebugInfo({
         count: submissionsData.length,
         totalCount: result.count,
         sample: submissionsData[0],
-        allData: submissionsData
+        allData: submissionsData,
+        apiResponse: result
       })
       
       setSubmissions(submissionsData)

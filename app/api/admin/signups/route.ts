@@ -16,6 +16,9 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '100')
     const offset = parseInt(searchParams.get('offset') || '0')
 
+    console.log('Fetching signups from database...')
+    console.log('Using supabaseAdmin client with service role key')
+    
     let query = supabaseAdmin
       .from('signups')
       .select('*, courses(title)', { count: 'exact' })

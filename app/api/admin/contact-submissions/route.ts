@@ -9,12 +9,41 @@ export async function GET(request: NextRequest) {
   const authError = await requireAdmin(request)
   if (authError) return authError
 
+  // Verify service role key is being used
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!serviceRoleKey) {
+    console.warn('⚠️ SUPABASE_SERVICE_ROLE_KEY not set - using anon key (may have RLS issues)')
+  } else {
+    console.log('✅ Using SUPABASE_SERVICE_ROLE_KEY (bypasses RLS)')
+  }
+
   try {
     const { searchParams } = new URL(request.url)
     const limit = parseInt(searchParams.get('limit') || '500')
     const offset = parseInt(searchParams.get('offset') || '0')
 
     console.log('Fetching contact submissions from database...')
+    console.log('Using supabaseAdmin client with service role key')
+    
+    // First, test if we can access the table at all
+    const testQuery = await supabaseAdmin
+      .from('contact_submissions')
+      .select('id')
+      .limit(1)
+    
+    if (testQuery.error) {
+      console.error('Test query error:', testQuery.error)
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Database error: ${testQuery.error.message}`,
+          code: testQuery.error.code,
+          hint: testQuery.error.hint || 'Check if the contact_submissions table exists and RLS policies allow access',
+        },
+        { status: 500 }
+      )
+    }
+
     const { data, error, count } = await supabaseAdmin
       .from('contact_submissions')
       .select('*', { count: 'exact' })
