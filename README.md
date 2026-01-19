@@ -92,9 +92,12 @@ This Next.js application can be deployed to various platforms. Here are instruct
 3. Add environment variables in Vercel dashboard:
    - `NEXT_PUBLIC_SUPABASE_URL` - Your Supabase project URL
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Your Supabase anon key
+   - `SUPABASE_SERVICE_ROLE_KEY` - Your Supabase service role key (required for admin operations)
 4. Deploy!
 
 Vercel will automatically detect Next.js and configure the build settings.
+
+**Important**: The `SUPABASE_SERVICE_ROLE_KEY` is required for admin functionality (signups, leads, contact submissions management). Without it, admin pages will not work in production.
 
 ### Netlify
 
@@ -106,16 +109,24 @@ Vercel will automatically detect Next.js and configure the build settings.
 4. Add environment variables in Netlify dashboard:
    - `NEXT_PUBLIC_SUPABASE_URL` - Your Supabase project URL
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Your Supabase anon key
+   - `SUPABASE_SERVICE_ROLE_KEY` - Your Supabase service role key (required for admin operations)
 5. Deploy!
+
+**Important**: The `SUPABASE_SERVICE_ROLE_KEY` is required for admin functionality. Without it, admin pages will not work in production.
 
 ### Other Platforms
 
 For other platforms (AWS, DigitalOcean, etc.):
-1. Set the same environment variables (`NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`)
+1. Set the following environment variables:
+   - `NEXT_PUBLIC_SUPABASE_URL` - Your Supabase project URL
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Your Supabase anon key
+   - `SUPABASE_SERVICE_ROLE_KEY` - Your Supabase service role key (required for admin operations)
 2. Run `npm run build` to build the application
 3. Run `npm start` to start the production server
 
-**Important**: Never commit your `.env.local` file to version control. Always set environment variables in your hosting platform's dashboard.
+**Important**: 
+- Never commit your `.env.local` file to version control. Always set environment variables in your hosting platform's dashboard.
+- The `SUPABASE_SERVICE_ROLE_KEY` is **required** for admin functionality in production. You can find it in your Supabase Dashboard → Settings → API → Service Role Key (keep this secret!)
 
 ## Development
 

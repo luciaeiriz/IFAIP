@@ -12,7 +12,16 @@ export async function GET(request: NextRequest) {
   // Verify service role key is being used
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
   if (!serviceRoleKey) {
-    console.warn('⚠️ SUPABASE_SERVICE_ROLE_KEY not set - using anon key (may have RLS issues)')
+    const errorMsg = 'SUPABASE_SERVICE_ROLE_KEY is not set. Admin operations require the service role key. Please add it to your deployment environment variables.'
+    console.error('❌', errorMsg)
+    return NextResponse.json(
+      {
+        success: false,
+        error: errorMsg,
+        hint: 'Add SUPABASE_SERVICE_ROLE_KEY to your deployment platform environment variables (Vercel/Netlify/etc). Find it in Supabase Dashboard → Settings → API → Service Role Key'
+      },
+      { status: 500 }
+    )
   } else {
     console.log('✅ Using SUPABASE_SERVICE_ROLE_KEY (bypasses RLS)')
   }

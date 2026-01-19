@@ -14,7 +14,21 @@ if (!supabaseUrl) {
 
 if (!supabaseServiceRoleKey) {
   if (process.env.NODE_ENV === 'production') {
-    throw new Error('SUPABASE_SERVICE_ROLE_KEY is required in production. Admin operations require service role key.')
+    const errorMessage = `
+❌ SUPABASE_SERVICE_ROLE_KEY is required in production!
+
+Admin operations (signups, leads, contact submissions) require the service role key to bypass RLS policies.
+
+To fix this:
+1. Go to your Supabase Dashboard → Settings → API
+2. Copy the "service_role" key (keep it secret!)
+3. Add it to your deployment platform's environment variables as SUPABASE_SERVICE_ROLE_KEY
+4. Redeploy your application
+
+For Vercel: Project Settings → Environment Variables → Add SUPABASE_SERVICE_ROLE_KEY
+For Netlify: Site Settings → Environment Variables → Add SUPABASE_SERVICE_ROLE_KEY
+    `.trim()
+    throw new Error(errorMessage)
   } else {
     // Development fallback - use anon key but warn
     const fallbackKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
