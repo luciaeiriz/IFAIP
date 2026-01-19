@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { createLead, getUTMParams } from '@/lib/leads'
 import { CourseTag } from '@/types/course'
+import { trackLeadCapture } from '@/lib/analytics'
 
 interface EmailCaptureCTAProps {
   tag?: CourseTag | string
@@ -44,6 +45,8 @@ export default function EmailCaptureCTA({ tag: tagProp }: EmailCaptureCTAProps =
       })
 
       if (result.success) {
+        // Track lead capture
+        trackLeadCapture(tag, utmParams)
         setIsSuccess(true)
         setEmail('')
       } else {

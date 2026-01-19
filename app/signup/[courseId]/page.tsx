@@ -8,6 +8,7 @@ import { getCourseById } from '@/lib/courses'
 import { createSignup, getAllUTMParams } from '@/lib/signups'
 import { Course } from '@/types/course'
 import Toast from '@/components/ui/Toast'
+import { trackCourseSignup } from '@/lib/analytics'
 
 // Zod validation schema
 const signupSchema = z.object({
@@ -104,6 +105,13 @@ function SignupContent() {
       const response = await createSignup(signupData)
 
       if (response.success) {
+        // Track signup event
+        trackCourseSignup(
+          courseId,
+          course.title,
+          landingTag,
+          utmParams
+        )
         // Redirect to thank you page
         router.push(`/thank-you?course_id=${courseId}`)
       } else {

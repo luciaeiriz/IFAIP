@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { getFeaturedCourses } from '@/src/data/courses'
 import { Course } from '@/types/course'
+import { trackCourseCardClick } from '@/lib/analytics'
 
 export default function PopularCourses() {
   const [courses, setCourses] = useState<Course[]>([])
@@ -84,6 +85,13 @@ export default function PopularCourses() {
                 key={course.id}
                 href={`/courses/${course.id}`}
                 className="group rounded-2xl border border-homepage-accentLight/50 bg-homepage-white p-5 sm:p-6 md:p-6 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1"
+                onClick={() => trackCourseCardClick(
+                  course.id,
+                  course.title,
+                  'view',
+                  course.tags[0], // Use first tag
+                  course.provider || undefined
+                )}
               >
                 <div className="mb-2 text-xs sm:text-sm font-medium text-homepage-dark/60">
                   {course.provider}

@@ -18,7 +18,9 @@
     "test-all-logos": "tsx scripts/test-all-logos.ts"
   },
   "dependencies": {
+    "@next/third-parties": "^14.2.0",
     "@supabase/supabase-js": "^2.38.0",
+    "@vercel/analytics": "^1.6.1",
     "dotenv": "^16.3.1",
     "next": "^14.0.0",
     "openai": "^6.14.0",

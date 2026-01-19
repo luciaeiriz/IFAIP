@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { trackCTAClick } from '@/lib/analytics'
 
 interface HeroSectionProps {
   badge?: string
@@ -80,13 +81,19 @@ export default function HeroSection({
           {/* CTAs */}
           <div className="flex flex-col items-center justify-center gap-3 sm:gap-4 sm:flex-row">
             <button
-              onClick={() => scrollToSection('courses')}
+              onClick={() => {
+                trackCTAClick('Explore Courses', 'hero_section', '#courses')
+                scrollToSection('courses')
+              }}
               className="w-full sm:w-auto rounded-md bg-white px-6 py-2.5 sm:px-8 sm:py-3 text-sm sm:text-base font-semibold text-primary-600 shadow-lg transition-all hover:bg-gray-100 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-primary-600"
             >
               Explore Courses
             </button>
             <button
-              onClick={() => scrollToSection('lead-capture')}
+              onClick={() => {
+                trackCTAClick('Get Course Recommendations', 'hero_section', '#lead-capture')
+                scrollToSection('lead-capture')
+              }}
               className="w-full sm:w-auto rounded-md border-2 border-white bg-transparent px-6 py-2.5 sm:px-8 sm:py-3 text-sm sm:text-base font-semibold text-white transition-all hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-primary-600"
             >
               Get Course Recommendations

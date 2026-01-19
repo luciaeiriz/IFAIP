@@ -11,6 +11,7 @@ import FeaturedTopPicks from '@/components/courses/FeaturedTopPicks'
 import AllCoursesGrid from '@/components/courses/AllCoursesGrid'
 import EmailCaptureCTA from '@/components/courses/EmailCaptureCTA'
 import { getLandingPageByTag } from '@/lib/landing-pages'
+import { trackCourseView } from '@/lib/analytics'
 
 // UUID regex pattern
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -368,6 +369,18 @@ function CourseDetailView({
 
   const keySkills = parseKeySkills(course.key_skills)
   const modules = parseModules(course.modules)
+
+  // Track course view when course is loaded
+  useEffect(() => {
+    if (course) {
+      trackCourseView(
+        course.id,
+        course.title,
+        course.tags[0], // Use first tag
+        course.provider || undefined
+      )
+    }
+  }, [course])
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createLead, getUTMParams } from '@/lib/leads'
+import { trackLeadCapture } from '@/lib/analytics'
 
 interface LeadCaptureProps {
   title: string
@@ -37,6 +38,8 @@ export default function LeadCapture({
       })
 
       if (result.success) {
+        // Track lead capture
+        trackLeadCapture(landingTag, utmParams)
         setIsSuccess(true)
         setEmail('')
         setRole('')

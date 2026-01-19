@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { trackCTAClick } from '@/lib/analytics'
 
 interface CTASectionProps {
   title?: string
@@ -23,6 +24,7 @@ export default function CTASection({
           <Link
             href={buttonHref}
             className="mb-10 inline-block rounded-lg bg-[#36498C] px-10 py-4 text-base font-semibold text-white shadow-xl transition-all hover:bg-[#36498C]/90 hover:shadow-2xl hover:scale-105 active:scale-100"
+            onClick={() => trackCTAClick(buttonText, 'cta_section', buttonHref)}
           >
             {buttonText}
           </Link>

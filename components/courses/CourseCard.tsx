@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Course, CourseLevel, CourseTag } from '@/types/course'
+import { trackCourseCardClick, trackExternalLinkClick } from '@/lib/analytics'
 
 // Re-export Course type for convenience
 export type { Course, CourseLevel, CourseTag } from '@/types/course'
@@ -44,6 +45,20 @@ export default function CourseCard({ course, showProvider = true, className = ''
     return { label: 'GOOD', color: 'bg-gray-50 text-gray-800 border-gray-200' }
   }
 
+  const handleCardClick = (actionType: 'view' | 'signup' | 'external') => {
+    if (actionType === 'external' && course.external_url) {
+      trackExternalLinkClick(course.id, course.title, course.external_url)
+    } else {
+      trackCourseCardClick(
+        course.id,
+        course.title,
+        actionType,
+        course.tags[0], // Use first tag
+        course.provider || undefined
+      )
+    }
+  }
+
   const getCTAButton = () => {
     const ratingInfo = getRatingLabel(course.rating)
     const buttonClass = "block w-full rounded-md bg-editorial-900 px-4 py-2 text-center text-sm font-semibold text-white transition-colors hover:bg-editorial-800"
@@ -55,6 +70,7 @@ export default function CourseCard({ course, showProvider = true, className = ''
           target="_blank"
           rel="noopener noreferrer"
           className={buttonClass}
+          onClick={() => handleCardClick('external')}
         >
           Go to Course
         </a>
@@ -64,6 +80,7 @@ export default function CourseCard({ course, showProvider = true, className = ''
         <Link
           href={`/signup/${course.id}`}
           className={buttonClass}
+          onClick={() => handleCardClick('signup')}
         >
           Sign Up
         </Link>
@@ -73,6 +90,7 @@ export default function CourseCard({ course, showProvider = true, className = ''
         <Link
           href={`/courses/${course.id}`}
           className={buttonClass}
+          onClick={() => handleCardClick('view')}
         >
           Learn More
         </Link>
