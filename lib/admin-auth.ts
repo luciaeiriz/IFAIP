@@ -21,7 +21,10 @@ export async function isAdminClient(): Promise<boolean> {
       return false
     }
 
-    console.log('Calling /api/admin/check-status with token:', session.access_token.substring(0, 20) + '...')
+    // Don't log tokens even in development for security
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Calling /api/admin/check-status')
+    }
 
     // Call server-side API route to check admin status
     // Pass the access token in Authorization header

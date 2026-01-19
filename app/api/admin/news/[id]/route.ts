@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/admin-api-middleware'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { isValidUUID } from '@/lib/validation'
 
 // DELETE news item
 export async function DELETE(
@@ -16,6 +17,14 @@ export async function DELETE(
     if (!id) {
       return NextResponse.json(
         { error: 'ID is required' },
+        { status: 400 }
+      )
+    }
+
+    // Validate UUID format
+    if (!isValidUUID(id)) {
+      return NextResponse.json(
+        { error: 'Invalid UUID format' },
         { status: 400 }
       )
     }

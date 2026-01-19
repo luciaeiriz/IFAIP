@@ -489,27 +489,30 @@ export default function LandingPageManagement() {
                             e.stopPropagation()
                             handleToggleEnabled(page)
                           }}
-                          className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                          className={`relative inline-flex h-7 w-14 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#36498C] focus:ring-offset-2 ${
                             page.is_enabled
-                              ? 'border border-yellow-300 text-yellow-700 hover:bg-yellow-50'
-                              : 'border border-green-300 text-green-700 hover:bg-green-50'
+                              ? 'bg-green-500'
+                              : 'bg-gray-300'
                           }`}
+                          role="switch"
+                          aria-checked={page.is_enabled}
+                          title={page.is_enabled ? 'Disable landing page' : 'Enable landing page'}
                         >
-                          {page.is_enabled ? (
-                            <>
-                              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                          <span
+                            className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform ${
+                              page.is_enabled ? 'translate-x-8' : 'translate-x-1'
+                            }`}
+                          >
+                            {page.is_enabled ? (
+                              <svg className="h-full w-full p-1 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                               </svg>
-                              Disable
-                            </>
-                          ) : (
-                            <>
-                              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            ) : (
+                              <svg className="h-full w-full p-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                               </svg>
-                              Enable
-                            </>
-                          )}
+                            )}
+                          </span>
                         </button>
                         <button
                           onClick={(e) => {

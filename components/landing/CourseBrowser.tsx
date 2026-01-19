@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
-import { getCoursesByTag, getFeaturedCourses } from '@/src/data/courses'
+import { getCoursesByTag, getFeaturedCoursesByTag } from '@/src/data/courses'
 import { Course, CourseLevel, CourseTag } from '@/types/course'
 
 interface CourseBrowserProps {
@@ -22,16 +22,14 @@ export default function CourseBrowser({ tag }: CourseBrowserProps) {
     const fetchCourses = async () => {
       setIsLoading(true)
       try {
+        // Fetch courses in parallel - optimized API calls
         const [taggedCourses, featured] = await Promise.all([
           getCoursesByTag(tag),
-          getFeaturedCourses(),
+          getFeaturedCoursesByTag(tag),
         ])
         setAllCourses(taggedCourses)
-        // Filter featured courses by tag and take top 3
-        const filteredFeatured = featured
-          .filter((course) => course.tags.includes(tag))
-          .slice(0, 3)
-        setFeaturedCourses(filteredFeatured)
+        // Take top 3 featured courses (already filtered by tag in database)
+        setFeaturedCourses(featured.slice(0, 3))
       } catch (error) {
         console.error('Error fetching courses:', error)
       } finally {

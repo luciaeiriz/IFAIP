@@ -35,8 +35,6 @@ export default function CoursesPage() {
         if (pagesResponse.ok) {
           const pagesData = await pagesResponse.json()
           const pages = pagesData.landingPages || []
-          console.log('📋 Fetched landing pages:', pages)
-          console.log('📋 Number of landing pages:', pages.length)
           setLandingPages(pages)
 
           // Fetch course counts for each landing page
@@ -111,7 +109,6 @@ export default function CoursesPage() {
     // This ensures admin changes are reflected quickly
     const pollInterval = setInterval(() => {
       if (document.visibilityState === 'visible') {
-        console.log('🔄 Courses page: Polling for landing page updates...')
         fetchData()
       }
     }, 5000) // Poll every 5 seconds
@@ -119,7 +116,6 @@ export default function CoursesPage() {
     // Also refresh when tab becomes visible
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
-        console.log('🔄 Courses page: Tab became visible, refreshing...')
         fetchData()
       }
     }
@@ -325,7 +321,6 @@ export default function CoursesPage() {
             }}
           >
             {landingPages.map((page) => {
-              console.log('🎴 Rendering landing page card:', page.name, page.tag)
               const courseCount = courseCounts[page.tag] || 0
               return (
                 <Link

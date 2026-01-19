@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo, Suspense } from 'react'
-import { getCoursesByTag, getFeaturedCourses } from '@/src/data/courses'
+import { getCoursesByTag, getFeaturedCoursesByTag } from '@/src/data/courses'
 import { Course, CourseTag } from '@/types/course'
 import ForbesHeroSection from '@/components/courses/ForbesHeroSection'
 import FeaturedTopPicks from '@/components/courses/FeaturedTopPicks'
@@ -20,31 +20,16 @@ function FleetCoursesContent() {
       setIsLoading(true)
       
       try {
-        console.log('🚀 === STARTING COURSE FETCH (FLEET) ===')
-        console.log(`Target tag: ${TAG}`)
-        
-        // Test connection
-        const { testSupabaseConnection } = await import('@/src/data/courses')
-        await testSupabaseConnection()
-        
-        // Fetch courses
+        // Fetch courses in parallel - optimized API calls
         const [courses, featured] = await Promise.all([
           getCoursesByTag(TAG),
-          getFeaturedCourses(),
+          getFeaturedCoursesByTag(TAG),
         ])
         
-        console.log(`✅ Fetch complete (Fleet):`)
-        console.log(`  - ${courses.length} courses for tag "${TAG}"`)
-        console.log(`  - ${featured.length} total featured courses`)
-        
-        const featuredForTag = featured.filter(c => c.tags.includes(TAG as CourseTag))
-        console.log(`  - ${featuredForTag.length} featured courses for tag "${TAG}"`)
-        
         setAllCourses(courses)
-        setFeaturedCourses(featuredForTag)
+        setFeaturedCourses(featured)
       } catch (err: any) {
         console.error('❌ Error fetching courses:', err)
-        console.error('Error message:', err.message)
         setAllCourses([])
         setFeaturedCourses([])
       } finally {

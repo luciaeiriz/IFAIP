@@ -50,63 +50,23 @@ function transformCourse(row: RawCourseRow): Course {
  */
 async function rawQueryAllCourses(): Promise<RawCourseRow[]> {
   try {
-    console.log('🔍 RAW QUERY: Fetching ALL courses with no filters...')
-    
-    // Log the Supabase URL being used (first 30 chars for security)
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-    console.log('🔗 Supabase URL:', supabaseUrl ? supabaseUrl.substring(0, 30) + '...' : '❌ MISSING')
-    console.log('🔑 Anon Key:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? '✅ Set' : '❌ MISSING')
-    
-    // Try the simplest possible query first
-    const { data, error, count } = await supabase
+    const { data, error } = await supabase
       .from('courses')
-      .select('*', { count: 'exact' })
-      .limit(100) // Add explicit limit
+      .select('*')
+      .limit(100)
 
     if (error) {
-      console.error('❌ RAW QUERY ERROR:', error)
-      console.error('Error code:', error.code)
-      console.error('Error message:', error.message)
-      console.error('Error hint:', error.hint)
-      console.error('Full error:', JSON.stringify(error, null, 2))
-      
+      console.error('❌ RAW QUERY ERROR:', error.message)
       // If it's an RLS error, provide helpful message
       if (error.code === 'PGRST301' || error.message?.includes('permission') || error.message?.includes('policy')) {
         console.error('🔒 RLS ERROR: Row Level Security is blocking the query!')
-        console.error('Check your Supabase RLS policies for the courses table.')
-        console.error('Go to Supabase Dashboard → Authentication → Policies → courses table')
-        console.error('Make sure "courses_select_public" policy exists and allows SELECT')
       }
-      
       return []
-    }
-
-    console.log(`✅ RAW QUERY SUCCESS: Found ${data?.length || 0} courses (count: ${count})`)
-    
-    if (data && data.length > 0) {
-      console.log('📋 Sample raw course data:', JSON.stringify(data[0], null, 2))
-      console.log('📋 All column names:', Object.keys(data[0]))
-      console.log('📋 Sample tag value:', data[0].tag)
-      console.log('📋 Sample priority value:', data[0].priority)
-    } else {
-      console.warn('⚠️ No courses found in database')
-      console.warn('This could mean:')
-      console.warn('1. No courses exist in THIS Supabase project')
-      console.warn('2. RLS policies are blocking the query (but no error shown)')
-      console.warn('3. Wrong Supabase project/credentials')
-      console.warn('')
-      console.warn('🔍 VERIFICATION STEPS:')
-      console.warn('1. Go to Supabase Dashboard → Table Editor → courses')
-      console.warn('2. Check if courses exist there')
-      console.warn('3. Verify the Supabase URL matches:', supabaseUrl.substring(0, 30) + '...')
-      console.warn('4. Check RLS policies: Dashboard → Authentication → Policies')
     }
 
     return data || []
   } catch (error: any) {
-    console.error('❌ RAW QUERY EXCEPTION:', error)
-    console.error('Exception message:', error?.message)
-    console.error('Exception stack:', error?.stack)
+    console.error('❌ RAW QUERY EXCEPTION:', error?.message)
     return []
   }
 }
@@ -115,19 +75,7 @@ async function rawQueryAllCourses(): Promise<RawCourseRow[]> {
  * Test Supabase connection with raw query
  */
 export async function testSupabaseConnection(): Promise<void> {
-  console.log('🧪 === TESTING SUPABASE CONNECTION ===')
-  console.log('Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL ? '✅ Set' : '❌ Missing')
-  console.log('Supabase Key:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? '✅ Set' : '❌ Missing')
-  
-  const courses = await rawQueryAllCourses()
-  console.log(`📊 Connection test result: ${courses.length} courses found`)
-  
-  if (courses.length > 0) {
-    const sample = courses[0]
-    console.log('📋 Sample course columns:', Object.keys(sample))
-    console.log('📋 Sample course tag value:', sample.tag)
-    console.log('📋 Sample course type column:', sample.type || sample.course_type || 'NOT FOUND')
-  }
+  await rawQueryAllCourses()
 }
 
 /**
@@ -135,28 +83,13 @@ export async function testSupabaseConnection(): Promise<void> {
  */
 export async function getAllCourses(): Promise<Course[]> {
   try {
-    console.log('📦 getAllCourses: Starting...')
-    
     const rawCourses = await rawQueryAllCourses()
     
     if (rawCourses.length === 0) {
-      console.warn('⚠️ getAllCourses: No courses found in database')
       return []
     }
 
-    console.log(`📦 getAllCourses: Transforming ${rawCourses.length} courses...`)
-    const transformed = rawCourses.map(transformCourse)
-    
-    if (transformed.length > 0) {
-      console.log('✅ getAllCourses: Sample transformed course:', {
-        id: transformed[0].id,
-        title: transformed[0].title,
-        tag: transformed[0].tags,
-        priority: transformed[0].priority,
-      })
-    }
-
-    return transformed
+    return rawCourses.map(transformCourse)
   } catch (error) {
     console.error('❌ getAllCourses ERROR:', error)
     return []
@@ -164,14 +97,34 @@ export async function getAllCourses(): Promise<Course[]> {
 }
 
 /**
+ * Cache for relevancy column lookups to avoid repeated database queries
+ */
+const relevancyColumnCache = new Map<string, string>()
+
+/**
  * Helper function to get the relevancy column name for a given tag
  * Supports both legacy tags (Business, Restaurant, Fleet) and dynamic tags from landing_pages table
+ * Uses caching to avoid repeated database queries
  */
 export async function getRelevancyColumn(tag: string): Promise<string> {
+  // Check cache first
+  if (relevancyColumnCache.has(tag)) {
+    return relevancyColumnCache.get(tag)!
+  }
+  
   // Check if it's a legacy tag
-  if (tag === 'Business') return 'business_relevancy'
-  if (tag === 'Restaurant') return 'restaurant_relevancy'
-  if (tag === 'Fleet') return 'fleet_relevancy'
+  if (tag === 'Business') {
+    relevancyColumnCache.set(tag, 'business_relevancy')
+    return 'business_relevancy'
+  }
+  if (tag === 'Restaurant') {
+    relevancyColumnCache.set(tag, 'restaurant_relevancy')
+    return 'restaurant_relevancy'
+  }
+  if (tag === 'Fleet') {
+    relevancyColumnCache.set(tag, 'fleet_relevancy')
+    return 'fleet_relevancy'
+  }
   
   // For new tags, fetch from landing_pages table
   try {
@@ -182,6 +135,7 @@ export async function getRelevancyColumn(tag: string): Promise<string> {
       .single()
     
     if (data?.relevancy_column) {
+      relevancyColumnCache.set(tag, data.relevancy_column) // Cache result
       return data.relevancy_column
     }
   } catch (error) {
@@ -189,7 +143,9 @@ export async function getRelevancyColumn(tag: string): Promise<string> {
   }
   
   // Fallback: generate column name from tag
-  return `${tag.toLowerCase()}_relevancy`
+  const fallback = `${tag.toLowerCase()}_relevancy`
+  relevancyColumnCache.set(tag, fallback) // Cache fallback
+  return fallback
 }
 
 /**
@@ -208,10 +164,6 @@ async function getCoursesByTagInternal(
     const { includeHidden = false, limit } = options
     const relevancyColumn = await getRelevancyColumn(tag)
     
-    console.log(`🏷️ getCoursesByTagInternal: Fetching courses for tag "${tag}" (includeHidden: ${includeHidden}, limit: ${limit || 'none'})...`)
-    console.log(`🏷️ IMPORTANT: NO tag filter, NO signup_enabled filter - getting ALL courses sorted by ${relevancyColumn}`)
-    console.log(`🏷️ Ordering by: ${relevancyColumn} (ascending, nullsFirst: false)`)
-    
     // Build query step by step - Supabase queries are chainable
     // CRITICAL: NO FILTERING BY TAG OR signup_enabled - get ALL courses, sort by relevancy score
     // The relevancy score determines which page the course appears on, not the tag field
@@ -228,21 +180,10 @@ async function getCoursesByTagInternal(
     // Apply limit AFTER ordering to ensure we get the top N courses
     if (limit) {
       query = query.limit(limit)
-      console.log(`🏷️ Limiting to ${limit} courses`)
     }
     
     const { data, error } = await query
     
-    // Log the actual results to debug
-    console.log(`🏷️ Query executed: returned ${data?.length || 0} courses (limit was ${limit || 'none'})`)
-    if (data && data.length > 0) {
-      console.log(`🏷️ Relevancy scores for returned courses:`, data.map((r: any) => ({
-        id: r.id,
-        title: r.title,
-        [relevancyColumn]: r[relevancyColumn],
-        signup_enabled: r.signup_enabled
-      })))
-    }
     if (data && limit && data.length > limit) {
       console.error(`❌ ERROR: Query returned ${data.length} courses but limit was ${limit}! This should not happen.`)
     }
@@ -272,9 +213,7 @@ async function getCoursesByTagInternal(
         return []
       }
       
-      const transformed = (fallbackData || []).map(transformCourse)
-      console.log(`🏷️ getCoursesByTagInternal (fallback): Returned ${transformed.length} courses`)
-      return transformed
+      return (fallbackData || []).map(transformCourse)
     }
     
     if (!data || data.length === 0) {
@@ -292,8 +231,6 @@ async function getCoursesByTagInternal(
       console.warn(`⚠️ WARNING: Database returned ${transformed.length} courses but limit is ${limit}. Truncating to ${limit}.`)
       transformed = transformed.slice(0, limit)
     }
-    
-    console.log(`🏷️ getCoursesByTagInternal: Successfully returned ${transformed.length} courses for tag "${tag}" (limit was ${limit || 'none'})`)
     
     return transformed
   } catch (error: any) {
@@ -331,8 +268,6 @@ export async function getCoursesByTagWithRelevancy(
   const relevancyColumn = await getRelevancyColumn(tag)
   
   try {
-    console.log(`🏷️ getCoursesByTagWithRelevancy: Fetching courses for tag "${tag}" with relevancy data...`)
-    
     // Build query - same logic as getCoursesByTagInternal but preserve relevancy data
     let query = supabase
       .from('courses')
@@ -385,16 +320,12 @@ export async function getCoursesByTagWithRelevancy(
       })) as CourseWithRelevancy[]
       
       // Enforce limit
-      const result = limit && coursesWithRelevancy.length > limit 
+      return limit && coursesWithRelevancy.length > limit 
         ? coursesWithRelevancy.slice(0, limit)
         : coursesWithRelevancy
-      
-      console.log(`🏷️ getCoursesByTagWithRelevancy (fallback): Returned ${result.length} courses`)
-      return result
     }
     
     if (!data || data.length === 0) {
-      console.warn(`⚠️ getCoursesByTagWithRelevancy: No courses found for tag "${tag}"`)
       return []
     }
     
@@ -413,7 +344,6 @@ export async function getCoursesByTagWithRelevancy(
       coursesWithRelevancy = coursesWithRelevancy.slice(0, limit)
     }
     
-    console.log(`🏷️ getCoursesByTagWithRelevancy: Successfully returned ${coursesWithRelevancy.length} courses for tag "${tag}"`)
     return coursesWithRelevancy
   } catch (error: any) {
     console.error('❌ getCoursesByTagWithRelevancy EXCEPTION:', error)
@@ -433,8 +363,6 @@ export async function getCoursesByTagForManagement(tag: CourseTag | string): Pro
  */
 export async function getCourseById(id: string): Promise<Course | null> {
   try {
-    console.log(`🔍 getCourseById: Fetching course ${id}...`)
-    
     const { data, error } = await supabase
       .from('courses')
       .select('*')
@@ -447,11 +375,9 @@ export async function getCourseById(id: string): Promise<Course | null> {
     }
 
     if (!data) {
-      console.warn(`⚠️ getCourseById: Course ${id} not found`)
       return null
     }
 
-    console.log(`✅ getCourseById: Found course ${id}`)
     return transformCourse(data)
   } catch (error) {
     console.error('❌ getCourseById EXCEPTION:', error)
@@ -465,8 +391,6 @@ export async function getCourseById(id: string): Promise<Course | null> {
  */
 export async function getFeaturedCourses(): Promise<Course[]> {
   try {
-    console.log('⭐ getFeaturedCourses: Fetching featured courses from database...')
-    
     // Query database directly for featured courses
     // Only show courses where signup_enabled is true (visible courses)
     const { data, error } = await supabase
@@ -482,19 +406,46 @@ export async function getFeaturedCourses(): Promise<Course[]> {
     }
 
     if (!data || data.length === 0) {
-      console.log('⭐ getFeaturedCourses: No featured courses found')
       return []
     }
 
-    console.log(`⭐ getFeaturedCourses: Database returned ${data.length} featured courses`)
-    
     // Transform database rows to Course objects
-    const featured = data.map(transformCourse)
-
-    console.log(`⭐ getFeaturedCourses: Successfully returned ${featured.length} featured courses`)
-    return featured
+    return data.map(transformCourse)
   } catch (error) {
     console.error('❌ getFeaturedCourses ERROR:', error)
+    return []
+  }
+}
+
+/**
+ * Optimized: Fetches featured courses filtered by tag - more efficient than fetching all and filtering client-side
+ * This reduces data transfer and improves performance
+ */
+export async function getFeaturedCoursesByTag(tag: CourseTag): Promise<Course[]> {
+  try {
+    // Query database directly for featured courses with tag filter
+    // This is more efficient than fetching all featured courses and filtering in memory
+    const { data, error } = await supabase
+      .from('courses')
+      .select('*')
+      .eq('is_featured', true)
+      .eq('signup_enabled', true)
+      .eq('tag', tag)
+      .order('priority', { ascending: true, nullsFirst: false })
+
+    if (error) {
+      console.error('❌ getFeaturedCoursesByTag DATABASE ERROR:', error)
+      return []
+    }
+
+    if (!data || data.length === 0) {
+      return []
+    }
+
+    // Transform database rows to Course objects
+    return data.map(transformCourse)
+  } catch (error) {
+    console.error('❌ getFeaturedCoursesByTag ERROR:', error)
     return []
   }
 }

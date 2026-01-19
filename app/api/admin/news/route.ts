@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/admin-api-middleware'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { isValidUUID, validateLength } from '@/lib/validation'
 
 // GET all news items
 export async function GET(request: NextRequest) {
@@ -57,13 +58,54 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate category
-    const validCategories = ['news', 'technology', 'science', 'business']
+    // Validate category (must match database CHECK constraint)
+    const validCategories = ['news', 'blog', 'researcher-spotlights', 'latest-research', 'events']
     if (!validCategories.includes(body.category)) {
       return NextResponse.json(
         { error: `Category must be one of: ${validCategories.join(', ')}` },
         { status: 400 }
       )
+    }
+
+    // Validate input lengths
+    const titleValidation = validateLength(body.title, 500, 'Title')
+    if (!titleValidation.isValid) {
+      return NextResponse.json(
+        { error: titleValidation.error },
+        { status: 400 }
+      )
+    }
+
+    if (body.description) {
+      const descValidation = validateLength(body.description, 2000, 'Description')
+      if (!descValidation.isValid) {
+        return NextResponse.json(
+          { error: descValidation.error },
+          { status: 400 }
+        )
+      }
+    }
+
+    if (body.label) {
+      const labelValidation = validateLength(body.label, 100, 'Label')
+      if (!labelValidation.isValid) {
+        return NextResponse.json(
+          { error: labelValidation.error },
+          { status: 400 }
+        )
+      }
+    }
+
+    // Validate href is a valid URL
+    if (body.href) {
+      try {
+        new URL(body.href)
+      } catch {
+        return NextResponse.json(
+          { error: 'Invalid href URL format' },
+          { status: 400 }
+        )
+      }
     }
 
     // Prepare the news item data
@@ -119,12 +161,62 @@ export async function PUT(request: NextRequest) {
       )
     }
 
-    // Validate category if provided
+    // Validate UUID format
+    if (!isValidUUID(body.id)) {
+      return NextResponse.json(
+        { error: 'Invalid UUID format' },
+        { status: 400 }
+      )
+    }
+
+    // Validate category if provided (must match database CHECK constraint)
     if (body.category) {
-      const validCategories = ['news', 'technology', 'science', 'business']
+      const validCategories = ['news', 'blog', 'researcher-spotlights', 'latest-research', 'events']
       if (!validCategories.includes(body.category)) {
         return NextResponse.json(
           { error: `Category must be one of: ${validCategories.join(', ')}` },
+          { status: 400 }
+        )
+      }
+    }
+
+    // Validate input lengths if provided
+    if (body.title !== undefined) {
+      const titleValidation = validateLength(body.title, 500, 'Title')
+      if (!titleValidation.isValid) {
+        return NextResponse.json(
+          { error: titleValidation.error },
+          { status: 400 }
+        )
+      }
+    }
+
+    if (body.description !== undefined) {
+      const descValidation = validateLength(body.description, 2000, 'Description')
+      if (!descValidation.isValid) {
+        return NextResponse.json(
+          { error: descValidation.error },
+          { status: 400 }
+        )
+      }
+    }
+
+    if (body.label !== undefined) {
+      const labelValidation = validateLength(body.label, 100, 'Label')
+      if (!labelValidation.isValid) {
+        return NextResponse.json(
+          { error: labelValidation.error },
+          { status: 400 }
+        )
+      }
+    }
+
+    if (body.href !== undefined) {
+      try {
+        new URL(body.href)
+      } catch {
+        return NextResponse.json(
+          { error: 'Invalid href URL format' },
           { status: 400 }
         )
       }

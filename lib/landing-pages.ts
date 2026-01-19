@@ -89,11 +89,7 @@ export async function getEnabledLandingPages(): Promise<LandingPagePublic[]> {
 export async function getLandingPageByTag(tag: string): Promise<LandingPage | null> {
   try {
     const normalizedTag = tag.toLowerCase()
-    console.log(`🔍 getLandingPageByTag: Searching for tag "${normalizedTag}"`)
     
-    // Try to fetch the landing page - RLS will filter to only enabled pages
-    // But we need to check if it exists even if disabled for admin purposes
-    // So we'll fetch all pages and filter client-side, or use a different approach
     const { data, error } = await supabase
       .from('landing_pages')
       .select('*')
@@ -102,31 +98,15 @@ export async function getLandingPageByTag(tag: string): Promise<LandingPage | nu
 
     if (error) {
       if (error.code === 'PGRST116') {
-        // Not found - could be because RLS is blocking or it doesn't exist
-        console.log(`❌ Landing page not found for tag "${normalizedTag}" (code: PGRST116)`)
-        console.log(`   This could mean:`)
-        console.log(`   1. The landing page doesn't exist`)
-        console.log(`   2. The landing page exists but is disabled (RLS blocking)`)
-        console.log(`   3. The tag doesn't match exactly`)
+        // Not found
         return null
       }
-      console.error('Error fetching landing page by tag:', error)
-      console.error('Error code:', error.code)
-      console.error('Error message:', error.message)
-      // Don't throw - return null so the page can still render with legacy fallback
+      console.error('Error fetching landing page by tag:', error.message)
       return null
     }
 
     if (!data) {
-      console.log(`❌ No data returned for tag "${normalizedTag}"`)
       return null
-    }
-
-    console.log(`✅ Found landing page:`, data.name, `(enabled: ${data.is_enabled})`)
-    
-    // If RLS allowed it through, it should be enabled, but double-check
-    if (!data.is_enabled) {
-      console.warn(`⚠️ Landing page "${data.name}" is disabled but was returned (RLS might not be working correctly)`)
     }
     
     return data

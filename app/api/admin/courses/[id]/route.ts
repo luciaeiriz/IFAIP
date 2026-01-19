@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/admin-api-middleware'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { isValidUUID, validateLength } from '@/lib/validation'
 
 export async function PUT(
   request: NextRequest,
@@ -11,6 +12,15 @@ export async function PUT(
 
   try {
     const { id } = params
+    
+    // Validate UUID format
+    if (!isValidUUID(id)) {
+      return NextResponse.json(
+        { error: 'Invalid UUID format' },
+        { status: 400 }
+      )
+    }
+
     const body = await request.json()
 
     // Validate required fields
@@ -19,6 +29,25 @@ export async function PUT(
         { error: 'Title and tag are required' },
         { status: 400 }
       )
+    }
+
+    // Validate input lengths
+    const titleValidation = validateLength(body.title, 500, 'Title')
+    if (!titleValidation.isValid) {
+      return NextResponse.json(
+        { error: titleValidation.error },
+        { status: 400 }
+      )
+    }
+
+    if (body.description) {
+      const descValidation = validateLength(body.description, 5000, 'Description')
+      if (!descValidation.isValid) {
+        return NextResponse.json(
+          { error: descValidation.error },
+          { status: 400 }
+        )
+      }
     }
 
     // Prepare the course data for database
@@ -87,6 +116,14 @@ export async function DELETE(
 
   try {
     const { id } = params
+
+    // Validate UUID format
+    if (!isValidUUID(id)) {
+      return NextResponse.json(
+        { error: 'Invalid UUID format' },
+        { status: 400 }
+      )
+    }
 
     const { error } = await supabaseAdmin
       .from('courses')

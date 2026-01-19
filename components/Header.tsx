@@ -39,10 +39,6 @@ export default function Header() {
         })
         if (response.ok) {
           const data = await response.json()
-          console.log('📋 Header: Fetched landing pages:', data.landingPages)
-          data.landingPages?.forEach((page: any) => {
-            console.log(`  - ${page.name}: description="${page.description}" (type: ${typeof page.description}, length: ${page.description?.length || 0})`)
-          })
           setLandingPages(data.landingPages || [])
         }
       } catch (error) {
@@ -56,7 +52,6 @@ export default function Header() {
     // Refetch when window gains focus (user switches back to tab)
     // This helps catch changes made in another tab or after admin updates
     const handleFocus = () => {
-      console.log('🔄 Header: Window focused, refreshing landing pages...')
       fetchLandingPages()
     }
     
@@ -71,7 +66,6 @@ export default function Header() {
     window.addEventListener('focus', handleFocus)
     window.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {
-        console.log('🔄 Header: Tab became visible, refreshing landing pages...')
         fetchLandingPages()
       }
     })
@@ -400,15 +394,6 @@ export default function Header() {
                                 ? (description.length > 145 ? description.substring(0, 145).trim() + '...' : description)
                                 : 'AI certification programs'
                               
-                              // Debug log
-                              if (page.tag === 'healthcare') {
-                                console.log(`🏥 Healthcare card:`, {
-                                  rawDescription: page.description,
-                                  processedDescription: description,
-                                  truncatedDescription,
-                                  heroTitle: page.heroTitle
-                                })
-                              }
                               
                               return (
                                 <Link
@@ -731,15 +716,6 @@ export default function Header() {
                                 ? (description.length > 145 ? description.substring(0, 145).trim() + '...' : description)
                                 : 'AI certification programs'
                               
-                              // Debug log
-                              if (page.tag === 'healthcare') {
-                                console.log(`🏥 Healthcare card:`, {
-                                  rawDescription: page.description,
-                                  processedDescription: description,
-                                  truncatedDescription,
-                                  heroTitle: page.heroTitle
-                                })
-                              }
                               
                               return (
                                 <Link

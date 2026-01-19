@@ -45,7 +45,6 @@ function transformCourse(row: DatabaseCourse): Course {
  */
 export async function getCoursesByTag(tag: CourseTag): Promise<Course[]> {
   try {
-    console.log(`Fetching courses with tag: ${tag}`)
     const { data: courses, error } = await supabase
       .from('courses')
       .select('*')
@@ -54,13 +53,7 @@ export async function getCoursesByTag(tag: CourseTag): Promise<Course[]> {
 
     if (error) {
       console.error('Error fetching courses by tag:', error)
-      console.error('Error details:', JSON.stringify(error, null, 2))
       throw error
-    }
-
-    console.log(`Found ${courses?.length || 0} courses with tag ${tag}`)
-    if (courses && courses.length > 0) {
-      console.log('Sample course:', JSON.stringify(courses[0], null, 2))
     }
 
     return (courses || []).map(transformCourse)
@@ -140,9 +133,7 @@ export async function getFeaturedCourses(): Promise<Course[]> {
 
     // Transform and filter to top 3 by priority
     const transformed = (courses || []).map(transformCourse)
-    const filtered = transformed.filter(c => c.priority !== null && c.priority <= 3).slice(0, 3)
-    console.log(`Found ${filtered.length} featured courses (from ${transformed.length} total)`)
-    return filtered
+    return transformed.filter(c => c.priority !== null && c.priority <= 3).slice(0, 3)
   } catch (error) {
     console.error('Error in getFeaturedCourses:', error)
     throw error
@@ -154,22 +145,13 @@ export async function getFeaturedCourses(): Promise<Course[]> {
  */
 export async function testDatabaseConnection(): Promise<void> {
   try {
-    console.log('Testing database connection...')
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('courses')
       .select('tag, priority, title')
       .limit(5)
 
     if (error) {
       console.error('Database connection error:', error)
-      return
-    }
-
-    console.log(`Found ${data?.length || 0} courses in database`)
-    if (data && data.length > 0) {
-      console.log('Sample courses:', data)
-      const uniqueTags = Array.from(new Set(data.map(c => c.tag).filter(Boolean)))
-      console.log('Unique tags found:', uniqueTags)
     }
   } catch (error) {
     console.error('Error testing database:', error)

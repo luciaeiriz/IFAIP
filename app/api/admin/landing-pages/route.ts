@@ -41,6 +41,16 @@ export async function GET(request: NextRequest) {
         try {
           const relevancyColumn = page.relevancy_column
           
+          // Validate column name to prevent SQL injection (should match pattern: lowercase, numbers, underscores)
+          const columnNamePattern = /^[a-z0-9_]+$/
+          if (!columnNamePattern.test(relevancyColumn)) {
+            console.warn(`Invalid relevancy column name: ${relevancyColumn}`)
+            return {
+              ...page,
+              courseCount: 0,
+            }
+          }
+          
           // Fetch courses and filter in memory since we can't use dynamic column names in filters
           const { data: allCourses, error: coursesError } = await supabaseAdmin
             .from('courses')

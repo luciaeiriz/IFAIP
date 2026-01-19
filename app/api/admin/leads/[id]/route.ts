@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/admin-api-middleware'
 import { supabase } from '@/lib/supabase'
+import { isValidUUID } from '@/lib/validation'
 
 export async function DELETE(
   request: NextRequest,
@@ -11,6 +12,14 @@ export async function DELETE(
 
   try {
     const { id } = params
+
+    // Validate UUID format
+    if (!isValidUUID(id)) {
+      return NextResponse.json(
+        { error: 'Invalid UUID format' },
+        { status: 400 }
+      )
+    }
 
     const { error } = await supabase
       .from('leads')

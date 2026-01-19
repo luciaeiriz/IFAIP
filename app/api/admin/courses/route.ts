@@ -3,6 +3,7 @@ import { requireAdmin } from '@/lib/admin-api-middleware'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { rankNewCourse } from '@/lib/rank-course'
 import { randomUUID } from 'crypto'
+import { validateLength } from '@/lib/validation'
 
 export async function POST(request: NextRequest) {
   const authError = await requireAdmin(request)
@@ -15,6 +16,44 @@ export async function POST(request: NextRequest) {
     if (!body.title || !body.tag) {
       return NextResponse.json(
         { error: 'Title and tag are required' },
+        { status: 400 }
+      )
+    }
+
+    // Validate input lengths
+    const titleValidation = validateLength(body.title, 500, 'Title')
+    if (!titleValidation.isValid) {
+      return NextResponse.json(
+        { error: titleValidation.error },
+        { status: 400 }
+      )
+    }
+
+    if (body.description) {
+      const descValidation = validateLength(body.description, 5000, 'Description')
+      if (!descValidation.isValid) {
+        return NextResponse.json(
+          { error: descValidation.error },
+          { status: 400 }
+        )
+      }
+    }
+
+    if (body.headline) {
+      const headlineValidation = validateLength(body.headline, 200, 'Headline')
+      if (!headlineValidation.isValid) {
+        return NextResponse.json(
+          { error: headlineValidation.error },
+          { status: 400 }
+        )
+      }
+    }
+
+    // Validate tag is one of allowed values
+    const validTags = ['Business', 'Restaurant', 'Fleet']
+    if (!validTags.includes(body.tag)) {
+      return NextResponse.json(
+        { error: `Tag must be one of: ${validTags.join(', ')}` },
         { status: 400 }
       )
     }
