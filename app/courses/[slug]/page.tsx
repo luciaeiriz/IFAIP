@@ -166,6 +166,7 @@ function LandingPageView({ slug }: { slug: string }) {
   const [allCourses, setAllCourses] = useState<Course[]>([])
   const [featuredCourses, setFeaturedCourses] = useState<Course[]>([])
   const [landingPage, setLandingPage] = useState<any>(null)
+  const [currentTag, setCurrentTag] = useState<CourseTag | undefined>(undefined)
   const [isLoading, setIsLoading] = useState(true)
   const [notFoundError, setNotFoundError] = useState(false)
 
@@ -204,6 +205,12 @@ function LandingPageView({ slug }: { slug: string }) {
         const tagForCourses = pageData?.tag || normalizedTag
         console.log(`📚 Fetching courses for tag: "${tagForCourses}"`)
         
+        // Convert to proper CourseTag format (capitalized)
+        const normalizedTagForCourses = tagForCourses.charAt(0).toUpperCase() + tagForCourses.slice(1).toLowerCase()
+        const courseTag = (normalizedTagForCourses === 'Business' || normalizedTagForCourses === 'Restaurant' || normalizedTagForCourses === 'Fleet') 
+          ? normalizedTagForCourses as CourseTag 
+          : undefined
+        
         const [courses, featured] = await Promise.all([
           getCoursesByTag(tagForCourses),
           getFeaturedCourses(),
@@ -218,6 +225,7 @@ function LandingPageView({ slug }: { slug: string }) {
         
         setAllCourses(courses)
         setFeaturedCourses(featuredForTag)
+        setCurrentTag(courseTag)
       } catch (err: any) {
         console.error('❌ Error fetching courses:', err)
         setAllCourses([])
@@ -287,7 +295,7 @@ function LandingPageView({ slug }: { slug: string }) {
       <FeaturedTopPicks courses={featuredTopPicks} />
       {allCourses.length > 0 && (
         <div className="bg-white pt-4 pb-12">
-          <AllCoursesGrid courses={allCourses} />
+          <AllCoursesGrid courses={allCourses} tag={currentTag} />
         </div>
       )}
       <EmailCaptureCTA tag={slug} />

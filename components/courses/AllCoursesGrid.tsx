@@ -4,14 +4,50 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Course } from '@/types/course'
+import { Course, CourseTag } from '@/types/course'
 
 interface AllCoursesGridProps {
   courses: Course[]
+  tag?: CourseTag
 }
 
-export default function AllCoursesGrid({ courses }: AllCoursesGridProps) {
+export default function AllCoursesGrid({ courses, tag }: AllCoursesGridProps) {
   const router = useRouter()
+
+  // Get guides based on current tag - show links to other course listing pages
+  const getGuides = () => {
+    const allGuides = [
+      {
+        title: 'AI for Business',
+        href: '/courses/business',
+        description: 'Transform your business operations with cutting-edge AI solutions and training programs'
+      },
+      {
+        title: 'AI for Restaurants',
+        href: '/courses/restaurant',
+        description: 'Revolutionize your restaurant operations with AI-powered solutions for inventory, ordering, and customer experience'
+      },
+      {
+        title: 'AI for Fleet Management',
+        href: '/courses/fleet',
+        description: 'Optimize your fleet operations with intelligent AI systems for routing, maintenance, and logistics'
+      }
+    ]
+
+    // Filter out the current tag's guide
+    const currentTagMap: Record<string, string> = {
+      'Business': 'AI for Business',
+      'Restaurant': 'AI for Restaurants',
+      'Fleet': 'AI for Fleet Management'
+    }
+
+    const filteredGuides = allGuides.filter(guide => guide.title !== currentTagMap[tag || ''])
+    
+    // Return first 2 guides (or all if less than 2)
+    return filteredGuides.slice(0, 2)
+  }
+
+  const guides = getGuides()
 
   const handleCardClick = (course: Course, e: React.MouseEvent<HTMLDivElement>) => {
     // Don't navigate if clicking on interactive elements (buttons, links, etc.)
@@ -525,59 +561,39 @@ export default function AllCoursesGrid({ courses }: AllCoursesGridProps) {
               width: '100%'
             }}></div>
 
-            {/* Entry 1 - First subsection */}
-            <div style={{ padding: '16px 20px', height: '87px' }}>
-              <h4 style={{
-                fontSize: '14px',
-                fontFamily: 'EuclidCircularB, sans-serif',
-                fontWeight: 'normal',
-                color: '#181716',
-                marginBottom: '8px',
-                marginTop: '0',
-                lineHeight: '1.4'
-              }}>
-                Best Online Leadership Programmes
-              </h4>
-              <a href="#" style={{
-                fontSize: '14px',
-                fontFamily: 'EuclidCircularB, sans-serif',
-                color: '#395BB6',
-                textDecoration: 'none',
-                fontWeight: 'normal'
-              }}>
-                Read More
-              </a>
-            </div>
-
-            {/* Full-width separator line */}
-            <div style={{
-              borderBottom: '1px solid #E0E0E0',
-              width: '100%'
-            }}></div>
-
-            {/* Entry 2 - Second subsection */}
-            <div style={{ padding: '16px 20px', height: '109px' }}>
-              <h4 style={{
-                fontSize: '14px',
-                fontFamily: 'EuclidCircularB, sans-serif',
-                fontWeight: 'normal',
-                color: '#181716',
-                marginBottom: '8px',
-                marginTop: '0',
-                lineHeight: '1.4'
-              }}>
-                The Best Business Management Courses
-              </h4>
-              <a href="#" style={{
-                fontSize: '14px',
-                fontFamily: 'EuclidCircularB, sans-serif',
-                color: '#395BB6',
-                textDecoration: 'none',
-                fontWeight: 'normal'
-              }}>
-                Read More
-              </a>
-            </div>
+            {/* Dynamic Guides */}
+            {guides.map((guide, index) => (
+              <div key={guide.href}>
+                {index > 0 && (
+                  <div style={{
+                    borderBottom: '1px solid #E0E0E0',
+                    width: '100%'
+                  }}></div>
+                )}
+                <div style={{ padding: '16px 20px', minHeight: '87px' }}>
+                  <h4 style={{
+                    fontSize: '14px',
+                    fontFamily: 'EuclidCircularB, sans-serif',
+                    fontWeight: 'normal',
+                    color: '#181716',
+                    marginBottom: '8px',
+                    marginTop: '0',
+                    lineHeight: '1.4'
+                  }}>
+                    {guide.title}
+                  </h4>
+                  <Link href={guide.href} style={{
+                    fontSize: '14px',
+                    fontFamily: 'EuclidCircularB, sans-serif',
+                    color: '#395BB6',
+                    textDecoration: 'none',
+                    fontWeight: 'normal'
+                  }}>
+                    Read More
+                  </Link>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
