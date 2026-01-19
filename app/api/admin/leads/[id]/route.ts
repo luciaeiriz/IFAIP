@@ -3,6 +3,8 @@ import { requireAdmin } from '@/lib/admin-api-middleware'
 import { supabase } from '@/lib/supabase'
 import { isValidUUID } from '@/lib/validation'
 
+export const dynamic = 'force-dynamic'
+
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }

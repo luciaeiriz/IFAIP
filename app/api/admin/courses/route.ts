@@ -5,6 +5,8 @@ import { rankNewCourse } from '@/lib/rank-course'
 import { randomUUID } from 'crypto'
 import { validateLength } from '@/lib/validation'
 
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: NextRequest) {
   const authError = await requireAdmin(request)
   if (authError) return authError

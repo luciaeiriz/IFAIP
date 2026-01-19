@@ -3,6 +3,8 @@ import { requireAdmin } from '@/lib/admin-api-middleware'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { isValidUUID } from '@/lib/validation'
 
+export const dynamic = 'force-dynamic'
+
 // DELETE news item
 export async function DELETE(
   request: NextRequest,

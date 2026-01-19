@@ -3,6 +3,8 @@ import { requireAdmin } from '@/lib/admin-api-middleware'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { rankCoursesForLandingPage } from '@/lib/rank-course'
 
+export const dynamic = 'force-dynamic'
+
 // UUID regex pattern
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 

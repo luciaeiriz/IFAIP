@@ -2,6 +2,18 @@ import { supabase } from '@/lib/supabase'
 import { NextRequest } from 'next/server'
 
 /**
+ * Validate that Supabase URL uses HTTPS in production
+ * Returns true if valid, false otherwise
+ */
+function validateSupabaseUrl(supabaseUrl: string): boolean {
+  if (process.env.NODE_ENV === 'production' && supabaseUrl && !supabaseUrl.startsWith('https://')) {
+    console.error('❌ Supabase URL must use HTTPS in production. Current URL:', supabaseUrl.substring(0, 30) + '...')
+    return false
+  }
+  return true
+}
+
+/**
  * Check if the current client-side user is an admin
  * Use this in client components
  * Calls a server-side API route to check admin status securely
@@ -98,6 +110,11 @@ async function getUserIdFromRequest(request: NextRequest): Promise<string | null
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
     
+    // Validate HTTPS in production
+    if (!validateSupabaseUrl(supabaseUrl)) {
+      return null
+    }
+    
     // First, try Authorization header (Bearer token)
     const authHeader = request.headers.get('authorization')
     if (authHeader?.startsWith('Bearer ')) {
@@ -113,15 +130,46 @@ async function getUserIdFromRequest(request: NextRequest): Promise<string | null
             headers: {
               Authorization: `Bearer ${token}`,
             },
+            fetch: (url, options = {}) => {
+              // Add timeout to prevent hanging
+              const timeoutMs = 10000 // 10 seconds for getUser operations
+              const controller = new AbortController()
+              const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
+              
+              return fetch(url, {
+                ...options,
+                signal: options.signal || controller.signal,
+              }).finally(() => {
+                clearTimeout(timeoutId)
+              })
+            },
           },
         })
         
-        const { data: { user }, error } = await tempClient.auth.getUser(token)
-        if (!error && user) {
-          console.log('✅ Extracted user ID from Authorization header:', user.id)
-          return user.id
-        } else {
-          console.error('❌ Error getting user from token:', error)
+        // Add timeout wrapper to getUser call
+        try {
+          const getUserPromise = tempClient.auth.getUser(token)
+          const timeoutPromise = new Promise<never>((_, reject) => 
+            setTimeout(() => reject(new Error('getUser timeout')), 10000)
+          )
+          
+          const { data: { user }, error } = await Promise.race([
+            getUserPromise,
+            timeoutPromise,
+          ]) as any
+          
+          if (!error && user) {
+            console.log('✅ Extracted user ID from Authorization header:', user.id)
+            return user.id
+          } else {
+            console.error('❌ Error getting user from token:', error)
+          }
+        } catch (getUserError: any) {
+          if (getUserError.message === 'getUser timeout') {
+            console.error('❌ getUser() timed out after 10 seconds')
+          } else {
+            console.error('❌ Error getting user from token:', getUserError)
+          }
         }
       }
     } else {
@@ -152,11 +200,42 @@ async function getUserIdFromRequest(request: NextRequest): Promise<string | null
               headers: {
                 Authorization: `Bearer ${accessToken}`,
               },
+              fetch: (url, options = {}) => {
+                // Add timeout to prevent hanging
+                const timeoutMs = 10000 // 10 seconds for getUser operations
+                const controller = new AbortController()
+                const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
+                
+                return fetch(url, {
+                  ...options,
+                  signal: options.signal || controller.signal,
+                }).finally(() => {
+                  clearTimeout(timeoutId)
+                })
+              },
             },
           })
-          const { data: { user }, error } = await tempClient.auth.getUser(accessToken)
-          if (!error && user) {
-            return user.id
+          
+          // Add timeout wrapper to getUser call
+          try {
+            const getUserPromise = tempClient.auth.getUser(accessToken)
+            const timeoutPromise = new Promise<never>((_, reject) => 
+              setTimeout(() => reject(new Error('getUser timeout')), 10000)
+            )
+            
+            const { data: { user }, error } = await Promise.race([
+              getUserPromise,
+              timeoutPromise,
+            ]) as any
+            
+            if (!error && user) {
+              return user.id
+            }
+          } catch (getUserError: any) {
+            if (getUserError.message === 'getUser timeout') {
+              console.error('❌ getUser() timed out after 10 seconds (cookie)')
+            }
+            // Skip other errors, continue to next cookie
           }
         }
       } catch (parseError) {
@@ -180,11 +259,42 @@ async function getUserIdFromRequest(request: NextRequest): Promise<string | null
                   headers: {
                     Authorization: `Bearer ${accessToken}`,
                   },
+                  fetch: (url, options = {}) => {
+                    // Add timeout to prevent hanging
+                    const timeoutMs = 10000 // 10 seconds for getUser operations
+                    const controller = new AbortController()
+                    const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
+                    
+                    return fetch(url, {
+                      ...options,
+                      signal: options.signal || controller.signal,
+                    }).finally(() => {
+                      clearTimeout(timeoutId)
+                    })
+                  },
                 },
               })
-              const { data: { user }, error } = await tempClient.auth.getUser(accessToken)
-              if (!error && user) {
-                return user.id
+              
+              // Add timeout wrapper to getUser call
+              try {
+                const getUserPromise = tempClient.auth.getUser(accessToken)
+                const timeoutPromise = new Promise<never>((_, reject) => 
+                  setTimeout(() => reject(new Error('getUser timeout')), 10000)
+                )
+                
+                const { data: { user }, error } = await Promise.race([
+                  getUserPromise,
+                  timeoutPromise,
+                ]) as any
+                
+                if (!error && user) {
+                  return user.id
+                }
+              } catch (getUserError: any) {
+                if (getUserError.message === 'getUser timeout') {
+                  console.error('❌ getUser() timed out after 10 seconds (cookie loop)')
+                }
+                // Skip other errors, continue to next cookie
               }
             }
           } catch {
@@ -207,6 +317,12 @@ async function getUserIdFromRequest(request: NextRequest): Promise<string | null
  */
 export async function isAdminServer(request: NextRequest): Promise<boolean> {
   try {
+    // Validate Supabase URL before making queries
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+    if (!validateSupabaseUrl(supabaseUrl)) {
+      return false
+    }
+    
     const userId = await getUserIdFromRequest(request)
     
     if (!userId) {
@@ -224,11 +340,33 @@ export async function isAdminServer(request: NextRequest): Promise<boolean> {
     // Use .maybeSingle() instead of .single() to handle 0 rows gracefully
     // Dynamically import supabaseAdmin to avoid bundling it in client code
     const { supabaseAdmin } = await import('@/lib/supabase-admin')
-    const { data, error } = await supabaseAdmin
+    
+    // Add timeout wrapper to admin query
+    const queryPromise = supabaseAdmin
       .from('admin_users')
       .select('id')
       .eq('user_id', userId)
       .maybeSingle()
+    
+    const timeoutPromise = new Promise<never>((_, reject) => 
+      setTimeout(() => reject(new Error('Admin query timeout')), 10000)
+    )
+    
+    let data, error
+    try {
+      const result = await Promise.race([
+        queryPromise,
+        timeoutPromise,
+      ]) as any
+      data = result.data
+      error = result.error
+    } catch (timeoutError: any) {
+      if (timeoutError.message === 'Admin query timeout') {
+        console.error('❌ Admin query timed out after 10 seconds')
+        return false
+      }
+      throw timeoutError
+    }
 
     if (error) {
       console.error('❌ Error querying admin_users:', {

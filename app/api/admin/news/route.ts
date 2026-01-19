@@ -3,6 +3,8 @@ import { requireAdmin } from '@/lib/admin-api-middleware'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { isValidUUID, validateLength } from '@/lib/validation'
 
+export const dynamic = 'force-dynamic'
+
 // GET all news items
 export async function GET(request: NextRequest) {
   const authError = await requireAdmin(request)

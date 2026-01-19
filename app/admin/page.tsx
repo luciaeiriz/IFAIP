@@ -48,15 +48,59 @@ export default function AdminPage() {
 
   const checkAuth = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession()
+      // Add timeout to getSession call
+      const sessionPromise = supabase.auth.getSession()
+      const sessionTimeoutPromise = new Promise<never>((_, reject) => 
+        setTimeout(() => reject(new Error('Session check timeout')), 10000)
+      )
+      
+      let session
+      try {
+        const result = await Promise.race([
+          sessionPromise,
+          sessionTimeoutPromise,
+        ]) as any
+        session = result.data?.session
+      } catch (sessionError: any) {
+        if (sessionError.message === 'Session check timeout') {
+          console.error('❌ Session check timed out after 10 seconds')
+          setIsAuthenticated(false)
+          setIsAdmin(false)
+          setIsLoading(false)
+          return
+        }
+        throw sessionError
+      }
+      
       if (session) {
         setIsAuthenticated(true)
-        // Check admin status
-        const adminStatus = await isAdminClient()
-        setIsAdmin(adminStatus)
-        // If user is authenticated but not admin, sign them out
-        if (!adminStatus) {
-          await supabase.auth.signOut()
+        // Check admin status with timeout
+        try {
+          const adminStatusPromise = isAdminClient()
+          const adminTimeoutPromise = new Promise<boolean>((resolve) => 
+            setTimeout(() => {
+              console.error('❌ Admin status check timed out after 10 seconds')
+              resolve(false)
+            }, 10000)
+          )
+          
+          const adminStatus = await Promise.race([
+            adminStatusPromise,
+            adminTimeoutPromise,
+          ])
+          
+          setIsAdmin(adminStatus)
+          // If user is authenticated but not admin, sign them out
+          if (!adminStatus) {
+            await supabase.auth.signOut()
+            setIsAuthenticated(false)
+          }
+        } catch (adminError) {
+          console.error('Error checking admin status:', {
+            error: adminError instanceof Error ? adminError.message : String(adminError),
+            name: adminError instanceof Error ? adminError.name : 'Unknown',
+          })
+          setIsAdmin(false)
           setIsAuthenticated(false)
         }
       } else {

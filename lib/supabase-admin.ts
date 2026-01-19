@@ -32,6 +32,29 @@ export const supabaseAdmin = createClient(supabaseUrl, adminKey, {
   auth: {
     autoRefreshToken: false,
     persistSession: false
-  }
+  },
+  global: {
+    fetch: (url, options = {}) => {
+      // Add timeout to prevent hanging in production
+      // Use AbortSignal.timeout if available, otherwise create a timeout promise
+      const timeoutMs = 30000 // 30 seconds for admin operations
+      
+      // If options already has a signal, respect it
+      if (options.signal) {
+        return fetch(url, options)
+      }
+      
+      // Create timeout signal
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
+      
+      return fetch(url, {
+        ...options,
+        signal: controller.signal,
+      }).finally(() => {
+        clearTimeout(timeoutId)
+      })
+    },
+  },
 })
 
