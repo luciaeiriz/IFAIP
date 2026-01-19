@@ -106,12 +106,14 @@ function SignupContent() {
 
       if (response.success) {
         // Track signup event
-        trackCourseSignup(
-          courseId,
-          course.title,
-          landingTag,
-          utmParams
-        )
+        if (course) {
+          trackCourseSignup(
+            courseId,
+            course.title,
+            landingTag,
+            utmParams
+          )
+        }
         // Redirect to thank you page
         router.push(`/thank-you?course_id=${courseId}`)
       } else {
