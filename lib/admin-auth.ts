@@ -39,38 +39,81 @@ export async function isAdminClient(): Promise<boolean> {
     // Pass the access token in Authorization header
     // This avoids exposing the service role key to the client
     // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/943b77db-b2c1-4974-a490-571bb73856af',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/admin-auth.ts:33',message:'before fetch to check-status',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+    if (process.env.NODE_ENV === 'development') {
+      fetch('http://127.0.0.1:7243/ingest/943b77db-b2c1-4974-a490-571bb73856af',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/admin-auth.ts:33',message:'before fetch to check-status',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+    }
     // #endregion
-    const response = await fetch('/api/admin/check-status', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${session.access_token}`,
-      },
-      credentials: 'include', // Include cookies for session
-    })
+    
+    // Add timeout to prevent hanging in production
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
+    
+    let response: Response
+    try {
+      response = await fetch('/api/admin/check-status', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        credentials: 'include', // Include cookies for session
+        signal: controller.signal,
+      })
+      clearTimeout(timeoutId)
+    } catch (fetchError: any) {
+      clearTimeout(timeoutId)
+      if (fetchError.name === 'AbortError') {
+        console.error('Admin status check timed out after 10 seconds')
+        return false
+      }
+      throw fetchError
+    }
     // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/943b77db-b2c1-4974-a490-571bb73856af',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/admin-auth.ts:43',message:'after fetch to check-status',data:{ok:response.ok,status:response.status,statusText:response.statusText},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+    if (process.env.NODE_ENV === 'development') {
+      fetch('http://127.0.0.1:7243/ingest/943b77db-b2c1-4974-a490-571bb73856af',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/admin-auth.ts:71',message:'after fetch to check-status',data:{ok:response.ok,status:response.status,statusText:response.statusText},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+    }
     // #endregion
 
     if (!response.ok) {
-      console.error('API route returned error:', response.status, response.statusText)
       const errorText = await response.text()
-      console.error('Error response:', errorText)
+      let errorData: any = {}
+      try {
+        errorData = JSON.parse(errorText)
+      } catch {
+        errorData = { message: errorText }
+      }
+      
+      console.error('Admin status check failed:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorData,
+        url: window.location.href,
+      })
       return false
     }
 
     const data = await response.json()
-    console.log('Admin check result:', data)
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Admin check result:', data)
+    }
     // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/943b77db-b2c1-4974-a490-571bb73856af',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/admin-auth.ts:52',message:'isAdminClient exit',data:{isAdmin:data.isAdmin===true},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+    if (process.env.NODE_ENV === 'development') {
+      fetch('http://127.0.0.1:7243/ingest/943b77db-b2c1-4974-a490-571bb73856af',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/admin-auth.ts:85',message:'isAdminClient exit',data:{isAdmin:data.isAdmin===true},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+    }
     // #endregion
     return data.isAdmin === true
   } catch (error) {
     // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/943b77db-b2c1-4974-a490-571bb73856af',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/admin-auth.ts:55',message:'isAdminClient error',data:{errorMessage:error instanceof Error?error.message:String(error)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+    if (process.env.NODE_ENV === 'development') {
+      fetch('http://127.0.0.1:7243/ingest/943b77db-b2c1-4974-a490-571bb73856af',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/admin-auth.ts:90',message:'isAdminClient error',data:{errorMessage:error instanceof Error?error.message:String(error)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+    }
     // #endregion
-    console.error('Error checking admin status (client):', error)
+    console.error('Error checking admin status (client):', {
+      error: error instanceof Error ? error.message : String(error),
+      name: error instanceof Error ? error.name : 'Unknown',
+      stack: error instanceof Error ? error.stack : undefined,
+      url: typeof window !== 'undefined' ? window.location.href : 'server',
+    })
     return false
   }
 }
@@ -211,58 +254,52 @@ async function getUserIdFromRequest(request: NextRequest): Promise<string | null
  * Use this in API routes and server components
  */
 export async function isAdminServer(request: NextRequest): Promise<boolean> {
-  // #region agent log
-  fetch('http://127.0.0.1:7243/ingest/943b77db-b2c1-4974-a490-571bb73856af',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/admin-auth.ts:174',message:'isAdminServer entry',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-  // #endregion
   try {
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/943b77db-b2c1-4974-a490-571bb73856af',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/admin-auth.ts:176',message:'before getUserIdFromRequest',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-    // #endregion
     const userId = await getUserIdFromRequest(request)
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/943b77db-b2c1-4974-a490-571bb73856af',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/admin-auth.ts:178',message:'after getUserIdFromRequest',data:{hasUserId:!!userId,userId:userId?.substring(0,8)+'...'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-    // #endregion
     
     if (!userId) {
-      console.log('⚠️ No user ID found in request')
+      if (process.env.NODE_ENV === 'production') {
+        console.error('⚠️ No user ID found in request - check Authorization header or cookies')
+      }
       return false
     }
 
-    console.log('🔍 Checking admin status for user:', userId)
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔍 Checking admin status for user:', userId)
+    }
 
     // Check if user exists in admin_users table
     // Use .maybeSingle() instead of .single() to handle 0 rows gracefully
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/943b77db-b2c1-4974-a490-571bb73856af',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/admin-auth.ts:188',message:'before admin_users query',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-    // #endregion
     const { data, error } = await supabaseAdmin
       .from('admin_users')
       .select('id')
       .eq('user_id', userId)
       .maybeSingle()
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/943b77db-b2c1-4974-a490-571bb73856af',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/admin-auth.ts:194',message:'after admin_users query',data:{hasError:!!error,hasData:!!data,errorMessage:error?.message},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-    // #endregion
 
     if (error) {
-      console.error('❌ Error querying admin_users:', error)
+      console.error('❌ Error querying admin_users:', {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint,
+      })
       return false
     }
 
     const isAdmin = !!data
-    console.log(isAdmin ? '✅ User is admin' : '❌ User is not admin')
-    if (!isAdmin) {
-      console.log('💡 User ID not found in admin_users table. Make sure your user_id matches auth.users.id exactly.')
+    if (process.env.NODE_ENV === 'development') {
+      console.log(isAdmin ? '✅ User is admin' : '❌ User is not admin')
+      if (!isAdmin) {
+        console.log('💡 User ID not found in admin_users table. Make sure your user_id matches auth.users.id exactly.')
+      }
     }
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/943b77db-b2c1-4974-a490-571bb73856af',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/admin-auth.ts:203',message:'isAdminServer exit',data:{isAdmin},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-    // #endregion
     return isAdmin
   } catch (error) {
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/943b77db-b2c1-4974-a490-571bb73856af',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/admin-auth.ts:206',message:'isAdminServer error',data:{errorMessage:error instanceof Error?error.message:String(error)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
-    // #endregion
-    console.error('Error checking admin status (server):', error)
+    console.error('Error checking admin status (server):', {
+      error: error instanceof Error ? error.message : String(error),
+      name: error instanceof Error ? error.name : 'Unknown',
+      stack: error instanceof Error ? error.stack : undefined,
+    })
     return false
   }
 }

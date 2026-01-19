@@ -150,3 +150,96 @@
 {"location":"lib/admin-auth.ts:188","message":"before admin_users query","data":{},"timestamp":1768831682478,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
 {"location":"lib/admin-auth.ts:194","message":"after admin_users query","data":{"hasError":false,"hasData":true},"timestamp":1768831682521,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
 {"location":"lib/admin-auth.ts:203","message":"isAdminServer exit","data":{"isAdmin":true},"timestamp":1768831682522,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"app/admin/page.tsx:125","message":"rendering loading state","data":{},"timestamp":1768832167906,"sessionId":"debug-session","runId":"run1","hypothesisId":"D"}
+{"location":"app/admin/page.tsx:125","message":"rendering loading state","data":{},"timestamp":1768832168385,"sessionId":"debug-session","runId":"run1","hypothesisId":"D"}
+{"location":"app/admin/page.tsx:125","message":"rendering loading state","data":{},"timestamp":1768832168386,"sessionId":"debug-session","runId":"run1","hypothesisId":"D"}
+{"location":"app/admin/page.tsx:49","message":"checkAuth entry","data":{},"timestamp":1768832168398,"sessionId":"debug-session","runId":"run1","hypothesisId":"D"}
+{"location":"app/admin/page.tsx:52","message":"before getSession","data":{},"timestamp":1768832168399,"sessionId":"debug-session","runId":"run1","hypothesisId":"A"}
+{"location":"app/admin/page.tsx:121","message":"render check","data":{"isLoading":true,"isAuthenticated":false,"isAdmin":false},"timestamp":1768832168399,"sessionId":"debug-session","runId":"run1","hypothesisId":"D"}
+{"location":"app/admin/page.tsx:49","message":"checkAuth entry","data":{},"timestamp":1768832168402,"sessionId":"debug-session","runId":"run1","hypothesisId":"D"}
+{"location":"app/admin/page.tsx:52","message":"before getSession","data":{},"timestamp":1768832168402,"sessionId":"debug-session","runId":"run1","hypothesisId":"A"}
+{"location":"app/admin/page.tsx:121","message":"render check","data":{"isLoading":true,"isAuthenticated":false,"isAdmin":false},"timestamp":1768832168402,"sessionId":"debug-session","runId":"run1","hypothesisId":"D"}
+{"location":"app/admin/page.tsx:54","message":"after getSession","data":{"hasSession":true,"hasUser":true},"timestamp":1768832168422,"sessionId":"debug-session","runId":"run1","hypothesisId":"A"}
+{"location":"app/admin/page.tsx:58","message":"before isAdminClient","data":{},"timestamp":1768832168422,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"lib/admin-auth.ts:10","message":"isAdminClient entry","data":{},"timestamp":1768832168423,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"lib/admin-auth.ts:13","message":"before getSession in isAdminClient","data":{},"timestamp":1768832168423,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"app/admin/page.tsx:125","message":"rendering loading state","data":{},"timestamp":1768832168438,"sessionId":"debug-session","runId":"run1","hypothesisId":"D"}
+{"location":"app/admin/page.tsx:125","message":"rendering loading state","data":{},"timestamp":1768832168438,"sessionId":"debug-session","runId":"run1","hypothesisId":"D"}
+{"location":"app/admin/page.tsx:121","message":"render check","data":{"isLoading":true,"isAuthenticated":true,"isAdmin":false},"timestamp":1768832168438,"sessionId":"debug-session","runId":"run1","hypothesisId":"D"}
+{"location":"app/admin/page.tsx:54","message":"after getSession","data":{"hasSession":true,"hasUser":true},"timestamp":1768832168442,"sessionId":"debug-session","runId":"run1","hypothesisId":"A"}
+{"location":"app/admin/page.tsx:58","message":"before isAdminClient","data":{},"timestamp":1768832168442,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"lib/admin-auth.ts:10","message":"isAdminClient entry","data":{},"timestamp":1768832168442,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"lib/admin-auth.ts:13","message":"before getSession in isAdminClient","data":{},"timestamp":1768832168442,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"app/admin/page.tsx:125","message":"rendering loading state","data":{},"timestamp":1768832168443,"sessionId":"debug-session","runId":"run1","hypothesisId":"D"}
+{"location":"app/admin/page.tsx:125","message":"rendering loading state","data":{},"timestamp":1768832168443,"sessionId":"debug-session","runId":"run1","hypothesisId":"D"}
+{"location":"app/admin/page.tsx:27","message":"onAuthStateChange fired","data":{"event":"INITIAL_SESSION","hasSession":true},"timestamp":1768832168443,"sessionId":"debug-session","runId":"run1","hypothesisId":"D"}
+{"location":"app/admin/page.tsx:31","message":"onAuthStateChange before isAdminClient","data":{},"timestamp":1768832168443,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"lib/admin-auth.ts:10","message":"isAdminClient entry","data":{},"timestamp":1768832168443,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"lib/admin-auth.ts:13","message":"before getSession in isAdminClient","data":{},"timestamp":1768832168443,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"lib/admin-auth.ts:15","message":"after getSession in isAdminClient","data":{"hasSession":true,"hasError":false,"hasUser":true,"hasToken":true},"timestamp":1768832168444,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"lib/admin-auth.ts:33","message":"before fetch to check-status","data":{},"timestamp":1768832168444,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"lib/admin-auth.ts:15","message":"after getSession in isAdminClient","data":{"hasSession":true,"hasError":false,"hasUser":true,"hasToken":true},"timestamp":1768832168444,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"lib/admin-auth.ts:33","message":"before fetch to check-status","data":{},"timestamp":1768832168444,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"lib/admin-auth.ts:15","message":"after getSession in isAdminClient","data":{"hasSession":true,"hasError":false,"hasUser":true,"hasToken":true},"timestamp":1768832168444,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"lib/admin-auth.ts:33","message":"before fetch to check-status","data":{},"timestamp":1768832168444,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"lib/admin-auth.ts:90","message":"checking auth header","data":{"hasAuthHeader":true,"startsWithBearer":true},"timestamp":1768832168548,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"lib/admin-auth.ts:106","message":"before getUser from auth header","data":{},"timestamp":1768832168549,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"lib/admin-auth.ts:174","message":"isAdminServer entry","data":{},"timestamp":1768832168548,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"lib/admin-auth.ts:82","message":"getUserIdFromRequest entry","data":{},"timestamp":1768832168548,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"app/api/admin/check-status/route.ts:6","message":"before isAdminServer","data":{},"timestamp":1768832168548,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"lib/admin-auth.ts:176","message":"before getUserIdFromRequest","data":{},"timestamp":1768832168548,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"app/api/admin/check-status/route.ts:4","message":"check-status API entry","data":{},"timestamp":1768832168548,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"lib/admin-auth.ts:108","message":"after getUser from auth header","data":{"hasUser":true,"hasError":false},"timestamp":1768832168651,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"lib/admin-auth.ts:178","message":"after getUserIdFromRequest","data":{"hasUserId":true,"userId":"4c605cdd..."},"timestamp":1768832168652,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"lib/admin-auth.ts:188","message":"before admin_users query","data":{},"timestamp":1768832168653,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"lib/admin-auth.ts:194","message":"after admin_users query","data":{"hasError":false,"hasData":true},"timestamp":1768832168712,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"lib/admin-auth.ts:203","message":"isAdminServer exit","data":{"isAdmin":true},"timestamp":1768832168712,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"app/api/admin/check-status/route.ts:8","message":"after isAdminServer","data":{"isAdmin":true},"timestamp":1768832168712,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"app/api/admin/check-status/route.ts:10","message":"before returning response","data":{},"timestamp":1768832168712,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"lib/admin-auth.ts:90","message":"checking auth header","data":{"hasAuthHeader":true,"startsWithBearer":true},"timestamp":1768832168718,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"lib/admin-auth.ts:106","message":"before getUser from auth header","data":{},"timestamp":1768832168719,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"app/api/admin/check-status/route.ts:4","message":"check-status API entry","data":{},"timestamp":1768832168718,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"lib/admin-auth.ts:174","message":"isAdminServer entry","data":{},"timestamp":1768832168718,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"app/api/admin/check-status/route.ts:6","message":"before isAdminServer","data":{},"timestamp":1768832168718,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"lib/admin-auth.ts:176","message":"before getUserIdFromRequest","data":{},"timestamp":1768832168718,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"lib/admin-auth.ts:82","message":"getUserIdFromRequest entry","data":{},"timestamp":1768832168718,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"lib/admin-auth.ts:43","message":"after fetch to check-status","data":{"ok":true,"status":200,"statusText":"OK"},"timestamp":1768832168724,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"lib/admin-auth.ts:52","message":"isAdminClient exit","data":{"isAdmin":true},"timestamp":1768832168724,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"app/admin/page.tsx:33","message":"onAuthStateChange after isAdminClient","data":{"adminStatus":true},"timestamp":1768832168724,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"app/admin/page.tsx:125","message":"rendering loading state","data":{},"timestamp":1768832168725,"sessionId":"debug-session","runId":"run1","hypothesisId":"D"}
+{"location":"app/admin/page.tsx:125","message":"rendering loading state","data":{},"timestamp":1768832168725,"sessionId":"debug-session","runId":"run1","hypothesisId":"D"}
+{"location":"app/admin/page.tsx:121","message":"render check","data":{"isLoading":true,"isAuthenticated":true,"isAdmin":true},"timestamp":1768832168725,"sessionId":"debug-session","runId":"run1","hypothesisId":"D"}
+{"location":"lib/admin-auth.ts:108","message":"after getUser from auth header","data":{"hasUser":true,"hasError":false},"timestamp":1768832168782,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"lib/admin-auth.ts:178","message":"after getUserIdFromRequest","data":{"hasUserId":true,"userId":"4c605cdd..."},"timestamp":1768832168783,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"lib/admin-auth.ts:188","message":"before admin_users query","data":{},"timestamp":1768832168783,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"lib/admin-auth.ts:194","message":"after admin_users query","data":{"hasError":false,"hasData":true},"timestamp":1768832168825,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"lib/admin-auth.ts:203","message":"isAdminServer exit","data":{"isAdmin":true},"timestamp":1768832168826,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"app/api/admin/check-status/route.ts:8","message":"after isAdminServer","data":{"isAdmin":true},"timestamp":1768832168826,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"app/api/admin/check-status/route.ts:10","message":"before returning response","data":{},"timestamp":1768832168827,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"lib/admin-auth.ts:43","message":"after fetch to check-status","data":{"ok":true,"status":200,"statusText":"OK"},"timestamp":1768832168829,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"lib/admin-auth.ts:52","message":"isAdminClient exit","data":{"isAdmin":true},"timestamp":1768832168937,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"app/admin/page.tsx:60","message":"after isAdminClient","data":{"adminStatus":true},"timestamp":1768832168937,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"app/admin/page.tsx:71","message":"checkAuth state updated","data":{"isAuthenticated":true,"adminStatus":true},"timestamp":1768832168937,"sessionId":"debug-session","runId":"run1","hypothesisId":"D"}
+{"location":"app/admin/page.tsx:95","message":"checkAuth finally block - setting isLoading to false","data":{},"timestamp":1768832168937,"sessionId":"debug-session","runId":"run1","hypothesisId":"D"}
+{"location":"app/admin/page.tsx:97","message":"checkAuth finally block - setIsLoading called","data":{},"timestamp":1768832168937,"sessionId":"debug-session","runId":"run1","hypothesisId":"D"}
+{"location":"app/admin/page.tsx:121","message":"render check","data":{"isLoading":false,"isAuthenticated":true,"isAdmin":true},"timestamp":1768832168943,"sessionId":"debug-session","runId":"run1","hypothesisId":"D"}
+{"location":"lib/admin-auth.ts:90","message":"checking auth header","data":{"hasAuthHeader":true,"startsWithBearer":true},"timestamp":1768832168952,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"lib/admin-auth.ts:106","message":"before getUser from auth header","data":{},"timestamp":1768832168955,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"app/api/admin/check-status/route.ts:4","message":"check-status API entry","data":{},"timestamp":1768832168949,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"app/api/admin/check-status/route.ts:6","message":"before isAdminServer","data":{},"timestamp":1768832168950,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"lib/admin-auth.ts:174","message":"isAdminServer entry","data":{},"timestamp":1768832168950,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"lib/admin-auth.ts:82","message":"getUserIdFromRequest entry","data":{},"timestamp":1768832168952,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"lib/admin-auth.ts:176","message":"before getUserIdFromRequest","data":{},"timestamp":1768832168952,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"lib/admin-auth.ts:108","message":"after getUser from auth header","data":{"hasUser":true,"hasError":false},"timestamp":1768832169005,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"lib/admin-auth.ts:178","message":"after getUserIdFromRequest","data":{"hasUserId":true,"userId":"4c605cdd..."},"timestamp":1768832169006,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"lib/admin-auth.ts:188","message":"before admin_users query","data":{},"timestamp":1768832169007,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"lib/admin-auth.ts:194","message":"after admin_users query","data":{"hasError":false,"hasData":true},"timestamp":1768832169053,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"lib/admin-auth.ts:203","message":"isAdminServer exit","data":{"isAdmin":true},"timestamp":1768832169053,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"app/api/admin/check-status/route.ts:8","message":"after isAdminServer","data":{"isAdmin":true},"timestamp":1768832169053,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"app/api/admin/check-status/route.ts:10","message":"before returning response","data":{},"timestamp":1768832169054,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"lib/admin-auth.ts:43","message":"after fetch to check-status","data":{"ok":true,"status":200,"statusText":"OK"},"timestamp":1768832169055,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"lib/admin-auth.ts:52","message":"isAdminClient exit","data":{"isAdmin":true},"timestamp":1768832169124,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"app/admin/page.tsx:60","message":"after isAdminClient","data":{"adminStatus":true},"timestamp":1768832169125,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"app/admin/page.tsx:71","message":"checkAuth state updated","data":{"isAuthenticated":true,"adminStatus":true},"timestamp":1768832169125,"sessionId":"debug-session","runId":"run1","hypothesisId":"D"}
+{"location":"app/admin/page.tsx:95","message":"checkAuth finally block - setting isLoading to false","data":{},"timestamp":1768832169125,"sessionId":"debug-session","runId":"run1","hypothesisId":"D"}
+{"location":"app/admin/page.tsx:97","message":"checkAuth finally block - setIsLoading called","data":{},"timestamp":1768832169125,"sessionId":"debug-session","runId":"run1","hypothesisId":"D"}
