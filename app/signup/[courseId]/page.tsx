@@ -36,8 +36,10 @@ function SignupContent() {
   const [errors, setErrors] = useState<Partial<Record<keyof SignupFormData, string>>>({})
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
 
-  // Get URL parameters
-  const landingTag = searchParams.get('tag') || 'Business'
+  // Get URL parameters and validate
+  const tagParam = searchParams.get('tag')
+  const validTags = ['Business', 'Restaurant', 'Fleet']
+  const urlLandingTag = (tagParam && validTags.includes(tagParam)) ? tagParam : null
   const source = searchParams.get('source') || null
 
   useEffect(() => {
@@ -92,6 +94,12 @@ function SignupContent() {
     try {
       // Get UTM parameters
       const utmParams = getAllUTMParams()
+
+      // Determine landing tag: use URL parameter if valid, otherwise use course tag, fallback to Business
+      const courseTag = course?.tags?.[0] && validTags.includes(course.tags[0]) 
+        ? course.tags[0] 
+        : null
+      const landingTag = urlLandingTag || courseTag || 'Business'
 
       // Create signup data
       const signupData = {

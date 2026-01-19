@@ -19,6 +19,7 @@ export default function ContactSubmissionsManagement() {
   const [submissions, setSubmissions] = useState<ContactSubmission[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [selectedSubmission, setSelectedSubmission] = useState<ContactSubmission | null>(null)
+  const [debugInfo, setDebugInfo] = useState<any>(null)
 
   useEffect(() => {
     fetchSubmissions()
@@ -27,17 +28,44 @@ export default function ContactSubmissionsManagement() {
   const fetchSubmissions = async () => {
     try {
       setIsLoading(true)
+      console.log('Fetching contact submissions...')
       const response = await adminFetch('/api/admin/contact-submissions')
+      
+      console.log('Response status:', response.status, response.statusText)
+      
       const result = await response.json()
+      console.log('Response data:', result)
 
-      if (!response.ok || !result.success) {
+      if (!response.ok) {
+        console.error('API returned error status:', response.status, result)
+        throw new Error(result.error || `HTTP ${response.status}: ${response.statusText}`)
+      }
+
+      if (!result.success) {
+        console.error('API returned success:false:', result)
         throw new Error(result.error || 'Failed to fetch contact submissions')
       }
 
-      console.log('Fetched contact submissions:', result.submissions?.length || 0)
-      setSubmissions(result.submissions || [])
+      const submissionsData = result.submissions || []
+      console.log('Fetched contact submissions:', submissionsData.length, 'items')
+      console.log('Sample submission:', submissionsData[0])
+      
+      // Store debug info
+      setDebugInfo({
+        count: submissionsData.length,
+        totalCount: result.count,
+        sample: submissionsData[0],
+        allData: submissionsData
+      })
+      
+      setSubmissions(submissionsData)
     } catch (error: any) {
       console.error('Error fetching contact submissions:', error)
+      console.error('Error details:', {
+        message: error?.message,
+        stack: error?.stack,
+        name: error?.name
+      })
       const errorMessage = error?.message || 'Unknown error'
       alert(`Failed to load contact submissions.\n\nError: ${errorMessage}\n\nPlease check:\n1. Has the migration been run in Supabase?\n2. Check browser console for more details.`)
     } finally {
@@ -114,8 +142,23 @@ export default function ContactSubmissionsManagement() {
       {isLoading ? (
         <div className="text-center py-12 text-gray-600">Loading contact submissions...</div>
       ) : submissions.length === 0 ? (
-        <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-          <p className="text-gray-600">No contact submissions found</p>
+        <div className="bg-white rounded-lg border border-gray-200 p-12">
+          <div className="text-center mb-4">
+            <p className="text-gray-600">No contact submissions found</p>
+          </div>
+          {debugInfo && (
+            <div className="mt-4 p-4 bg-gray-50 rounded text-xs">
+              <p className="font-semibold mb-2">Debug Info:</p>
+              <p>Count from API: {debugInfo.count}</p>
+              <p>Total count: {debugInfo.totalCount}</p>
+              {debugInfo.sample && (
+                <div className="mt-2">
+                  <p className="font-semibold">Sample data:</p>
+                  <pre className="mt-1 overflow-auto">{JSON.stringify(debugInfo.sample, null, 2)}</pre>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
