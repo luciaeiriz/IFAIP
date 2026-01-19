@@ -4,11 +4,11 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 
-type FilterType = 'all' | 'news' | 'blog' | 'researcher-spotlights' | 'latest-research' | 'events'
+type FilterType = 'all' | 'news' | 'technology' | 'science' | 'business'
 
 interface LatestCard {
   id: string
-  category: 'news' | 'blog' | 'researcher-spotlights' | 'latest-research' | 'events'
+  category: 'news' | 'technology' | 'science' | 'business'
   label: string
   title: string
   description?: string
@@ -16,6 +16,7 @@ interface LatestCard {
   time?: string
   href: string
   imageColor: string
+  imageUrl?: string | null
 }
 
 export default function HomePage() {
@@ -54,34 +55,6 @@ export default function HomePage() {
       imageColor: 'from-blue-900 to-blue-700'
     },
     {
-      id: '2',
-      category: 'events',
-      label: 'Event',
-      title: '2-day Workshop on Responsibility and Accountability in Safety-Critical AI Applications',
-      date: 'Monday 12 Jan 2026 - Tuesday 13 Jan 2026',
-      time: 'Time: 11:30 - 15:00',
-      href: '/events/workshop-responsibility',
-      imageColor: 'from-green-600 to-green-800'
-    },
-    {
-      id: '3',
-      category: 'latest-research',
-      label: 'Research projects',
-      title: 'Advancing Management Skills in Biomedical AI Research',
-      description: 'Tackling the challenges of collaboration and data sharing in the AI ecosystem.',
-      href: '/research/biomedical-ai',
-      imageColor: 'from-purple-600 to-purple-800'
-    },
-    {
-      id: '4',
-      category: 'researcher-spotlights',
-      label: 'Research spotlight',
-      title: 'Isabel Fenton',
-      description: 'Isabel Fenton is applying data science and AI to environmental challenges and sustainability research.',
-      href: '/research/isabel-fenton',
-      imageColor: 'from-pink-500 to-magenta-600'
-    },
-    {
       id: '5',
       category: 'news',
       label: 'News',
@@ -90,54 +63,6 @@ export default function HomePage() {
       date: 'Tuesday 15 Dec 2025',
       href: '/news/ml-healthcare',
       imageColor: 'from-indigo-600 to-indigo-800'
-    },
-    {
-      id: '6',
-      category: 'blog',
-      label: 'Blog',
-      title: 'The Future of AI in Education: Opportunities and Challenges',
-      description: 'Exploring how artificial intelligence is transforming the educational landscape and what it means for students and educators.',
-      date: 'Monday 14 Dec 2025',
-      href: '/blog/ai-education-future',
-      imageColor: 'from-teal-600 to-teal-800'
-    },
-    {
-      id: '7',
-      category: 'events',
-      label: 'Event',
-      title: 'AI Ethics Conference 2026',
-      date: 'Friday 20 Feb 2026',
-      time: 'Time: 09:00 - 17:00',
-      href: '/events/ai-ethics-conference',
-      imageColor: 'from-orange-600 to-orange-800'
-    },
-    {
-      id: '8',
-      category: 'researcher-spotlights',
-      label: 'Research spotlight',
-      title: 'Dr. Michael Chen',
-      description: 'Dr. Chen is pioneering work in neural network optimization and computational efficiency.',
-      href: '/research/michael-chen',
-      imageColor: 'from-cyan-600 to-cyan-800'
-    },
-    {
-      id: '9',
-      category: 'blog',
-      label: 'Blog',
-      title: 'Understanding Large Language Models: A Comprehensive Guide',
-      description: 'Deep dive into how LLMs work, their capabilities, limitations, and real-world applications.',
-      date: 'Wednesday 13 Dec 2025',
-      href: '/blog/llm-guide',
-      imageColor: 'from-amber-600 to-amber-800'
-    },
-    {
-      id: '10',
-      category: 'latest-research',
-      label: 'Research projects',
-      title: 'Quantum Computing Meets AI: New Frontiers',
-      description: 'Exploring the intersection of quantum computing and artificial intelligence for next-generation problem solving.',
-      href: '/research/quantum-ai',
-      imageColor: 'from-violet-600 to-violet-800'
     },
     {
       id: '11',
@@ -158,82 +83,6 @@ export default function HomePage() {
       date: 'Friday 19 Dec 2025',
       href: '/news/nlp-breakthrough',
       imageColor: 'from-blue-600 to-blue-800'
-    },
-    {
-      id: '13',
-      category: 'blog',
-      label: 'Blog',
-      title: 'AI and Climate Change: Technology Solutions for Sustainability',
-      description: 'How artificial intelligence is being leveraged to address climate challenges and create sustainable solutions.',
-      date: 'Tuesday 16 Dec 2025',
-      href: '/blog/ai-climate',
-      imageColor: 'from-emerald-600 to-emerald-800'
-    },
-    {
-      id: '14',
-      category: 'blog',
-      label: 'Blog',
-      title: 'The Evolution of Computer Vision: From Pixels to Understanding',
-      description: 'Tracing the development of computer vision technologies and their impact on industries from healthcare to autonomous vehicles.',
-      date: 'Thursday 17 Dec 2025',
-      href: '/blog/computer-vision',
-      imageColor: 'from-rose-600 to-rose-800'
-    },
-    {
-      id: '15',
-      category: 'events',
-      label: 'Event',
-      title: 'AI Innovation Summit 2026',
-      date: 'Saturday 15 Mar 2026',
-      time: 'Time: 10:00 - 18:00',
-      href: '/events/innovation-summit',
-      imageColor: 'from-yellow-600 to-yellow-800'
-    },
-    {
-      id: '16',
-      category: 'events',
-      label: 'Event',
-      title: 'Machine Learning Bootcamp for Professionals',
-      date: 'Monday 10 Feb 2026 - Friday 14 Feb 2026',
-      time: 'Time: 09:00 - 17:00',
-      href: '/events/ml-bootcamp',
-      imageColor: 'from-lime-600 to-lime-800'
-    },
-    {
-      id: '17',
-      category: 'researcher-spotlights',
-      label: 'Research spotlight',
-      title: 'Dr. Sarah Martinez',
-      description: 'Dr. Martinez specializes in explainable AI and is developing methods to make machine learning models more transparent and interpretable.',
-      href: '/research/sarah-martinez',
-      imageColor: 'from-fuchsia-600 to-fuchsia-800'
-    },
-    {
-      id: '18',
-      category: 'researcher-spotlights',
-      label: 'Research spotlight',
-      title: 'Prof. James Wilson',
-      description: 'Prof. Wilson leads research in reinforcement learning and its applications to robotics and autonomous systems.',
-      href: '/research/james-wilson',
-      imageColor: 'from-sky-600 to-sky-800'
-    },
-    {
-      id: '19',
-      category: 'latest-research',
-      label: 'Research projects',
-      title: 'Federated Learning for Privacy-Preserving AI',
-      description: 'Developing distributed machine learning approaches that protect user privacy while enabling collaborative model training.',
-      href: '/research/federated-learning',
-      imageColor: 'from-indigo-600 to-indigo-800'
-    },
-    {
-      id: '20',
-      category: 'latest-research',
-      label: 'Research projects',
-      title: 'AI-Driven Drug Discovery and Development',
-      description: 'Using machine learning to accelerate pharmaceutical research and reduce time-to-market for new treatments.',
-      href: '/research/ai-drug-discovery',
-      imageColor: 'from-cyan-600 to-cyan-800'
     },
   ]
 
@@ -276,15 +125,7 @@ export default function HomePage() {
   // Filter cards based on active filter
   const filteredCards = (activeFilter === 'all' 
     ? latestCards 
-    : latestCards.filter(card => {
-        if (activeFilter === 'researcher-spotlights') {
-          return card.category === 'researcher-spotlights'
-        }
-        if (activeFilter === 'latest-research') {
-          return card.category === 'latest-research'
-        }
-        return card.category === activeFilter
-      })
+    : latestCards.filter(card => card.category === activeFilter)
   ).slice(0, 4)
 
   const handleFilterClick = (filter: FilterType) => {
@@ -627,7 +468,7 @@ export default function HomePage() {
               </button>
               <button 
                 className={`text-sm border-b-2 pb-1 transition-colors cursor-pointer ${
-                  activeFilter === 'blog' 
+                  activeFilter === 'technology' 
                     ? 'font-bold text-black border-black' 
                     : 'font-normal text-gray-600 hover:text-black border-transparent'
                 }`}
@@ -637,13 +478,13 @@ export default function HomePage() {
                   lineHeight: '1.5',
                   verticalAlign: 'baseline'
                 }}
-                onClick={() => handleFilterClick('blog')}
+                onClick={() => handleFilterClick('technology')}
               >
-                Blog
+                Technology
               </button>
               <button 
                 className={`text-sm border-b-2 pb-1 transition-colors cursor-pointer ${
-                  activeFilter === 'researcher-spotlights' 
+                  activeFilter === 'science' 
                     ? 'font-bold text-black border-black' 
                     : 'font-normal text-gray-600 hover:text-black border-transparent'
                 }`}
@@ -653,13 +494,13 @@ export default function HomePage() {
                   lineHeight: '1.5',
                   verticalAlign: 'baseline'
                 }}
-                onClick={() => handleFilterClick('researcher-spotlights')}
+                onClick={() => handleFilterClick('science')}
               >
-                Researcher spotlights
+                Science
               </button>
               <button 
                 className={`text-sm border-b-2 pb-1 transition-colors cursor-pointer ${
-                  activeFilter === 'latest-research' 
+                  activeFilter === 'business' 
                     ? 'font-bold text-black border-black' 
                     : 'font-normal text-gray-600 hover:text-black border-transparent'
                 }`}
@@ -669,25 +510,9 @@ export default function HomePage() {
                   lineHeight: '1.5',
                   verticalAlign: 'baseline'
                 }}
-                onClick={() => handleFilterClick('latest-research')}
+                onClick={() => handleFilterClick('business')}
               >
-                Latest research
-              </button>
-              <button 
-                className={`text-sm border-b-2 pb-1 transition-colors cursor-pointer ${
-                  activeFilter === 'events' 
-                    ? 'font-bold text-black border-black' 
-                    : 'font-normal text-gray-600 hover:text-black border-transparent'
-                }`}
-                style={{ 
-                  fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-                  fontSize: '16px',
-                  lineHeight: '1.5',
-                  verticalAlign: 'baseline'
-                }}
-                onClick={() => handleFilterClick('events')}
-              >
-                Events
+                Business
               </button>
             </div>
           </div>
@@ -747,9 +572,33 @@ export default function HomePage() {
                 <div 
                   className="bg-gray-200 relative overflow-hidden w-full md:w-1/2 flex-shrink-0 min-h-[150px] md:min-h-[209px]"
                 >
-                  <div className={`absolute inset-0 bg-gradient-to-br ${card.imageColor} flex items-center justify-center`}>
-                    <span className="text-white text-xs md:text-sm font-medium">{card.label} Image</span>
-                  </div>
+                  {card.imageUrl ? (
+                    <>
+                      <img
+                        src={card.imageUrl}
+                        alt={card.title}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          // Hide image and show gradient fallback if image fails to load
+                          const target = e.target as HTMLImageElement
+                          target.style.display = 'none'
+                          const fallback = target.parentElement?.querySelector('.gradient-fallback') as HTMLElement
+                          if (fallback) fallback.style.display = 'flex'
+                        }}
+                      />
+                      <div 
+                        className={`gradient-fallback absolute inset-0 bg-gradient-to-br ${card.imageColor} flex items-center justify-center hidden`}
+                      >
+                        <span className="text-white text-xs md:text-sm font-medium">{card.label} Image</span>
+                      </div>
+                    </>
+                  ) : (
+                    <div 
+                      className={`absolute inset-0 bg-gradient-to-br ${card.imageColor} flex items-center justify-center`}
+                    >
+                      <span className="text-white text-xs md:text-sm font-medium">{card.label} Image</span>
+                    </div>
+                  )}
                 </div>
                 <div 
                   className="flex flex-col justify-end relative w-full md:w-1/2 p-4 min-h-[150px] md:min-h-[209px]"

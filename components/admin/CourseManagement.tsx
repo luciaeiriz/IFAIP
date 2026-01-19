@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Course, CourseTag } from '@/types/course'
 import { getAllCourses } from '@/lib/courses'
+import { adminFetch } from '@/lib/admin-api-client'
 import CourseForm from './CourseForm'
 import CourseList from './CourseList'
 
@@ -86,7 +87,7 @@ export default function CourseManagement() {
     }
 
     try {
-      const response = await fetch(`/api/admin/courses/${courseId}`, {
+      const response = await adminFetch(`/api/admin/courses/${courseId}`, {
         method: 'DELETE',
       })
 

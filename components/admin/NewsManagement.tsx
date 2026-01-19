@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { adminFetch } from '@/lib/admin-api-client'
 
 interface NewsItem {
   id: string
-  category: 'news' | 'blog' | 'researcher-spotlights' | 'latest-research' | 'events'
+  category: 'news' | 'technology' | 'science' | 'business'
   label: string
   title: string
   description?: string
@@ -12,12 +13,13 @@ interface NewsItem {
   time?: string
   href: string
   image_color: string
+  image_url?: string | null
   display_order: number
   created_at?: string
   updated_at?: string
 }
 
-type NewsCategory = 'news' | 'blog' | 'researcher-spotlights' | 'latest-research' | 'events'
+type NewsCategory = 'news' | 'technology' | 'science' | 'business'
 
 export default function NewsManagement() {
   const [newsItems, setNewsItems] = useState<NewsItem[]>([])
@@ -34,7 +36,7 @@ export default function NewsManagement() {
   const fetchNewsItems = async () => {
     try {
       setIsLoading(true)
-      const response = await fetch('/api/admin/news')
+      const response = await adminFetch('/api/admin/news')
       if (!response.ok) throw new Error('Failed to fetch news items')
       const data = await response.json()
       setNewsItems(data.newsItems || [])
@@ -53,9 +55,8 @@ export default function NewsManagement() {
 
     try {
       setIsRefreshing(category)
-      const response = await fetch('/api/admin/news/refresh', {
+      const response = await adminFetch('/api/admin/news/refresh', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ category, limit: 4 })
       })
 
@@ -86,9 +87,8 @@ export default function NewsManagement() {
         ? { ...itemData, id: editingItem.id }
         : itemData
 
-      const response = await fetch(url, {
+      const response = await adminFetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       })
 
@@ -112,7 +112,7 @@ export default function NewsManagement() {
     }
 
     try {
-      const response = await fetch(`/api/admin/news/${id}`, {
+      const response = await adminFetch(`/api/admin/news/${id}`, {
         method: 'DELETE'
       })
 
@@ -141,10 +141,9 @@ export default function NewsManagement() {
   const categories: Array<{ value: NewsCategory | 'all'; label: string }> = [
     { value: 'all', label: 'All Categories' },
     { value: 'news', label: 'News' },
-    { value: 'blog', label: 'Blog' },
-    { value: 'researcher-spotlights', label: 'Researcher Spotlights' },
-    { value: 'latest-research', label: 'Latest Research' },
-    { value: 'events', label: 'Events' },
+    { value: 'technology', label: 'Technology' },
+    { value: 'science', label: 'Science' },
+    { value: 'business', label: 'Business' },
   ]
 
   const filteredItems = selectedCategory === 'all'
@@ -169,28 +168,12 @@ export default function NewsManagement() {
             {filteredItems.length} news items
           </p>
         </div>
-        <div className="flex gap-2">
-          <button
-            onClick={() => handleRefreshFromAPI('news')}
-            disabled={isRefreshing === 'news'}
-            className="rounded-lg border border-[#36498C] px-4 py-2 text-sm font-medium text-[#36498C] hover:bg-[#36498C]/10 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isRefreshing === 'news' ? 'Refreshing...' : 'Refresh News from API'}
-          </button>
-          <button
-            onClick={() => handleRefreshFromAPI('blog')}
-            disabled={isRefreshing === 'blog'}
-            className="rounded-lg border border-[#36498C] px-4 py-2 text-sm font-medium text-[#36498C] hover:bg-[#36498C]/10 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isRefreshing === 'blog' ? 'Refreshing...' : 'Refresh Blog from API'}
-          </button>
-          <button
-            onClick={() => setShowForm(true)}
-            className="rounded-lg bg-[#36498C] px-4 py-2 text-sm font-semibold text-white hover:bg-[#36498C]/90"
-          >
-            Add New Item
-          </button>
-        </div>
+        <button
+          onClick={() => setShowForm(true)}
+          className="rounded-lg bg-[#36498C] px-4 py-2 text-sm font-semibold text-white hover:bg-[#36498C]/90"
+        >
+          Add New Item
+        </button>
       </div>
 
       {/* Category Filter */}
@@ -235,13 +218,15 @@ export default function NewsManagement() {
                 <h3 className="text-lg font-semibold text-gray-900 capitalize">
                   {category.replace('-', ' ')} ({items.length})
                 </h3>
-                {(category === 'news' || category === 'blog') && (
+                {(category === 'news' || category === 'technology' || category === 'science' || category === 'business') && (
                   <button
                     onClick={() => handleRefreshFromAPI(category as NewsCategory)}
                     disabled={isRefreshing === category}
                     className="rounded-lg border border-[#36498C] px-4 py-2 text-sm font-medium text-[#36498C] hover:bg-[#36498C]/10 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {isRefreshing === category ? 'Refreshing...' : 'Refresh from NewsAPI'}
+                    {isRefreshing === category 
+                      ? 'Refreshing...' 
+                      : `Refresh ${category.charAt(0).toUpperCase() + category.slice(1)} from NewsAPI`}
                   </button>
                 )}
               </div>
@@ -344,15 +329,58 @@ function NewsItemForm({
     time: item?.time || '',
     href: item?.href || '',
     imageColor: item?.image_color || 'from-blue-900 to-blue-700',
+    imageUrl: item?.image_url || '',
     display_order: item?.display_order || 0,
   })
+  const [isUploading, setIsUploading] = useState(false)
+  const [uploadError, setUploadError] = useState<string | null>(null)
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setIsUploading(true)
+    setUploadError(null)
+
+    try {
+      const uploadFormData = new FormData()
+      uploadFormData.append('file', file)
+
+      const response = await adminFetch('/api/admin/news/upload-image', {
+        method: 'POST',
+        body: uploadFormData,
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to upload image')
+      }
+
+      const data = await response.json()
+      setFormData({ ...formData, imageUrl: data.imageUrl })
+    } catch (error: any) {
+      console.error('Error uploading image:', error)
+      setUploadError(error.message || 'Failed to upload image')
+    } finally {
+      setIsUploading(false)
+    }
+  }
+
+  const handleRemoveImage = () => {
+    setFormData({ ...formData, imageUrl: '' })
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    onSave(formData)
+    // Map formData to match NewsItem interface
+    onSave({
+      ...formData,
+      image_color: formData.imageColor,
+      image_url: formData.imageUrl || null,
+    })
   }
 
-  const categories: NewsCategory[] = ['news', 'blog', 'researcher-spotlights', 'latest-research', 'events']
+  const categories: NewsCategory[] = ['news', 'technology', 'science', 'business']
   const colors = [
     'from-blue-900 to-blue-700',
     'from-indigo-600 to-indigo-800',
@@ -466,9 +494,52 @@ function NewsItemForm({
             />
           </div>
 
+          <div className="md:col-span-2">
+            <label className="block text-xs font-medium text-gray-700 mb-1">
+              Image (optional - overrides NewsAPI image)
+            </label>
+            <div className="space-y-2">
+              {formData.imageUrl && (
+                <div className="relative">
+                  <img
+                    src={formData.imageUrl}
+                    alt="Preview"
+                    className="h-32 w-full object-cover rounded-md border border-gray-300"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleRemoveImage}
+                    className="absolute top-2 right-2 rounded-full bg-red-500 text-white p-1 hover:bg-red-600"
+                    title="Remove image"
+                  >
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              )}
+              <input
+                type="file"
+                accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
+                onChange={handleImageUpload}
+                disabled={isUploading}
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#36498C] focus:ring-1 focus:ring-[#36498C] disabled:opacity-50 disabled:cursor-not-allowed"
+              />
+              {isUploading && (
+                <p className="text-xs text-gray-500">Uploading image...</p>
+              )}
+              {uploadError && (
+                <p className="text-xs text-red-600">{uploadError}</p>
+              )}
+              {formData.imageUrl && (
+                <p className="text-xs text-gray-500">Custom image set. This will override NewsAPI image.</p>
+              )}
+            </div>
+          </div>
+
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-1">
-              Image Color (gradient)
+              Image Color (gradient fallback)
             </label>
             <select
               value={formData.imageColor}

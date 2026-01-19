@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { adminFetch } from '@/lib/admin-api-client'
 
 interface AdminLoginProps {
   onLoginSuccess: () => void
@@ -30,7 +31,34 @@ export default function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
         return
       }
 
-      if (data.user) {
+      if (data.user && data.session?.access_token) {
+        // Check if user is admin before allowing access
+        // Use API route to check admin status securely (server-side)
+        // Note: adminFetch requires a session, but we just logged in, so we need to wait a moment
+        // for the session to be available, or use fetch with manual header
+        const response = await adminFetch('/api/admin/check-status', {
+          method: 'GET',
+        })
+
+        if (!response.ok) {
+          // Error checking admin status - sign out for safety
+          await supabase.auth.signOut()
+          setError('Error verifying admin status. Please try again.')
+          setIsLoading(false)
+          return
+        }
+
+        const { isAdmin } = await response.json()
+
+        if (!isAdmin) {
+          // User is not an admin - sign them out immediately
+          await supabase.auth.signOut()
+          setError('Access denied. You do not have admin privileges.')
+          setIsLoading(false)
+          return
+        }
+
+        // User is confirmed admin - proceed with login
         onLoginSuccess()
       }
     } catch (err: any) {

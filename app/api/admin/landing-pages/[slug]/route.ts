@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAdmin } from '@/lib/admin-api-middleware'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 
 // UUID regex pattern
@@ -9,6 +10,9 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { slug: string } }
 ) {
+  const authError = await requireAdmin(request)
+  if (authError) return authError
+
   try {
     const { slug } = params
     const { searchParams } = new URL(request.url)

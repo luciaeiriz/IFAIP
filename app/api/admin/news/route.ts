@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAdmin } from '@/lib/admin-api-middleware'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 
 // GET all news items
 export async function GET(request: NextRequest) {
+  const authError = await requireAdmin(request)
+  if (authError) return authError
+
   try {
     const { searchParams } = new URL(request.url)
     const category = searchParams.get('category')
@@ -39,6 +43,9 @@ export async function GET(request: NextRequest) {
 
 // POST create new news item
 export async function POST(request: NextRequest) {
+  const authError = await requireAdmin(request)
+  if (authError) return authError
+
   try {
     const body = await request.json()
 
@@ -51,7 +58,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate category
-    const validCategories = ['news', 'blog', 'researcher-spotlights', 'latest-research', 'events']
+    const validCategories = ['news', 'technology', 'science', 'business']
     if (!validCategories.includes(body.category)) {
       return NextResponse.json(
         { error: `Category must be one of: ${validCategories.join(', ')}` },
@@ -69,6 +76,7 @@ export async function POST(request: NextRequest) {
       time: body.time || null,
       href: body.href,
       image_color: body.imageColor || 'from-blue-900 to-blue-700',
+      image_url: body.imageUrl || null,
       display_order: body.display_order || 0,
     }
 
@@ -98,6 +106,9 @@ export async function POST(request: NextRequest) {
 
 // PUT update news item
 export async function PUT(request: NextRequest) {
+  const authError = await requireAdmin(request)
+  if (authError) return authError
+
   try {
     const body = await request.json()
 
@@ -110,7 +121,7 @@ export async function PUT(request: NextRequest) {
 
     // Validate category if provided
     if (body.category) {
-      const validCategories = ['news', 'blog', 'researcher-spotlights', 'latest-research', 'events']
+      const validCategories = ['news', 'technology', 'science', 'business']
       if (!validCategories.includes(body.category)) {
         return NextResponse.json(
           { error: `Category must be one of: ${validCategories.join(', ')}` },
@@ -129,6 +140,7 @@ export async function PUT(request: NextRequest) {
     if (body.time !== undefined) updateData.time = body.time
     if (body.href !== undefined) updateData.href = body.href
     if (body.imageColor !== undefined) updateData.image_color = body.imageColor
+    if (body.imageUrl !== undefined) updateData.image_url = body.imageUrl
     if (body.display_order !== undefined) updateData.display_order = body.display_order
 
     const { data, error } = await supabaseAdmin

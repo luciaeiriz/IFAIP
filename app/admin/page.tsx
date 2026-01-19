@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
+import { isAdminClient } from '@/lib/admin-auth'
 import AdminLogin from '@/components/admin/AdminLogin'
 import DashboardOverview from '@/components/admin/DashboardOverview'
 import CourseManagement from '@/components/admin/CourseManagement'
@@ -15,6 +16,7 @@ type AdminTab = 'dashboard' | 'courses' | 'landing-pages' | 'leads' | 'signups' 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<AdminTab>('dashboard')
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -22,11 +24,20 @@ export default function AdminPage() {
     checkAuth()
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session) {
         setIsAuthenticated(true)
+        // Check admin status when session changes
+        const adminStatus = await isAdminClient()
+        setIsAdmin(adminStatus)
+        // If user is authenticated but not admin, sign them out
+        if (!adminStatus) {
+          await supabase.auth.signOut()
+          setIsAuthenticated(false)
+        }
       } else {
         setIsAuthenticated(false)
+        setIsAdmin(false)
       }
     })
 
@@ -38,23 +49,49 @@ export default function AdminPage() {
   const checkAuth = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession()
-      setIsAuthenticated(!!session)
+      if (session) {
+        setIsAuthenticated(true)
+        // Check admin status
+        const adminStatus = await isAdminClient()
+        setIsAdmin(adminStatus)
+        // If user is authenticated but not admin, sign them out
+        if (!adminStatus) {
+          await supabase.auth.signOut()
+          setIsAuthenticated(false)
+        }
+      } else {
+        setIsAuthenticated(false)
+        setIsAdmin(false)
+      }
     } catch (error) {
       console.error('Error checking auth:', error)
       setIsAuthenticated(false)
+      setIsAdmin(false)
     } finally {
       setIsLoading(false)
     }
   }
 
-  const handleLoginSuccess = () => {
-    setIsAuthenticated(true)
+  const handleLoginSuccess = async () => {
+    // Verify admin status after login
+    const adminStatus = await isAdminClient()
+    if (adminStatus) {
+      setIsAuthenticated(true)
+      setIsAdmin(true)
+    } else {
+      // User logged in but is not an admin
+      await supabase.auth.signOut()
+      setIsAuthenticated(false)
+      setIsAdmin(false)
+      alert('Access denied. You do not have admin privileges.')
+    }
   }
 
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut()
       setIsAuthenticated(false)
+      setIsAdmin(false)
     } catch (error) {
       console.error('Error logging out:', error)
     }
@@ -71,7 +108,7 @@ export default function AdminPage() {
     )
   }
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated || !isAdmin) {
     return <AdminLogin onLoginSuccess={handleLoginSuccess} />
   }
 

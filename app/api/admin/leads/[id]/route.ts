@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAdmin } from '@/lib/admin-api-middleware'
 import { supabase } from '@/lib/supabase'
 
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const authError = await requireAdmin(request)
+  if (authError) return authError
+
   try {
     const { id } = params
 

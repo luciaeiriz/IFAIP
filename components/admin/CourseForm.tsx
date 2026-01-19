@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Course, CourseTag, CourseLevel } from '@/types/course'
+import { adminFetch } from '@/lib/admin-api-client'
 
 interface CourseFormProps {
   course?: Course | null
@@ -101,11 +102,8 @@ export default function CourseForm({ course, onSave, onCancel }: CourseFormProps
         : '/api/admin/courses'
       const method = course ? 'PUT' : 'POST'
 
-      const response = await fetch(url, {
+      const response = await adminFetch(url, {
         method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(courseData),
       })
 

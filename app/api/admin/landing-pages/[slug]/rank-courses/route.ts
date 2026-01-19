@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAdmin } from '@/lib/admin-api-middleware'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { rankCoursesForLandingPage } from '@/lib/rank-course'
 
@@ -10,6 +11,9 @@ export async function POST(
   request: NextRequest,
   { params }: { params: { slug: string } }
 ) {
+  const authError = await requireAdmin(request)
+  if (authError) return authError
+
   try {
     const { slug } = params
 

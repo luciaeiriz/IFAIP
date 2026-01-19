@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAdmin } from '@/lib/admin-api-middleware'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 
 // POST refresh news from NewsAPI
 export async function POST(request: NextRequest) {
+  const authError = await requireAdmin(request)
+  if (authError) return authError
+
   try {
     const body = await request.json()
     const category = body.category || 'news' // Default to 'news'
@@ -23,17 +27,49 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Fetch AI news from NewsAPI
-    const query = encodeURIComponent('artificial intelligence OR AI OR machine learning OR deep learning OR neural networks')
-    const response = await fetch(
-      `https://newsapi.org/v2/everything?q=${query}&language=en&sortBy=publishedAt&pageSize=${limit}&apiKey=${apiKey}`,
-      {
-        headers: {
-          'User-Agent': 'IFAIP-News-Aggregator/1.0'
+    // Check if category is supported by NewsAPI
+    const supportedCategories = ['news', 'technology', 'science', 'business']
+    if (!supportedCategories.includes(category)) {
+      return NextResponse.json(
+        { 
+          error: `Category "${category}" is not supported for automatic fetching. Please add items manually via the admin interface.`,
+          supportedCategories
         },
-        cache: 'no-store'
-      }
-    )
+        { status: 400 }
+      )
+    }
+
+    // Build AI-focused query with category-specific terms
+    let queryTerms = 'artificial intelligence OR AI OR machine learning OR deep learning OR neural networks'
+    
+    // Add category-specific AI terms to narrow results
+    if (category === 'technology') {
+      queryTerms += ' OR AI technology OR tech AI OR artificial intelligence technology'
+    } else if (category === 'science') {
+      queryTerms += ' OR AI research OR artificial intelligence research OR ML research'
+    } else if (category === 'business') {
+      queryTerms += ' OR AI business OR business AI OR AI enterprise OR enterprise AI'
+    }
+    
+    const aiQuery = encodeURIComponent(queryTerms)
+    
+    // Calculate date one month ago (NewsAPI requires YYYY-MM-DD format)
+    const oneMonthAgo = new Date()
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1)
+    const fromDate = oneMonthAgo.toISOString().split('T')[0] // Format: YYYY-MM-DD
+    
+    // Use everything endpoint for all categories to ensure AI-related content
+    // Sort by relevancy to prioritize most relevant articles, not just newest
+    // Fetch more results than needed so we can filter for AI relevance
+    const fetchLimit = Math.max(limit * 3, 20) // Fetch 3x to filter for relevance
+    const apiUrl = `https://newsapi.org/v2/everything?q=${aiQuery}&language=en&sortBy=relevancy&from=${fromDate}&pageSize=${fetchLimit}&apiKey=${apiKey}`
+
+    const response = await fetch(apiUrl, {
+      headers: {
+        'User-Agent': 'IFAIP-News-Aggregator/1.0'
+      },
+      cache: 'no-store'
+    })
 
     if (!response.ok) {
       const errorText = await response.text()
@@ -65,8 +101,37 @@ export async function POST(request: NextRequest) {
       'from-orange-600 to-orange-800',
     ]
 
+    // AI-related keywords to filter articles
+    const aiKeywords = [
+      'artificial intelligence', 'AI', 'machine learning', 'ML', 'deep learning',
+      'neural network', 'neural networks', 'artificial neural', 'computer vision',
+      'natural language processing', 'NLP', 'robotics', 'automation', 'algorithm',
+      'data science', 'predictive analytics', 'chatbot', 'chatbots', 'GPT',
+      'transformer', 'LLM', 'large language model', 'generative AI', 'gen AI'
+    ]
+    
+    // Filter articles to ensure they're AI-related
+    const isAIRelated = (article: any): boolean => {
+      const title = (article.title || '').toLowerCase()
+      const description = (article.description || article.content || '').toLowerCase()
+      const text = `${title} ${description}`
+      
+      return aiKeywords.some(keyword => text.includes(keyword.toLowerCase()))
+    }
+
     const newsItems = data.articles
-      .filter((article: any) => article.title && article.url && article.url !== '[Removed]')
+      .filter((article: any) => {
+        if (!article.title || !article.url || article.url === '[Removed]') {
+          return false
+        }
+        
+        // Ensure article is AI-related
+        if (!isAIRelated(article)) {
+          return false
+        }
+        
+        return true
+      })
       .slice(0, limit)
       .map((article: any, index: number) => {
         const publishedDate = new Date(article.publishedAt)
@@ -77,14 +142,18 @@ export async function POST(request: NextRequest) {
           year: 'numeric'
         })
 
-        // Determine if it's a blog based on source
-        const blogSources = ['medium.com', 'substack.com', 'blog.', 'techcrunch.com']
-        const isBlog = blogSources.some(source => 
-          article.url?.toLowerCase().includes(source) || 
-          article.source?.name?.toLowerCase().includes('blog')
-        )
-        
-        const articleCategory = isBlog ? 'blog' : category
+        // Determine category and label
+        let articleCategory: string
+        let label: string
+
+        if (category === 'technology' || category === 'science' || category === 'business') {
+          articleCategory = category
+          label = category.charAt(0).toUpperCase() + category.slice(1)
+        } else {
+          // For news category, all articles are news
+          articleCategory = 'news'
+          label = 'News'
+        }
 
         // Clean up description
         let description = article.description || article.content || ''
@@ -93,14 +162,20 @@ export async function POST(request: NextRequest) {
           description = description.substring(0, 200).trim() + '...'
         }
 
+        // Extract image URL from NewsAPI (urlToImage field)
+        const imageUrl = article.urlToImage && article.urlToImage !== '[Removed]' 
+          ? article.urlToImage 
+          : null
+
         return {
           category: articleCategory,
-          label: articleCategory === 'news' ? 'News' : 'Blog',
+          label: label,
           title: article.title,
           description: description || null,
           date: formattedDate,
           href: article.url,
           image_color: colors[index % colors.length],
+          image_url: imageUrl,
           display_order: index,
         }
       })

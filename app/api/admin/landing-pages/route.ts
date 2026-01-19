@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAdmin } from '@/lib/admin-api-middleware'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 
 // GET all landing pages (admin only)
 export async function GET(request: NextRequest) {
+  const authError = await requireAdmin(request)
+  if (authError) return authError
+
   try {
     const { data, error } = await supabaseAdmin
       .from('landing_pages')
@@ -81,6 +85,9 @@ export async function GET(request: NextRequest) {
 
 // POST create new landing page
 export async function POST(request: NextRequest) {
+  const authError = await requireAdmin(request)
+  if (authError) return authError
+
   try {
     const body = await request.json()
 
@@ -116,6 +123,18 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
+
+    // Auto-assign display_order: get max display_order and add 1
+    const { data: maxOrderData } = await supabaseAdmin
+      .from('landing_pages')
+      .select('display_order')
+      .order('display_order', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+    
+    const nextDisplayOrder = maxOrderData?.display_order !== undefined 
+      ? maxOrderData.display_order + 1 
+      : 0
 
     // Generate relevancy column name
     const relevancyColumn = `${normalizedTag}_relevancy`
@@ -197,7 +216,7 @@ export async function POST(request: NextRequest) {
       header_image_url: body.headerImageUrl || '/hero.png', // Placeholder
       relevancy_column: relevancyColumn,
       is_enabled: Boolean(body.isEnabled ?? true), // Explicitly convert to boolean, default to enabled
-      display_order: body.displayOrder || 0,
+      display_order: nextDisplayOrder, // Auto-assigned: max + 1
     }
 
     const { data, error } = await supabaseAdmin
@@ -259,6 +278,9 @@ export async function POST(request: NextRequest) {
 
 // PUT update landing page
 export async function PUT(request: NextRequest) {
+  const authError = await requireAdmin(request)
+  if (authError) return authError
+
   try {
     const body = await request.json()
 
@@ -344,7 +366,7 @@ export async function PUT(request: NextRequest) {
       updateData.is_enabled = Boolean(body.isEnabled)
       console.log(`🔄 PUT: Setting is_enabled to ${updateData.is_enabled} (from ${body.isEnabled}, type: ${typeof body.isEnabled}) for landing page ${body.id}`)
     }
-    if (body.displayOrder !== undefined) updateData.display_order = body.displayOrder
+    // display_order is now auto-assigned on creation, so we ignore it on updates
 
     console.log(`💾 PUT: Updating landing page ${body.id} with data:`, updateData)
     

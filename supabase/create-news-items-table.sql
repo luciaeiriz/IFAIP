@@ -9,7 +9,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- Step 2: Create news_items table
 CREATE TABLE IF NOT EXISTS news_items (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    category TEXT NOT NULL CHECK (category IN ('news', 'blog', 'researcher-spotlights', 'latest-research', 'events')),
+    category TEXT NOT NULL CHECK (category IN ('news', 'technology', 'science', 'business')),
     label TEXT NOT NULL,
     title TEXT NOT NULL,
     description TEXT,
