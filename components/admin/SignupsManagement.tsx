@@ -32,11 +32,15 @@ export default function SignupsManagement() {
   const fetchSignups = async () => {
     try {
       setIsLoading(true)
+      // Add timestamp to prevent caching
+      const timestamp = Date.now()
       const url = filterTag !== 'all' 
-        ? `/api/admin/signups?landing_tag=${filterTag}&limit=500`
-        : `/api/admin/signups?limit=500`
+        ? `/api/admin/signups?landing_tag=${filterTag}&limit=500&_t=${timestamp}`
+        : `/api/admin/signups?limit=500&_t=${timestamp}`
       
-      const response = await adminFetch(url)
+      const response = await adminFetch(url, {
+        cache: 'no-store',
+      })
       const result = await response.json()
 
       if (!response.ok || !result.success) {
@@ -85,6 +89,14 @@ export default function SignupsManagement() {
           <p className="text-sm text-gray-600 mt-1">{signups.length} recent signups</p>
         </div>
         <div className="flex gap-2">
+          <button
+            onClick={() => fetchSignups()}
+            disabled={isLoading}
+            className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Refresh signups"
+          >
+            {isLoading ? 'Refreshing...' : '🔄 Refresh'}
+          </button>
           <select
             value={filterTag}
             onChange={(e) => setFilterTag(e.target.value)}

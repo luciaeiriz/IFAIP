@@ -39,11 +39,18 @@ export async function GET(request: NextRequest) {
 
     console.log(`Successfully fetched ${data?.length || 0} contact submissions (total: ${count || 0})`)
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       submissions: data || [],
       count: count || 0,
     })
+    
+    // Prevent caching
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+    response.headers.set('Pragma', 'no-cache')
+    response.headers.set('Expires', '0')
+    
+    return response
   } catch (error: any) {
     console.error('Error in GET /api/admin/contact-submissions:', error)
     console.error('Error stack:', error?.stack)

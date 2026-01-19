@@ -29,7 +29,11 @@ export default function ContactSubmissionsManagement() {
     try {
       setIsLoading(true)
       console.log('Fetching contact submissions...')
-      const response = await adminFetch('/api/admin/contact-submissions')
+      // Add timestamp to prevent caching
+      const timestamp = Date.now()
+      const response = await adminFetch(`/api/admin/contact-submissions?_t=${timestamp}`, {
+        cache: 'no-store',
+      })
       
       console.log('Response status:', response.status, response.statusText)
       
@@ -130,13 +134,23 @@ export default function ContactSubmissionsManagement() {
           <h2 className="text-2xl font-bold text-gray-900">Contact Submissions</h2>
           <p className="text-sm text-gray-600 mt-1">{submissions.length} total submissions</p>
         </div>
-        <button
-          onClick={handleExport}
-          disabled={submissions.length === 0}
-          className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Export CSV
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => fetchSubmissions()}
+            disabled={isLoading}
+            className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Refresh submissions"
+          >
+            {isLoading ? 'Refreshing...' : '🔄 Refresh'}
+          </button>
+          <button
+            onClick={handleExport}
+            disabled={submissions.length === 0}
+            className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Export CSV
+          </button>
+        </div>
       </div>
 
       {isLoading ? (

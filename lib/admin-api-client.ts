@@ -32,5 +32,6 @@ export async function adminFetch(url: string, options: RequestInit = {}): Promis
     ...options,
     headers,
     credentials: 'include',
+    cache: options.cache || 'no-store', // Default to no-store to prevent caching
   })
 }
