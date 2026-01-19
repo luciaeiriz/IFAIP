@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
+import { getUTMParams } from '@/lib/contact'
 
 export default function ContactPage() {
   const [activeSection, setActiveSection] = useState<string | null>(null)
@@ -28,12 +29,31 @@ export default function ContactPage() {
     setSubmitStatus('idle')
 
     try {
-      // Here you would typically send the form data to your API
-      // For now, we'll simulate a successful submission
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      setSubmitStatus('success')
-      setFormData({ name: '', email: '', subject: '', message: '' })
+      // Get UTM parameters
+      const utmParams = getUTMParams()
+
+      // Send form data to API
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          ...utmParams,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok && data.success) {
+        setSubmitStatus('success')
+        setFormData({ name: '', email: '', subject: '', message: '' })
+      } else {
+        setSubmitStatus('error')
+      }
     } catch (error) {
+      console.error('Error submitting contact form:', error)
       setSubmitStatus('error')
     } finally {
       setIsSubmitting(false)

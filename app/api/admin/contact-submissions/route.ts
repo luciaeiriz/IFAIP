@@ -11,47 +11,33 @@ export async function GET(request: NextRequest) {
 
   try {
     const { searchParams } = new URL(request.url)
-    const landingTag = searchParams.get('landing_tag')
-    const courseId = searchParams.get('course_id')
-    const limit = parseInt(searchParams.get('limit') || '100')
+    const limit = parseInt(searchParams.get('limit') || '500')
     const offset = parseInt(searchParams.get('offset') || '0')
 
-    let query = supabaseAdmin
-      .from('signups')
-      .select('*, courses(title)', { count: 'exact' })
+    const { data, error, count } = await supabaseAdmin
+      .from('contact_submissions')
+      .select('*', { count: 'exact' })
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1)
 
-    if (landingTag && landingTag !== 'all') {
-      query = query.eq('landing_tag', landingTag)
-    }
-
-    if (courseId) {
-      query = query.eq('course_id', courseId)
-    }
-
-    const { data, error, count } = await query
-
     if (error) {
-      console.error('Error fetching signups:', error)
+      console.error('Error fetching contact submissions:', error)
       return NextResponse.json(
-        { error: error.message || 'Failed to fetch signups' },
+        { error: error.message || 'Failed to fetch contact submissions' },
         { status: 500 }
       )
     }
 
     return NextResponse.json({
       success: true,
-      signups: data || [],
+      submissions: data || [],
       count: count || 0,
     })
   } catch (error) {
-    console.error('Error in GET /api/admin/signups:', error)
+    console.error('Error in GET /api/admin/contact-submissions:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     )
   }
 }
-
-

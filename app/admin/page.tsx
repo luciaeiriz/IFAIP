@@ -10,8 +10,9 @@ import LeadsManagement from '@/components/admin/LeadsManagement'
 import SignupsManagement from '@/components/admin/SignupsManagement'
 import LandingPageManagement from '@/components/admin/LandingPageManagement'
 import NewsManagement from '@/components/admin/NewsManagement'
+import ContactSubmissionsManagement from '@/components/admin/ContactSubmissionsManagement'
 
-type AdminTab = 'dashboard' | 'courses' | 'landing-pages' | 'leads' | 'signups' | 'news'
+type AdminTab = 'dashboard' | 'courses' | 'landing-pages' | 'leads' | 'signups' | 'news' | 'contact'
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<AdminTab>('dashboard')
@@ -178,6 +179,7 @@ export default function AdminPage() {
     { id: 'news' as AdminTab, label: 'News', icon: '📰' },
     { id: 'leads' as AdminTab, label: 'Leads', icon: '👥' },
     { id: 'signups' as AdminTab, label: 'Signups', icon: '✅' },
+    { id: 'contact' as AdminTab, label: 'Contact', icon: '📧' },
   ]
 
   return (
@@ -221,6 +223,7 @@ export default function AdminPage() {
         {activeTab === 'news' && <NewsManagement />}
         {activeTab === 'leads' && <LeadsManagement />}
         {activeTab === 'signups' && <SignupsManagement />}
+        {activeTab === 'contact' && <ContactSubmissionsManagement />}
       </div>
     </div>
   )

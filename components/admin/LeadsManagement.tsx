@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { adminFetch } from '@/lib/admin-api-client'
 
 interface Lead {
   id: string
@@ -26,23 +26,22 @@ export default function LeadsManagement() {
   const fetchLeads = async () => {
     try {
       setIsLoading(true)
-      let query = supabase
-        .from('leads')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(500)
+      const url = filterTag !== 'all' 
+        ? `/api/admin/leads?landing_tag=${filterTag}&limit=500`
+        : `/api/admin/leads?limit=500`
+      
+      const response = await adminFetch(url)
+      const result = await response.json()
 
-      if (filterTag !== 'all') {
-        query = query.eq('landing_tag', filterTag)
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'Failed to fetch leads')
       }
 
-      const { data, error } = await query
-
-      if (error) throw error
-      setLeads(data || [])
-    } catch (error) {
+      console.log('Fetched leads:', result.leads?.length || 0)
+      setLeads(result.leads || [])
+    } catch (error: any) {
       console.error('Error fetching leads:', error)
-      alert('Failed to load leads. Please check the console for details.')
+      alert(`Failed to load leads: ${error?.message || 'Unknown error'}\n\nPlease check the browser console for more details.`)
     } finally {
       setIsLoading(false)
     }

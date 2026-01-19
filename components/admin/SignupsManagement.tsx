@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { adminFetch } from '@/lib/admin-api-client'
 
 interface Signup {
   id: string
@@ -32,23 +32,22 @@ export default function SignupsManagement() {
   const fetchSignups = async () => {
     try {
       setIsLoading(true)
-      let query = supabase
-        .from('signups')
-        .select('*, courses(title)')
-        .order('created_at', { ascending: false })
-        .limit(500)
+      const url = filterTag !== 'all' 
+        ? `/api/admin/signups?landing_tag=${filterTag}&limit=500`
+        : `/api/admin/signups?limit=500`
+      
+      const response = await adminFetch(url)
+      const result = await response.json()
 
-      if (filterTag !== 'all') {
-        query = query.eq('landing_tag', filterTag)
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'Failed to fetch signups')
       }
 
-      const { data, error } = await query
-
-      if (error) throw error
-      setSignups(data || [])
-    } catch (error) {
+      console.log('Fetched signups:', result.signups?.length || 0)
+      setSignups(result.signups || [])
+    } catch (error: any) {
       console.error('Error fetching signups:', error)
-      alert('Failed to load signups. Please check the console for details.')
+      alert(`Failed to load signups: ${error?.message || 'Unknown error'}\n\nPlease check the browser console for more details.`)
     } finally {
       setIsLoading(false)
     }

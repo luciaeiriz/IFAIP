@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/admin-api-middleware'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 import { isValidUUID } from '@/lib/validation'
 
 export const dynamic = 'force-dynamic'
@@ -23,7 +23,7 @@ export async function DELETE(
       )
     }
 
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('leads')
       .delete()
       .eq('id', id)

@@ -24,26 +24,24 @@ export async function DELETE(
     }
 
     const { error } = await supabaseAdmin
-      .from('signups')
+      .from('contact_submissions')
       .delete()
       .eq('id', id)
 
     if (error) {
-      console.error('Error deleting signup:', error)
+      console.error('Error deleting contact submission:', error)
       return NextResponse.json(
-        { error: error.message || 'Failed to delete signup' },
+        { error: error.message || 'Failed to delete contact submission' },
         { status: 500 }
       )
     }
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Error in DELETE /api/admin/signups/[id]:', error)
+    console.error('Error in DELETE /api/admin/contact-submissions/[id]:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     )
   }
 }
-
-

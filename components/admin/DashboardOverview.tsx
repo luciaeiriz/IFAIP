@@ -8,6 +8,7 @@ interface DashboardStats {
   totalCourses: number
   totalLeads: number
   totalSignups: number
+  totalContactSubmissions: number
   recentSignups: any[]
   popularCourses: { course_id: string; count: number; title: string }[]
   signupsByTag: { tag: string; count: number }[]
@@ -47,14 +48,16 @@ export default function DashboardOverview() {
       const allCourses = await getAllCourses()
       const totalCourses = allCourses.length
 
-      // Get all leads and signups (not filtered)
-      const [leadsRes, signupsRes] = await Promise.all([
+      // Get all leads, signups, and contact submissions (not filtered)
+      const [leadsRes, signupsRes, contactRes] = await Promise.all([
         supabase.from('leads').select('id', { count: 'exact' }),
-        supabase.from('signups').select('id, created_at, course_id', { count: 'exact' })
+        supabase.from('signups').select('id, created_at, course_id', { count: 'exact' }),
+        supabase.from('contact_submissions').select('id', { count: 'exact' })
       ])
       
       const totalLeads = leadsRes.count || leadsRes.data?.length || 0
       const totalSignups = signupsRes.count || signupsRes.data?.length || 0
+      const totalContactSubmissions = contactRes.count || contactRes.data?.length || 0
       
       // Get recent signups
       const recentSignupsRes = await supabase
@@ -171,6 +174,7 @@ export default function DashboardOverview() {
         totalCourses,
         totalLeads,
         totalSignups,
+        totalContactSubmissions,
         recentSignups: recentSignupsRes.data || [],
         popularCourses,
         signupsByTag,
@@ -195,7 +199,7 @@ export default function DashboardOverview() {
   return (
     <div className="space-y-6">
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
         <StatCard
           title="Total Courses"
           value={stats?.totalCourses || 0}
@@ -213,6 +217,12 @@ export default function DashboardOverview() {
           value={stats?.totalSignups || 0}
           icon="✅"
           color="purple"
+        />
+        <StatCard
+          title="Contact Submissions"
+          value={stats?.totalContactSubmissions || 0}
+          icon="📧"
+          color="orange"
         />
         <StatCard
           title="Conversion Rate"
