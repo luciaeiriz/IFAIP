@@ -1,5 +1,4 @@
 import { supabase } from '@/lib/supabase'
-import { supabaseAdmin } from '@/lib/supabase-admin'
 import { NextRequest } from 'next/server'
 
 /**
@@ -270,6 +269,8 @@ export async function isAdminServer(request: NextRequest): Promise<boolean> {
 
     // Check if user exists in admin_users table
     // Use .maybeSingle() instead of .single() to handle 0 rows gracefully
+    // Dynamically import supabaseAdmin to avoid bundling it in client code
+    const { supabaseAdmin } = await import('@/lib/supabase-admin')
     const { data, error } = await supabaseAdmin
       .from('admin_users')
       .select('id')
@@ -318,6 +319,8 @@ export async function getAdminUserId(request: NextRequest): Promise<string | nul
 
     // Check if user exists in admin_users table
     // Use .maybeSingle() instead of .single() to handle 0 rows gracefully
+    // Dynamically import supabaseAdmin to avoid bundling it in client code
+    const { supabaseAdmin } = await import('@/lib/supabase-admin')
     const { data, error } = await supabaseAdmin
       .from('admin_users')
       .select('user_id')
