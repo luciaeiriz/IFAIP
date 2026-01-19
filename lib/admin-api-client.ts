@@ -5,7 +5,25 @@ import { supabase } from './supabase'
  * Automatically includes the Authorization header with the current session's access token
  */
 export async function adminFetch(url: string, options: RequestInit = {}): Promise<Response> {
-  const { data: { session } } = await supabase.auth.getSession()
+  // Add timeout wrapper to getSession call
+  const sessionPromise = supabase.auth.getSession()
+  const sessionTimeoutPromise = new Promise<never>((_, reject) => 
+    setTimeout(() => reject(new Error('getSession timeout')), 30000)
+  )
+  
+  let session
+  try {
+    const result = await Promise.race([
+      sessionPromise,
+      sessionTimeoutPromise,
+    ]) as any
+    session = result.data?.session
+  } catch (timeoutError: any) {
+    if (timeoutError.message === 'getSession timeout') {
+      throw new Error('Session check timed out. Please try again.')
+    }
+    throw timeoutError
+  }
   
   if (!session?.access_token) {
     throw new Error('No active session. Please log in again.')

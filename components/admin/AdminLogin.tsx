@@ -33,12 +33,32 @@ export default function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
 
       if (data.user && data.session?.access_token) {
         // Check if user is admin before allowing access
-        // Use API route to check admin status securely (server-side)
-        // Note: adminFetch requires a session, but we just logged in, so we need to wait a moment
-        // for the session to be available, or use fetch with manual header
-        const response = await adminFetch('/api/admin/check-status', {
-          method: 'GET',
-        })
+        // Use the session we just got from signInWithPassword to avoid another getSession() call
+        // Add timeout to prevent hanging
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 30000) // 30 second timeout
+        
+        let response: Response
+        try {
+          response = await fetch('/api/admin/check-status', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${data.session.access_token}`,
+            },
+            credentials: 'include',
+            signal: controller.signal,
+          })
+          clearTimeout(timeoutId)
+        } catch (fetchError: any) {
+          clearTimeout(timeoutId)
+          if (fetchError.name === 'AbortError') {
+            setError('Admin verification timed out. Please check your connection and try again.')
+            setIsLoading(false)
+            return
+          }
+          throw fetchError
+        }
 
         if (!response.ok) {
           // Error checking admin status - sign out for safety

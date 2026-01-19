@@ -48,10 +48,11 @@ export default function AdminPage() {
 
   const checkAuth = async () => {
     try {
-      // Add timeout to getSession call
+      // Add timeout to getSession call (increased to 30s to match fetch timeout)
+      // getSession() may need to refresh the session, which requires network calls
       const sessionPromise = supabase.auth.getSession()
       const sessionTimeoutPromise = new Promise<never>((_, reject) => 
-        setTimeout(() => reject(new Error('Session check timeout')), 10000)
+        setTimeout(() => reject(new Error('Session check timeout')), 30000)
       )
       
       let session
@@ -63,7 +64,7 @@ export default function AdminPage() {
         session = result.data?.session
       } catch (sessionError: any) {
         if (sessionError.message === 'Session check timeout') {
-          console.error('❌ Session check timed out after 10 seconds')
+          console.error('❌ Session check timed out after 30 seconds - this may indicate network/TLS issues')
           setIsAuthenticated(false)
           setIsAdmin(false)
           setIsLoading(false)
@@ -74,14 +75,14 @@ export default function AdminPage() {
       
       if (session) {
         setIsAuthenticated(true)
-        // Check admin status with timeout
+        // Check admin status with timeout (increased to 30s)
         try {
           const adminStatusPromise = isAdminClient()
           const adminTimeoutPromise = new Promise<boolean>((resolve) => 
             setTimeout(() => {
-              console.error('❌ Admin status check timed out after 10 seconds')
+              console.error('❌ Admin status check timed out after 30 seconds')
               resolve(false)
-            }, 10000)
+            }, 30000)
           )
           
           const adminStatus = await Promise.race([
@@ -121,17 +122,40 @@ export default function AdminPage() {
   }
 
   const handleLoginSuccess = async () => {
-    // Verify admin status after login
-    const adminStatus = await isAdminClient()
-    if (adminStatus) {
-      setIsAuthenticated(true)
-      setIsAdmin(true)
-    } else {
-      // User logged in but is not an admin
+    // Verify admin status after login with timeout
+    try {
+      const adminStatusPromise = isAdminClient()
+      const adminTimeoutPromise = new Promise<boolean>((resolve) => 
+        setTimeout(() => {
+          console.error('❌ Admin status check timed out after 30 seconds')
+          resolve(false)
+        }, 30000)
+      )
+      
+      const adminStatus = await Promise.race([
+        adminStatusPromise,
+        adminTimeoutPromise,
+      ])
+      
+      if (adminStatus) {
+        setIsAuthenticated(true)
+        setIsAdmin(true)
+        setIsLoading(false)
+      } else {
+        // User logged in but is not an admin or check timed out
+        await supabase.auth.signOut()
+        setIsAuthenticated(false)
+        setIsAdmin(false)
+        setIsLoading(false)
+        alert('Access denied. You do not have admin privileges or verification timed out.')
+      }
+    } catch (error) {
+      console.error('Error verifying admin status after login:', error)
       await supabase.auth.signOut()
       setIsAuthenticated(false)
       setIsAdmin(false)
-      alert('Access denied. You do not have admin privileges.')
+      setIsLoading(false)
+      alert('Error verifying admin status. Please try again.')
     }
   }
 

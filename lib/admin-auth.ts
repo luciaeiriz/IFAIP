@@ -20,7 +20,27 @@ function validateSupabaseUrl(supabaseUrl: string): boolean {
  */
 export async function isAdminClient(): Promise<boolean> {
   try {
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+    // Add timeout wrapper to getSession call
+    const sessionPromise = supabase.auth.getSession()
+    const sessionTimeoutPromise = new Promise<never>((_, reject) => 
+      setTimeout(() => reject(new Error('getSession timeout')), 30000)
+    )
+    
+    let session, sessionError
+    try {
+      const result = await Promise.race([
+        sessionPromise,
+        sessionTimeoutPromise,
+      ]) as any
+      session = result.data?.session
+      sessionError = result.error
+    } catch (timeoutError: any) {
+      if (timeoutError.message === 'getSession timeout') {
+        console.error('❌ getSession() timed out after 30 seconds in isAdminClient()')
+        return false
+      }
+      throw timeoutError
+    }
 
     if (sessionError) {
       console.error('Error getting session:', sessionError)
@@ -41,9 +61,9 @@ export async function isAdminClient(): Promise<boolean> {
     // Pass the access token in Authorization header
     // This avoids exposing the service role key to the client
     
-    // Add timeout to prevent hanging in production
+    // Add timeout to prevent hanging in production (increased to 30s)
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 30000) // 30 second timeout
     
     let response: Response
     try {
@@ -60,7 +80,7 @@ export async function isAdminClient(): Promise<boolean> {
     } catch (fetchError: any) {
       clearTimeout(timeoutId)
       if (fetchError.name === 'AbortError') {
-        console.error('Admin status check timed out after 10 seconds')
+        console.error('Admin status check timed out after 30 seconds')
         return false
       }
       throw fetchError
