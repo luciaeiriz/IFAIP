@@ -1,5 +1,4 @@
 import { supabase } from './supabase'
-import { supabaseAdmin } from './supabase-admin'
 
 export interface LandingPage {
   id: string
@@ -33,6 +32,9 @@ export interface LandingPagePublic {
  */
 export async function getAllLandingPages(): Promise<LandingPage[]> {
   try {
+    // Dynamically import supabaseAdmin to avoid bundling in client code
+    const { supabaseAdmin } = await import('./supabase-admin')
+    
     const { data, error } = await supabaseAdmin
       .from('landing_pages')
       .select('*')

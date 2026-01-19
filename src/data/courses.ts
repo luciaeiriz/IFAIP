@@ -388,11 +388,11 @@ export async function getCourseById(id: string): Promise<Course | null> {
 /**
  * Fetches featured courses - directly queries database with is_featured filter
  * This is more efficient than fetching all courses and filtering in memory
+ * Handles missing is_featured column gracefully
  */
 export async function getFeaturedCourses(): Promise<Course[]> {
   try {
-    // Query database directly for featured courses
-    // Only show courses where signup_enabled is true (visible courses)
+    // Try to query with is_featured filter first
     const { data, error } = await supabase
       .from('courses')
       .select('*')
@@ -401,6 +401,24 @@ export async function getFeaturedCourses(): Promise<Course[]> {
       .order('priority', { ascending: true, nullsFirst: false })
 
     if (error) {
+      // If error is about missing column (42703 = undefined_column), fallback to getting all courses
+      if (error.code === '42703' || error.message?.includes('is_featured') || error.message?.includes('column') && error.message?.includes('does not exist')) {
+        console.warn('⚠️ is_featured column does not exist, fetching top courses instead')
+        const { data: fallbackData, error: fallbackError } = await supabase
+          .from('courses')
+          .select('*')
+          .eq('signup_enabled', true)
+          .order('priority', { ascending: true, nullsFirst: false })
+          .limit(10) // Limit to top 10 as featured
+        
+        if (fallbackError) {
+          console.error('❌ getFeaturedCourses FALLBACK ERROR:', fallbackError)
+          return []
+        }
+        
+        return (fallbackData || []).map(transformCourse)
+      }
+      
       console.error('❌ getFeaturedCourses DATABASE ERROR:', error)
       return []
     }
@@ -420,11 +438,11 @@ export async function getFeaturedCourses(): Promise<Course[]> {
 /**
  * Optimized: Fetches featured courses filtered by tag - more efficient than fetching all and filtering client-side
  * This reduces data transfer and improves performance
+ * Handles missing is_featured column gracefully
  */
 export async function getFeaturedCoursesByTag(tag: CourseTag): Promise<Course[]> {
   try {
-    // Query database directly for featured courses with tag filter
-    // This is more efficient than fetching all featured courses and filtering in memory
+    // Try to query with is_featured filter first
     const { data, error } = await supabase
       .from('courses')
       .select('*')
@@ -432,8 +450,28 @@ export async function getFeaturedCoursesByTag(tag: CourseTag): Promise<Course[]>
       .eq('signup_enabled', true)
       .eq('tag', tag)
       .order('priority', { ascending: true, nullsFirst: false })
+      .limit(3)
 
     if (error) {
+      // If error is about missing column (42703 = undefined_column), fallback to getting courses without is_featured filter
+      if (error.code === '42703' || error.message?.includes('is_featured') || (error.message?.includes('column') && error.message?.includes('does not exist'))) {
+        console.warn('⚠️ is_featured column does not exist, fetching top courses for tag instead')
+        const { data: fallbackData, error: fallbackError } = await supabase
+          .from('courses')
+          .select('*')
+          .eq('signup_enabled', true)
+          .eq('tag', tag)
+          .order('priority', { ascending: true, nullsFirst: false })
+          .limit(3)
+        
+        if (fallbackError) {
+          console.error('❌ getFeaturedCoursesByTag FALLBACK ERROR:', fallbackError)
+          return []
+        }
+        
+        return (fallbackData || []).map(transformCourse)
+      }
+      
       console.error('❌ getFeaturedCoursesByTag DATABASE ERROR:', error)
       return []
     }
