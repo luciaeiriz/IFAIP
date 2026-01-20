@@ -153,7 +153,7 @@ export default function ForbesHeroSection({ tag, heroTitle }: ForbesHeroSectionP
       >
         {/* Hero image */}
         <Image
-          src="/hero.png"
+          src="/hero.png?v=2"
           alt="Hero"
           fill
           style={{

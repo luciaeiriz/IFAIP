@@ -7,6 +7,7 @@ import ForbesHeroSection from '@/components/courses/ForbesHeroSection'
 import FeaturedTopPicks from '@/components/courses/FeaturedTopPicks'
 import AllCoursesGrid from '@/components/courses/AllCoursesGrid'
 import EmailCaptureCTA from '@/components/courses/EmailCaptureCTA'
+import LandingPageScrollBanner from '@/components/courses/LandingPageScrollBanner'
 
 const TAG = 'Business'
 
@@ -47,6 +48,11 @@ function BusinessCoursesContent() {
     return allCourses.slice(0, 3)
   }, [allCourses])
 
+  // Get top course for banner (first course is top-ranked)
+  const topCourse = useMemo(() => {
+    return allCourses.length > 0 ? allCourses[0] : null
+  }, [allCourses])
+
 
   if (isLoading) {
     return (
@@ -76,7 +82,10 @@ function BusinessCoursesContent() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white" style={{ paddingBottom: '100px' }}>
+      {/* Scroll Banner - shows top program info */}
+      <LandingPageScrollBanner topCourse={topCourse} />
+      
       {/* Hero Section */}
       <ForbesHeroSection tag={TAG} />
 

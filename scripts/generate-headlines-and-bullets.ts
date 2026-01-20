@@ -53,7 +53,7 @@ ${courseInfo}
 
 Generate:
 1. A short headline/tagline (maximum 60 characters) that captures the essence of what this course teaches. Make it compelling and concise.
-2. A list of 3-5 bullet points that break down the key learning outcomes or what students will learn. Each bullet point should be a complete sentence ending with a period.
+2. A list of exactly 3 bullet points that break down the key learning outcomes or what students will learn. Each bullet point should be a complete sentence ending with a period.
 
 Return ONLY valid JSON in this exact format:
 {
@@ -71,7 +71,7 @@ Return ONLY valid JSON in this exact format:
       messages: [
         {
           role: 'system',
-          content: 'You are an expert at creating compelling course descriptions. Always return valid JSON only, no additional text. Headlines must be 60 characters or less.'
+          content: 'You are an expert at creating compelling course descriptions. Always return valid JSON only, no additional text. Headlines must be 60 characters or less. Always generate exactly 3 bullet points.'
         },
         {
           role: 'user',
@@ -103,7 +103,7 @@ Return ONLY valid JSON in this exact format:
     const bulletPoints = parsed.bulletPoints
       .map(bp => bp.trim())
       .filter(bp => bp.length > 0)
-      .slice(0, 5) // Max 5 bullet points
+      .slice(0, 3) // Exactly 3 bullet points
 
     return {
       headline,

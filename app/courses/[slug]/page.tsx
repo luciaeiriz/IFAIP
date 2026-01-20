@@ -10,6 +10,8 @@ import ForbesHeroSection from '@/components/courses/ForbesHeroSection'
 import FeaturedTopPicks from '@/components/courses/FeaturedTopPicks'
 import AllCoursesGrid from '@/components/courses/AllCoursesGrid'
 import EmailCaptureCTA from '@/components/courses/EmailCaptureCTA'
+import ScrollBanner from '@/components/courses/ScrollBanner'
+import LandingPageScrollBanner from '@/components/courses/LandingPageScrollBanner'
 import { getLandingPageByTag } from '@/lib/landing-pages'
 import { trackCourseView } from '@/lib/analytics'
 
@@ -244,6 +246,17 @@ function LandingPageView({ slug }: { slug: string }) {
     return allCourses.slice(0, 3)
   }, [allCourses])
 
+  // Get top course for banner (first course is top-ranked)
+  const topCourse = useMemo(() => {
+    const top = allCourses.length > 0 ? allCourses[0] : null
+    console.log('🟢 LandingPageView topCourse:', {
+      allCoursesCount: allCourses.length,
+      topCourseTitle: top?.title,
+      topCourseId: top?.id
+    })
+    return top
+  }, [allCourses])
+
   if (notFoundError) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -287,7 +300,10 @@ function LandingPageView({ slug }: { slug: string }) {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white" style={{ paddingBottom: '100px' }}>
+      {/* Scroll Banner - shows top program info */}
+      <LandingPageScrollBanner topCourse={topCourse} />
+      
       <ForbesHeroSection 
         tag={landingPage?.name || slug} 
         heroTitle={landingPage?.hero_title}
@@ -392,6 +408,9 @@ function CourseDetailView({
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Scroll Banner - shows top program info */}
+      {course && <ScrollBanner currentCourse={course} />}
+      
       {/* Hero Section */}
       <div style={{ backgroundColor: '#F3F6FC', minHeight: '463px', paddingBottom: '0px', overflow: 'visible', position: 'relative' }}>
         <div className="mx-auto max-w-7xl py-16" style={{ paddingLeft: '0', paddingRight: '24px', overflow: 'visible', height: '537px' }}>
@@ -528,7 +547,7 @@ function CourseDetailView({
       </div>
 
       {/* Main Content Section */}
-      <div className="bg-white w-full relative" style={{ marginTop: '0', paddingTop: '24px' }}>
+      <div className="bg-white w-full relative" style={{ marginTop: '0', paddingTop: '24px', paddingBottom: '100px' }}>
         <div className="mx-auto max-w-7xl py-12" style={{ paddingLeft: '0', paddingRight: '24px' }}>
           <div className="grid grid-cols-1 gap-8">
             <div style={{ marginLeft: '-24px', paddingLeft: '24px' }}>

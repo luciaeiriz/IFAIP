@@ -71,8 +71,8 @@ export default function AllCoursesGrid({ courses, tag }: AllCoursesGridProps) {
 
   const getRatingLabel = (rating: number | null): { label: string; color: string } => {
     if (!rating) return { label: 'GOOD', color: 'bg-gray-50 text-gray-800 border-gray-200' }
-    if (rating >= 9.5) return { label: 'EXCELLENT', color: 'bg-white text-gray-900 border-gray-300' }
-    if (rating >= 9.0) return { label: 'VERY GOOD', color: 'bg-white text-gray-900 border-gray-300' }
+    if (rating >= 4.7) return { label: 'EXCELLENT', color: 'bg-white text-gray-900 border-gray-300' }
+    if (rating >= 4.5) return { label: 'VERY GOOD', color: 'bg-white text-gray-900 border-gray-300' }
     return { label: 'GOOD', color: 'bg-white text-gray-900 border-gray-300' }
   }
 
@@ -231,7 +231,7 @@ export default function AllCoursesGrid({ courses, tag }: AllCoursesGridProps) {
                       }}
                     >
                       <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M3 9L7 13L15 5" stroke="#FF8C00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M3 9L7 13L15 5" stroke="#ED6F13" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                     </div>
                     <div
@@ -239,7 +239,7 @@ export default function AllCoursesGrid({ courses, tag }: AllCoursesGridProps) {
                       style={{
                         top: '6px',
                         height: '19px',
-                        backgroundColor: '#FF8C00',
+                        backgroundColor: '#ED6F13',
                         color: '#FFFFFF',
                         padding: '0px 8px',
                         fontWeight: 'bold',
@@ -308,7 +308,7 @@ export default function AllCoursesGrid({ courses, tag }: AllCoursesGridProps) {
                   {((course.bullet_points && course.bullet_points.length > 0) || course.description) && (
                     <div className="space-y-2">
                       {course.bullet_points && course.bullet_points.length > 0 ? (
-                        course.bullet_points.map((point, i) => (
+                        course.bullet_points.slice(0, 3).map((point, i) => (
                           <div key={i} className="flex items-start gap-2 text-sm" style={{ fontFamily: 'EuclidCircularB, sans-serif', color: '#181716', lineHeight: '1.5' }}>
                             <svg className="flex-shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 16 16" fill="none">
                               <circle cx="8" cy="8" r="8" fill="#CCEBE4"/>
@@ -398,8 +398,8 @@ export default function AllCoursesGrid({ courses, tag }: AllCoursesGridProps) {
                       <div className="space-y-2" style={{ width: '100%' }}>
                         {/* Use generated bullet_points if available, otherwise fallback to description parsing */}
                         {course.bullet_points && course.bullet_points.length > 0 ? (
-                          // Use generated bullet points from database
-                          course.bullet_points.map((point, i) => (
+                          // Use generated bullet points from database (limit to 3)
+                          course.bullet_points.slice(0, 3).map((point, i) => (
                             <div key={i} className="flex items-start gap-2" style={{ fontFamily: 'EuclidCircularB, sans-serif', fontSize: '14px', color: '#181716', lineHeight: '1.5' }}>
                               <svg className="flex-shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 16 16" fill="none">
                                 <circle cx="8" cy="8" r="8" fill="#CCEBE4"/>

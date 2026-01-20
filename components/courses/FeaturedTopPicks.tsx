@@ -140,9 +140,9 @@ export default function FeaturedTopPicks({ courses }: FeaturedTopPicksProps) {
   }
 
   return (
-    <section className="block py-6 sm:py-8 md:py-8 lg:py-8" style={{ backgroundColor: '#F6F7FF', width: '100%', marginLeft: '0', marginRight: '0', minHeight: '249px' }}>
+    <section className="block py-4 sm:py-5 md:py-5 lg:py-5" style={{ backgroundColor: '#F6F7FF', width: '100%', marginLeft: '0', marginRight: '0', minHeight: '249px' }}>
       <div className="px-4 sm:px-6 md:px-8 lg:px-20" style={{ width: '100%', boxSizing: 'border-box' }}>
-        <h2 className="mb-4 sm:mb-5 md:mb-6 lg:mb-6 text-base sm:text-lg md:text-lg lg:text-lg" style={{ fontSize: '18px', color: '#181716', fontFamily: 'EuclidCircularB, sans-serif', marginTop: '0' }}>
+        <h2 className="mb-2 sm:mb-3 md:mb-3 lg:mb-3 text-base sm:text-lg md:text-lg lg:text-lg" style={{ fontSize: '18px', color: '#181716', fontFamily: 'EuclidCircularB, sans-serif', marginTop: '0' }}>
           Our Top 3 Providers
         </h2>
 
