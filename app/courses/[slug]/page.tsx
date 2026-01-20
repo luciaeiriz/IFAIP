@@ -10,7 +10,6 @@ import ForbesHeroSection from '@/components/courses/ForbesHeroSection'
 import FeaturedTopPicks from '@/components/courses/FeaturedTopPicks'
 import AllCoursesGrid from '@/components/courses/AllCoursesGrid'
 import EmailCaptureCTA from '@/components/courses/EmailCaptureCTA'
-import ScrollBanner from '@/components/courses/ScrollBanner'
 import LandingPageScrollBanner from '@/components/courses/LandingPageScrollBanner'
 import { getLandingPageByTag } from '@/lib/landing-pages'
 import { trackCourseView } from '@/lib/analytics'
@@ -408,31 +407,28 @@ function CourseDetailView({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Scroll Banner - shows top program info */}
-      {course && <ScrollBanner currentCourse={course} />}
-      
       {/* Hero Section */}
-      <div style={{ backgroundColor: '#F3F6FC', minHeight: '463px', paddingBottom: '0px', overflow: 'visible', position: 'relative' }}>
-        <div className="mx-auto max-w-7xl py-16" style={{ paddingLeft: '0', paddingRight: '24px', overflow: 'visible', height: '537px' }}>
+      <div className="bg-[#F3F6FC] lg:min-h-[463px] pb-0 overflow-visible relative">
+        <div className="mx-auto max-w-7xl py-8 lg:py-16 px-4 sm:px-6 lg:px-8 lg:pr-6 overflow-visible lg:h-[537px]">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Left side - Hero content (2/3 width) */}
-            <div className="lg:col-span-2" style={{ marginLeft: '-24px', paddingLeft: '24px' }}>
+            <div className="lg:col-span-2 lg:-ml-6 lg:pl-6">
               {/* Logo */}
-              <div className="mb-6">
+              <div className="mb-4 lg:mb-6">
                 <Image 
                   src="/cognite_logo.png" 
                   alt="IFAIP Logo" 
                   width={200} 
                   height={60}
-                  style={{ objectFit: 'contain', height: '60px', width: 'auto' }}
+                  className="h-[40px] lg:h-[60px] w-auto"
+                  style={{ objectFit: 'contain' }}
                 />
               </div>
 
               {/* Title */}
               <h1 
-                className="mb-3 leading-tight text-gray-900"
+                className="mb-3 leading-tight text-gray-900 text-2xl sm:text-3xl lg:text-[44px]"
                 style={{
-                  fontSize: '44px',
                   fontFamily: '"Source Sans Pro", Arial, sans-serif',
                   fontWeight: 700
                 }}
@@ -443,9 +439,8 @@ function CourseDetailView({
               {/* Description */}
               {course.description && (
                 <p 
-                  className="mb-8 text-gray-700"
+                  className="mb-6 lg:mb-8 text-gray-700 text-sm sm:text-base"
                   style={{
-                    fontSize: '16px',
                     fontFamily: '"Source Sans Pro", Arial, sans-serif',
                     fontWeight: 400
                   }}
@@ -457,9 +452,8 @@ function CourseDetailView({
               {/* Instructor */}
               {course.instructors && (
                 <p 
-                  className="mb-8 text-gray-700"
+                  className="mb-6 lg:mb-8 text-gray-700 text-sm sm:text-base"
                   style={{
-                    fontSize: '16px',
                     fontFamily: '"Source Sans Pro", Arial, sans-serif',
                     fontWeight: 400
                   }}
@@ -469,30 +463,29 @@ function CourseDetailView({
               )}
 
               {/* Sign Up Button */}
-              <div className="mb-8">
+              <div className="mb-6 lg:mb-8">
                 {course.external_url ? (
                   <a
                     href={course.external_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block rounded-lg text-center font-bold text-white shadow-lg transition-all hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#0156D2] focus:ring-offset-2"
-                    style={{ backgroundColor: '#0156D2', width: '285px', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}
+                    className="inline-flex items-center justify-center rounded-lg text-center font-bold text-white shadow-lg transition-all hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#0156D2] focus:ring-offset-2 w-full sm:w-auto min-w-[285px] h-12 sm:h-16 text-sm sm:text-base px-6"
+                    style={{ backgroundColor: '#0156D2' }}
                   >
                     Enroll Now
                   </a>
                 ) : course.signup_enabled ? (
                   <Link
                     href={`/signup/${course.id}`}
-                    className="block rounded-lg text-center font-bold text-white shadow-lg transition-all hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#0156D2] focus:ring-offset-2"
-                    style={{ backgroundColor: '#0156D2', width: '285px', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}
+                    className="inline-flex items-center justify-center rounded-lg text-center font-bold text-white shadow-lg transition-all hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#0156D2] focus:ring-offset-2 w-full sm:w-auto min-w-[285px] h-12 sm:h-16 text-sm sm:text-base px-6"
+                    style={{ backgroundColor: '#0156D2' }}
                   >
                     Sign Up Now
                   </Link>
                 ) : (
                   <button
                     disabled
-                    className="block rounded-lg bg-gray-300 text-center text-base font-bold text-gray-500 cursor-not-allowed"
-                    style={{ width: '285px', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    className="inline-flex items-center justify-center rounded-lg bg-gray-300 text-center text-sm sm:text-base font-bold text-gray-500 cursor-not-allowed w-full sm:w-auto min-w-[285px] h-12 sm:h-16 px-6"
                   >
                     Coming Soon
                   </button>
@@ -504,41 +497,41 @@ function CourseDetailView({
           </div>
           
           {/* Meta Info Card */}
-          <div className="rounded-lg bg-white p-6 mb-0 relative z-10" style={{ marginLeft: '-24px', paddingLeft: '24px', marginRight: '-24px', paddingRight: '24px', marginBottom: '0', position: 'absolute', top: '478px', width: '1342px', height: '116px', boxShadow: '0 12px 40px rgba(0, 0, 0, 0.18), 0 6px 16px rgba(0, 0, 0, 0.12)' }}>
-            <div className="flex flex-wrap items-center divide-x divide-gray-200">
+          <div className="rounded-lg bg-white p-4 sm:p-6 mb-0 relative z-10 mt-8 lg:mt-0 lg:absolute lg:top-[478px] lg:-left-6 lg:-right-6 lg:w-[calc(100%+48px)] lg:h-[116px] shadow-[0_12px_40px_rgba(0,0,0,0.18),0_6px_16px_rgba(0,0,0,0.12)]">
+            <div className="flex flex-wrap items-center">
               {course.duration && (
-                <div className="flex-1 min-w-[150px] px-4 first:pl-0">
-                  <div className="font-bold text-gray-900 mb-1" style={{ fontSize: '20px' }}>{course.duration}</div>
-                  <div className="text-gray-500" style={{ fontSize: '14px' }}>Duration</div>
+                <div className="flex-1 min-w-[50%] lg:min-w-[150px] px-2 sm:px-4 py-3 lg:py-0 lg:pl-0 border-b lg:border-b-0 lg:border-r border-gray-200">
+                  <div className="font-bold text-gray-900 mb-1 text-base sm:text-lg lg:text-[20px]">{course.duration}</div>
+                  <div className="text-gray-500 text-xs sm:text-sm lg:text-[14px]">Duration</div>
                 </div>
               )}
               {course.level && (
-                <div className="flex-1 min-w-[150px] px-4">
-                  <div className="font-bold text-gray-900 mb-1" style={{ fontSize: '20px' }}>{course.level}</div>
-                  <div className="text-gray-500" style={{ fontSize: '14px' }}>Level</div>
+                <div className="flex-1 min-w-[50%] lg:min-w-[150px] px-2 sm:px-4 py-3 lg:py-0 border-b lg:border-b-0 lg:border-r border-gray-200">
+                  <div className="font-bold text-gray-900 mb-1 text-base sm:text-lg lg:text-[20px]">{course.level}</div>
+                  <div className="text-gray-500 text-xs sm:text-sm lg:text-[14px]">Level</div>
                 </div>
               )}
               {course.rating && (
-                <div className="flex-1 min-w-[150px] px-4">
-                  <div className="flex items-center gap-1 font-bold text-gray-900 mb-1" style={{ fontSize: '20px' }}>
+                <div className="flex-1 min-w-[50%] lg:min-w-[150px] px-2 sm:px-4 py-3 lg:py-0 border-b lg:border-b-0 lg:border-r border-gray-200">
+                  <div className="flex items-center gap-1 font-bold text-gray-900 mb-1 text-base sm:text-lg lg:text-[20px]">
                     <span className="text-blue-500">★</span>
                     {course.rating.toFixed(1)}
                   </div>
-                  <div className="text-gray-500" style={{ fontSize: '14px' }}>
+                  <div className="text-gray-500 text-xs sm:text-sm lg:text-[14px]">
                     {course.reviews ? `(${course.reviews} reviews)` : 'Rating'}
                   </div>
                 </div>
               )}
               {course.effort && (
-                <div className="flex-1 min-w-[150px] px-4">
-                  <div className="font-bold text-gray-900 mb-1" style={{ fontSize: '20px' }}>{course.effort}</div>
-                  <div className="text-gray-500" style={{ fontSize: '14px' }}>Effort</div>
+                <div className="flex-1 min-w-[50%] lg:min-w-[150px] px-2 sm:px-4 py-3 lg:py-0 border-b lg:border-b-0 lg:border-r border-gray-200">
+                  <div className="font-bold text-gray-900 mb-1 text-base sm:text-lg lg:text-[20px]">{course.effort}</div>
+                  <div className="text-gray-500 text-xs sm:text-sm lg:text-[14px]">Effort</div>
                 </div>
               )}
               {course.price_label && (
-                <div className="flex-1 min-w-[150px] px-4">
-                  <div className="font-bold text-gray-900 mb-1" style={{ fontSize: '20px' }}>{course.price_label}</div>
-                  <div className="text-gray-500" style={{ fontSize: '14px' }}>Price</div>
+                <div className="flex-1 min-w-[50%] lg:min-w-[150px] px-2 sm:px-4 py-3 lg:py-0 border-b-0 lg:border-r-0 border-gray-200">
+                  <div className="font-bold text-gray-900 mb-1 text-base sm:text-lg lg:text-[20px]">{course.price_label}</div>
+                  <div className="text-gray-500 text-xs sm:text-sm lg:text-[14px]">Price</div>
                 </div>
               )}
             </div>
@@ -547,16 +540,16 @@ function CourseDetailView({
       </div>
 
       {/* Main Content Section */}
-      <div className="bg-white w-full relative" style={{ marginTop: '0', paddingTop: '24px', paddingBottom: '100px' }}>
-        <div className="mx-auto max-w-7xl py-12" style={{ paddingLeft: '0', paddingRight: '24px' }}>
+      <div className="bg-white w-full relative mt-0 pt-6 lg:pt-6 pb-24 lg:pb-[100px]">
+        <div className="mx-auto max-w-7xl py-8 lg:py-12 px-4 sm:px-6 lg:px-8 lg:pr-6">
           <div className="grid grid-cols-1 gap-8">
-            <div style={{ marginLeft: '-24px', paddingLeft: '24px' }}>
+            <div className="lg:-ml-6 lg:pl-6">
             {/* Tab Navigation */}
-            <div className="mb-6 border-b border-gray-200 bg-white pb-0" style={{ marginTop: '20px' }}>
-              <nav className="flex space-x-1" aria-label="Tabs">
+            <div className="mb-6 border-b border-gray-200 bg-white pb-0 mt-5 lg:mt-5">
+              <nav className="flex overflow-x-auto -mx-4 px-4 lg:mx-0 lg:px-0 space-x-1 scrollbar-hide" aria-label="Tabs" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                 <button
                   onClick={() => scrollToSection('section-about', 'about')}
-                  className={`px-4 py-3 text-sm font-medium transition-colors ${
+                  className={`px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
                     activeTab === 'about'
                       ? 'text-[#0156D2] border-b-2 border-[#0156D2]'
                       : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
@@ -567,7 +560,7 @@ function CourseDetailView({
                 {keySkills.length > 0 && (
                   <button
                     onClick={() => scrollToSection('section-learn', 'learn')}
-                    className={`px-4 py-3 text-sm font-medium transition-colors ${
+                    className={`px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
                       activeTab === 'learn'
                         ? 'text-[#0156D2] border-b-2 border-[#0156D2]'
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
@@ -579,7 +572,7 @@ function CourseDetailView({
                 {modules.length > 0 && (
                   <button
                     onClick={() => scrollToSection('section-curriculum', 'curriculum')}
-                    className={`px-4 py-3 text-sm font-medium transition-colors ${
+                    className={`px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
                       activeTab === 'curriculum'
                         ? 'text-[#0156D2] border-b-2 border-[#0156D2]'
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
@@ -591,7 +584,7 @@ function CourseDetailView({
                 {(course.instructors || course.effort || course.languages || course.free_trial) && (
                   <button
                     onClick={() => scrollToSection('section-information', 'information')}
-                    className={`px-4 py-3 text-sm font-medium transition-colors ${
+                    className={`px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
                       activeTab === 'information'
                         ? 'text-[#0156D2] border-b-2 border-[#0156D2]'
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
@@ -602,7 +595,7 @@ function CourseDetailView({
                 )}
                 <button
                   onClick={() => scrollToSection('section-details', 'details')}
-                  className={`px-4 py-3 text-sm font-medium transition-colors ${
+                  className={`px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
                     activeTab === 'details'
                       ? 'text-[#0156D2] border-b-2 border-[#0156D2]'
                       : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'

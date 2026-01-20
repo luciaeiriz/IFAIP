@@ -1633,3 +1633,16 @@ html {
   }
 }
 
+/* Course detail page - Mobile responsive styles */
+@media (max-width: 1023px) {
+  /* Hide scrollbar for tab navigation */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+

@@ -142,13 +142,13 @@ export default function LandingPageScrollBanner({ topCourse }: LandingPageScroll
         borderTop: '1px solid #E0E0E0',
       }}
     >
-      <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
+      <div className="mx-auto max-w-full sm:max-w-2xl lg:max-w-7xl px-3 py-3 sm:px-6 lg:px-8">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6">
           {/* Course info - centered */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto justify-center">
             {/* Badge */}
             <div className="flex-shrink-0">
-              <div className="rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-800 whitespace-nowrap">
+              <div className="rounded-full bg-orange-100 px-2 sm:px-3 py-1 text-xs font-semibold text-orange-800 whitespace-nowrap">
                 ✓ Top Program
               </div>
             </div>
@@ -162,12 +162,12 @@ export default function LandingPageScrollBanner({ topCourse }: LandingPageScroll
             </div>
 
             {/* Course title and headline */}
-            <div className="text-center sm:text-left">
-              <h3 className="font-bold text-gray-900 text-base sm:text-lg" style={{ fontFamily: 'EuclidCircularB, sans-serif' }}>
+            <div className="text-center sm:text-left flex-1 min-w-0">
+              <h3 className="font-bold text-gray-900 text-sm sm:text-base lg:text-lg truncate" style={{ fontFamily: 'EuclidCircularB, sans-serif' }}>
                 {topCourse.title}
               </h3>
               {topCourse.headline && (
-                <p className="text-sm text-gray-600 mt-1" style={{ fontFamily: 'EuclidCircularB, sans-serif' }}>
+                <p className="text-xs sm:text-sm text-gray-600 mt-1 line-clamp-1" style={{ fontFamily: 'EuclidCircularB, sans-serif' }}>
                   {topCourse.headline}
                 </p>
               )}
@@ -175,7 +175,7 @@ export default function LandingPageScrollBanner({ topCourse }: LandingPageScroll
           </div>
 
           {/* CTA button and rating - centered */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto justify-center">
             {topCourse.rating && (
               <div className="hidden sm:flex items-center gap-1">
                 <span className="text-yellow-400 text-lg">★</span>
@@ -187,16 +187,16 @@ export default function LandingPageScrollBanner({ topCourse }: LandingPageScroll
                 href={topCourse.external_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-lg bg-[#0156D2] px-6 py-2.5 text-white font-semibold hover:bg-[#0144A8] transition-colors whitespace-nowrap"
-                style={{ fontSize: '14px', fontFamily: 'EuclidCircularB, sans-serif' }}
+                className="rounded-lg bg-[#0156D2] px-4 sm:px-6 py-2 sm:py-2.5 text-white font-semibold hover:bg-[#0144A8] transition-colors whitespace-nowrap text-xs sm:text-sm"
+                style={{ fontFamily: 'EuclidCircularB, sans-serif' }}
               >
                 Learn More
               </a>
             ) : topCourse.signup_enabled ? (
               <Link
                 href={`/courses/${topCourse.id}`}
-                className="rounded-lg bg-[#0156D2] px-6 py-2.5 text-white font-semibold hover:bg-[#0144A8] transition-colors whitespace-nowrap"
-                style={{ fontSize: '14px', fontFamily: 'EuclidCircularB, sans-serif' }}
+                className="rounded-lg bg-[#0156D2] px-4 sm:px-6 py-2 sm:py-2.5 text-white font-semibold hover:bg-[#0144A8] transition-colors whitespace-nowrap text-xs sm:text-sm"
+                style={{ fontFamily: 'EuclidCircularB, sans-serif' }}
               >
                 Learn More
               </Link>
