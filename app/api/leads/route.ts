@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 
 export async function POST(request: NextRequest) {
   try {
@@ -41,7 +41,9 @@ export async function POST(request: NextRequest) {
       utm_campaign: body.utm_campaign?.trim() || null,
     }
 
-    const { data, error } = await supabase
+    // Use admin client (service role key) to bypass RLS
+    // This is acceptable for public lead capture endpoints since we validate all input
+    const { data, error } = await supabaseAdmin
       .from('leads')
       .insert([leadData])
       .select()

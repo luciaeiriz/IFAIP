@@ -177,7 +177,7 @@ export default function AdminPage() {
     { id: 'courses' as AdminTab, label: 'Courses', icon: '📚' },
     { id: 'landing-pages' as AdminTab, label: 'Landing Pages', icon: '🎨' },
     { id: 'news' as AdminTab, label: 'News', icon: '📰' },
-    { id: 'leads' as AdminTab, label: 'Leads', icon: '👥' },
+    { id: 'leads' as AdminTab, label: 'Memberships', icon: '👥' },
     { id: 'signups' as AdminTab, label: 'Signups', icon: '✅' },
     { id: 'contact' as AdminTab, label: 'Contact', icon: '📧' },
   ]

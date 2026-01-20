@@ -1,8 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
-import { getAllCourses } from '@/lib/courses'
+import { adminFetch } from '@/lib/admin-api-client'
 
 interface DashboardStats {
   totalCourses: number
@@ -10,179 +9,56 @@ interface DashboardStats {
   totalSignups: number
   totalContactSubmissions: number
   recentSignups: any[]
+  recentLeads: any[]
+  recentContactSubmissions: any[]
   popularCourses: { course_id: string; count: number; title: string }[]
   signupsByTag: { tag: string; count: number }[]
   topUTMSources: { source: string; count: number }[]
+  topUTMMediums: { medium: string; count: number }[]
+  topUTMCampaigns: { campaign: string; count: number }[]
   signupsByMonth: { month: string; count: number }[]
+  leadsByMonth: { month: string; count: number }[]
+  contactByMonth: { month: string; count: number }[]
+  recentActivity: {
+    signupsToday: number
+    signupsThisWeek: number
+    membershipsToday: number
+    membershipsThisWeek: number
+    contactToday: number
+    contactThisWeek: number
+  }
 }
 
 export default function DashboardOverview() {
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     fetchStats()
   }, [])
 
-  // Helper function to get all visible course IDs for a tag (top 10 by relevancy)
-  const getVisibleCourseIds = async (tag: string): Promise<string[]> => {
-    const relevancyColumn = tag === 'Business' 
-      ? 'business_relevancy' 
-      : tag === 'Restaurant' 
-      ? 'restaurant_relevancy' 
-      : 'fleet_relevancy'
-    
-    // Get top 10 courses by relevancy (no tag or signup_enabled filter)
-    const { data } = await supabase
-      .from('courses')
-      .select('id')
-      .order(relevancyColumn, { ascending: true, nullsFirst: false })
-      .limit(10)
-    
-    return (data || []).map(course => course.id)
-  }
-
   const fetchStats = async () => {
     try {
-      // Fetch courses using getAllCourses to ensure proper transformation
-      const allCourses = await getAllCourses()
-      const totalCourses = allCourses.length
-
-      // Get all leads, signups, and contact submissions (not filtered)
-      const [leadsRes, signupsRes, contactRes] = await Promise.all([
-        supabase.from('leads').select('id', { count: 'exact' }),
-        supabase.from('signups').select('id, created_at, course_id', { count: 'exact' }),
-        supabase.from('contact_submissions').select('id', { count: 'exact' })
-      ])
+      setIsLoading(true)
+      setError(null)
       
-      const totalLeads = leadsRes.count || leadsRes.data?.length || 0
-      const totalSignups = signupsRes.count || signupsRes.data?.length || 0
-      const totalContactSubmissions = contactRes.count || contactRes.data?.length || 0
+      // Add timestamp to prevent caching
+      const timestamp = Date.now()
+      const response = await adminFetch(`/api/admin/dashboard?_t=${timestamp}`, {
+        cache: 'no-store',
+      })
       
-      // Get recent signups
-      const recentSignupsRes = await supabase
-        .from('signups')
-        .select('*, courses(title)')
-        .order('created_at', { ascending: false })
-        .limit(5)
+      const result = await response.json()
 
-      // Get popular courses (by signup count) - all signups
-      const signupsWithCourses = await supabase
-        .from('signups')
-        .select('course_id, courses(title)')
-        .not('course_id', 'is', null)
-
-      // Process popular courses
-      const courseCounts: Record<string, { count: number; title: string }> = {}
-      signupsWithCourses.data?.forEach((item: any) => {
-        if (item.course_id) {
-          if (!courseCounts[item.course_id]) {
-            courseCounts[item.course_id] = {
-              count: 0,
-              title: item.courses?.title || 'Unknown Course'
-            }
-          }
-          courseCounts[item.course_id].count++
-        }
-      })
-
-      const popularCourses = Object.entries(courseCounts)
-        .map(([course_id, data]) => ({ course_id, ...data }))
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 5)
-
-      // Get visible course IDs for analytics (top 10 per tag)
-      const [businessCourseIds, restaurantCourseIds, fleetCourseIds] = await Promise.all([
-        getVisibleCourseIds('Business'),
-        getVisibleCourseIds('Restaurant'),
-        getVisibleCourseIds('Fleet'),
-      ])
-
-      const visibleCourseIds = [...businessCourseIds, ...restaurantCourseIds, ...fleetCourseIds]
-
-      // Get signups by landing tag (only for visible courses)
-      let signupsByTagRes
-      if (visibleCourseIds.length > 0) {
-        signupsByTagRes = await supabase
-          .from('signups')
-          .select('landing_tag, course_id')
-          .in('course_id', visibleCourseIds)
-      } else {
-        signupsByTagRes = { data: [], error: null }
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'Failed to fetch dashboard stats')
       }
 
-      const tagCounts: Record<string, number> = {}
-      signupsByTagRes.data?.forEach((item: any) => {
-        const tag = item.landing_tag || 'Unknown'
-        tagCounts[tag] = (tagCounts[tag] || 0) + 1
-      })
-
-      const signupsByTag = Object.entries(tagCounts)
-        .map(([tag, count]) => ({ tag, count }))
-        .sort((a, b) => b.count - a.count)
-
-      // Get top UTM sources (only for visible courses)
-      let topSourcesRes
-      if (visibleCourseIds.length > 0) {
-        topSourcesRes = await supabase
-          .from('signups')
-          .select('utm_source, course_id')
-          .in('course_id', visibleCourseIds)
-          .not('utm_source', 'is', null)
-      } else {
-        topSourcesRes = { data: [], error: null }
-      }
-
-      const sourceCounts: Record<string, number> = {}
-      topSourcesRes.data?.forEach((item: any) => {
-        const source = item.utm_source || 'Unknown'
-        sourceCounts[source] = (sourceCounts[source] || 0) + 1
-      })
-
-      const topUTMSources = Object.entries(sourceCounts)
-        .map(([source, count]) => ({ source, count }))
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 10)
-
-      // Get signups by month (last 6 months, only for visible courses)
-      const sixMonthsAgo = new Date()
-      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
-
-      let signupsByMonthRes
-      if (visibleCourseIds.length > 0) {
-        signupsByMonthRes = await supabase
-          .from('signups')
-          .select('created_at, course_id')
-          .in('course_id', visibleCourseIds)
-          .gte('created_at', sixMonthsAgo.toISOString())
-      } else {
-        signupsByMonthRes = { data: [], error: null }
-      }
-
-      const monthCounts: Record<string, number> = {}
-      signupsByMonthRes.data?.forEach((item: any) => {
-        const date = new Date(item.created_at)
-        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
-        monthCounts[monthKey] = (monthCounts[monthKey] || 0) + 1
-      })
-
-      const signupsByMonth = Object.entries(monthCounts)
-        .map(([month, count]) => ({ month, count }))
-        .sort((a, b) => a.month.localeCompare(b.month))
-
-      setStats({
-        totalCourses,
-        totalLeads,
-        totalSignups,
-        totalContactSubmissions,
-        recentSignups: recentSignupsRes.data || [],
-        popularCourses,
-        signupsByTag,
-        topUTMSources,
-        signupsByMonth,
-      })
-    } catch (error) {
-      console.error('Error fetching stats:', error)
+      setStats(result.stats)
+    } catch (error: any) {
+      console.error('Error fetching dashboard stats:', error)
+      setError(error?.message || 'Failed to load dashboard data')
     } finally {
       setIsLoading(false)
     }
@@ -192,14 +68,58 @@ export default function DashboardOverview() {
     return <div className="text-center py-12 text-gray-600">Loading dashboard...</div>
   }
 
-  const conversionRate = stats && stats.totalLeads > 0
-    ? ((stats.totalSignups / stats.totalLeads) * 100).toFixed(1)
-    : '0.0'
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+        <p className="text-red-800 font-medium">Error loading dashboard</p>
+        <p className="text-red-600 text-sm mt-2">{error}</p>
+        <button
+          onClick={fetchStats}
+          className="mt-4 rounded-lg border border-red-300 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-100"
+        >
+          Retry
+        </button>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
+      {/* Recent Activity Summary */}
+      {stats?.recentActivity && (
+        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h2>
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+            <div className="text-center">
+              <p className="text-2xl font-bold text-gray-900">{stats.recentActivity.signupsToday}</p>
+              <p className="text-xs text-gray-600 mt-1">Signups Today</p>
+            </div>
+            <div className="text-center">
+              <p className="text-2xl font-bold text-gray-900">{stats.recentActivity.signupsThisWeek}</p>
+              <p className="text-xs text-gray-600 mt-1">Signups This Week</p>
+            </div>
+            <div className="text-center">
+              <p className="text-2xl font-bold text-gray-900">{stats.recentActivity.membershipsToday}</p>
+              <p className="text-xs text-gray-600 mt-1">Memberships Today</p>
+            </div>
+            <div className="text-center">
+              <p className="text-2xl font-bold text-gray-900">{stats.recentActivity.membershipsThisWeek}</p>
+              <p className="text-xs text-gray-600 mt-1">Memberships This Week</p>
+            </div>
+            <div className="text-center">
+              <p className="text-2xl font-bold text-gray-900">{stats.recentActivity.contactToday}</p>
+              <p className="text-xs text-gray-600 mt-1">Contact Today</p>
+            </div>
+            <div className="text-center">
+              <p className="text-2xl font-bold text-gray-900">{stats.recentActivity.contactThisWeek}</p>
+              <p className="text-xs text-gray-600 mt-1">Contact This Week</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Total Courses"
           value={stats?.totalCourses || 0}
@@ -207,7 +127,7 @@ export default function DashboardOverview() {
           color="blue"
         />
         <StatCard
-          title="Total Leads"
+          title="Total Memberships"
           value={stats?.totalLeads || 0}
           icon="👥"
           color="green"
@@ -224,17 +144,17 @@ export default function DashboardOverview() {
           icon="📧"
           color="orange"
         />
-        <StatCard
-          title="Conversion Rate"
-          value={`${conversionRate}%`}
-          icon="📈"
-          color="yellow"
-        />
       </div>
 
       {/* Recent Activity */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <RecentSignups signups={stats?.recentSignups || []} />
+        <RecentMemberships leads={stats?.recentLeads || []} />
+        <RecentContactSubmissions submissions={stats?.recentContactSubmissions || []} />
+      </div>
+
+      {/* Popular Courses */}
+      <div className="grid grid-cols-1 gap-6">
         <PopularCourses courses={stats?.popularCourses || []} />
       </div>
 
@@ -242,7 +162,7 @@ export default function DashboardOverview() {
       <div>
         <h2 className="text-xl font-bold text-gray-900 mb-4">Analytics & Insights</h2>
         <p className="text-sm text-gray-600 mb-6">
-          Analytics of all courses
+          Complete analytics of all collected data (no filters applied)
         </p>
       </div>
 
@@ -254,9 +174,9 @@ export default function DashboardOverview() {
         ) : (
           <div className="space-y-3">
             {stats?.signupsByTag.map((item) => {
-              const totalVisibleSignups = stats.signupsByTag.reduce((sum, t) => sum + t.count, 0)
-              const percentage = totalVisibleSignups > 0
-                ? ((item.count / totalVisibleSignups) * 100).toFixed(1)
+              const totalSignups = stats.signupsByTag.reduce((sum, t) => sum + t.count, 0)
+              const percentage = totalSignups > 0
+                ? ((item.count / totalSignups) * 100).toFixed(1)
                 : 0
               return (
                 <div key={item.tag}>
@@ -277,54 +197,160 @@ export default function DashboardOverview() {
         )}
       </div>
 
-      {/* Top UTM Sources */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Top UTM Sources</h3>
-        {stats?.topUTMSources && stats.topUTMSources.length === 0 ? (
-          <p className="text-sm text-gray-500">No UTM source data available</p>
-        ) : (
-          <div className="space-y-2">
-            {stats?.topUTMSources.map((item, index) => (
-              <div key={item.source} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                <div className="flex items-center">
-                  <span className="text-sm font-medium text-gray-400 mr-3 w-6">#{index + 1}</span>
-                  <span className="text-sm text-gray-900">{item.source}</span>
+      {/* UTM Analytics */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* Top UTM Sources */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Top UTM Sources</h3>
+          {stats?.topUTMSources && stats.topUTMSources.length === 0 ? (
+            <p className="text-sm text-gray-500">No UTM source data available</p>
+          ) : (
+            <div className="space-y-2">
+              {stats?.topUTMSources.map((item, index) => (
+                <div key={item.source} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+                  <div className="flex items-center">
+                    <span className="text-sm font-medium text-gray-400 mr-3 w-6">#{index + 1}</span>
+                    <span className="text-sm text-gray-900">{item.source}</span>
+                  </div>
+                  <span className="text-sm text-gray-600 font-medium">{item.count}</span>
                 </div>
-                <span className="text-sm text-gray-600 font-medium">{item.count} signups</span>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Top UTM Mediums */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Top UTM Mediums</h3>
+          {stats?.topUTMMediums && stats.topUTMMediums.length === 0 ? (
+            <p className="text-sm text-gray-500">No UTM medium data available</p>
+          ) : (
+            <div className="space-y-2">
+              {stats?.topUTMMediums.map((item, index) => (
+                <div key={item.medium} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+                  <div className="flex items-center">
+                    <span className="text-sm font-medium text-gray-400 mr-3 w-6">#{index + 1}</span>
+                    <span className="text-sm text-gray-900">{item.medium}</span>
+                  </div>
+                  <span className="text-sm text-gray-600 font-medium">{item.count}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Top UTM Campaigns */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Top UTM Campaigns</h3>
+          {stats?.topUTMCampaigns && stats.topUTMCampaigns.length === 0 ? (
+            <p className="text-sm text-gray-500">No UTM campaign data available</p>
+          ) : (
+            <div className="space-y-2">
+              {stats?.topUTMCampaigns.map((item, index) => (
+                <div key={item.campaign} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+                  <div className="flex items-center">
+                    <span className="text-sm font-medium text-gray-400 mr-3 w-6">#{index + 1}</span>
+                    <span className="text-sm text-gray-900">{item.campaign}</span>
+                  </div>
+                  <span className="text-sm text-gray-600 font-medium">{item.count}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Signups by Month */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Signups Trend (Last 6 Months)</h3>
-        {stats?.signupsByMonth && stats.signupsByMonth.length === 0 ? (
-          <p className="text-sm text-gray-500">No data available</p>
-        ) : (
-          <div className="space-y-2">
-            {stats?.signupsByMonth.map((item) => {
-              const maxCount = Math.max(...(stats.signupsByMonth || []).map(m => m.count))
-              const percentage = maxCount > 0 ? (item.count / maxCount) * 100 : 0
-              const monthName = new Date(item.month + '-01').toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
-              return (
-                <div key={item.month}>
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-sm font-medium text-gray-900">{monthName}</span>
-                    <span className="text-sm text-gray-600">{item.count} signups</span>
+      {/* Trends Section */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* Signups Trend */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Signups Trend</h3>
+          {stats?.signupsByMonth && stats.signupsByMonth.length === 0 ? (
+            <p className="text-sm text-gray-500">No data available</p>
+          ) : (
+            <div className="space-y-2">
+              {stats?.signupsByMonth.map((item) => {
+                const maxCount = Math.max(...(stats.signupsByMonth || []).map(m => m.count))
+                const percentage = maxCount > 0 ? (item.count / maxCount) * 100 : 0
+                const monthName = new Date(item.month + '-01').toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+                return (
+                  <div key={item.month}>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-sm font-medium text-gray-900">{monthName}</span>
+                      <span className="text-sm text-gray-600">{item.count}</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-[#34B682] h-2 rounded-full"
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-[#34B682] h-2 rounded-full"
-                      style={{ width: `${percentage}%` }}
-                    />
+                )
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Memberships Trend */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Memberships Trend</h3>
+          {stats?.leadsByMonth && stats.leadsByMonth.length === 0 ? (
+            <p className="text-sm text-gray-500">No data available</p>
+          ) : (
+            <div className="space-y-2">
+              {stats?.leadsByMonth.map((item) => {
+                const maxCount = Math.max(...(stats.leadsByMonth || []).map(m => m.count))
+                const percentage = maxCount > 0 ? (item.count / maxCount) * 100 : 0
+                const monthName = new Date(item.month + '-01').toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+                return (
+                  <div key={item.month}>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-sm font-medium text-gray-900">{monthName}</span>
+                      <span className="text-sm text-gray-600">{item.count}</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-green-600 h-2 rounded-full"
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
                   </div>
-                </div>
-              )
-            })}
-          </div>
-        )}
+                )
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Contact Submissions Trend */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Contact Submissions Trend</h3>
+          {stats?.contactByMonth && stats.contactByMonth.length === 0 ? (
+            <p className="text-sm text-gray-500">No data available</p>
+          ) : (
+            <div className="space-y-2">
+              {stats?.contactByMonth.map((item) => {
+                const maxCount = Math.max(...(stats.contactByMonth || []).map(m => m.count))
+                const percentage = maxCount > 0 ? (item.count / maxCount) * 100 : 0
+                const monthName = new Date(item.month + '-01').toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+                return (
+                  <div key={item.month}>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-sm font-medium text-gray-900">{monthName}</span>
+                      <span className="text-sm text-gray-600">{item.count}</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-orange-500 h-2 rounded-full"
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
@@ -367,6 +393,68 @@ function RecentSignups({ signups }: { signups: any[] }) {
                 {signup.courses?.title && (
                   <p className="text-xs text-gray-400 mt-1">{signup.courses.title}</p>
                 )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function RecentMemberships({ leads }: { leads: any[] }) {
+  return (
+    <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+      <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Memberships</h3>
+      {leads.length === 0 ? (
+        <p className="text-sm text-gray-500">No memberships yet</p>
+      ) : (
+        <div className="space-y-3">
+          {leads.map((lead) => (
+            <div key={lead.id} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+              <div>
+                <p className="text-sm font-medium text-gray-900">{lead.email}</p>
+                {lead.role && (
+                  <p className="text-xs text-gray-500">{lead.role}</p>
+                )}
+                {lead.landing_tag && (
+                  <span className="inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded-full bg-green-100 text-green-800">
+                    {lead.landing_tag}
+                  </span>
+                )}
+              </div>
+              <div className="text-right">
+                <p className="text-xs text-gray-500">
+                  {new Date(lead.created_at).toLocaleDateString()}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function RecentContactSubmissions({ submissions }: { submissions: any[] }) {
+  return (
+    <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+      <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Contact Submissions</h3>
+      {submissions.length === 0 ? (
+        <p className="text-sm text-gray-500">No contact submissions yet</p>
+      ) : (
+        <div className="space-y-3">
+          {submissions.map((submission) => (
+            <div key={submission.id} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+              <div>
+                <p className="text-sm font-medium text-gray-900">{submission.name}</p>
+                <p className="text-xs text-gray-500">{submission.email}</p>
+                <p className="text-xs text-gray-600 mt-1 line-clamp-1">{submission.subject}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs text-gray-500">
+                  {new Date(submission.created_at).toLocaleDateString()}
+                </p>
               </div>
             </div>
           ))}
