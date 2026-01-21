@@ -19,7 +19,6 @@ export default function ScrollBanner({ currentCourse }: ScrollBannerProps) {
   useEffect(() => {
     const fetchTopCourse = async () => {
       if (!currentCourse.tags || currentCourse.tags.length === 0) {
-        console.log('ScrollBanner: No tags found for current course')
         setIsLoading(false)
         return
       }
@@ -27,18 +26,12 @@ export default function ScrollBanner({ currentCourse }: ScrollBannerProps) {
       try {
         // Get courses by the first tag of the current course
         const tag = currentCourse.tags[0]
-        console.log('ScrollBanner: Fetching courses for tag:', tag)
         const courses = await getCoursesByTag(tag)
-        console.log('ScrollBanner: Found courses:', courses.length, 'Current course ID:', currentCourse.id)
         
         // The first course is the top-ranked (index 0)
         // Always show the top program, even if it's the current course
         if (courses.length > 0) {
-          console.log('ScrollBanner: Top course ID:', courses[0].id)
-          console.log('ScrollBanner: Setting top course')
           setTopCourse(courses[0])
-        } else {
-          console.log('ScrollBanner: No courses found')
         }
       } catch (error) {
         console.error('ScrollBanner: Error fetching top course:', error)
@@ -50,27 +43,56 @@ export default function ScrollBanner({ currentCourse }: ScrollBannerProps) {
     fetchTopCourse()
   }, [currentCourse])
 
-  // Show banner when top course is loaded
+  // Handle scroll to show/hide banner - appears after scrolling past hero section
   useEffect(() => {
-    if (topCourse) {
-      setIsVisible(true)
+    if (!topCourse) {
+      setIsVisible(false)
+      return
+    }
+    
+    const handleScroll = () => {
+      // Find the hero section or meta info card (the white card that appears below hero)
+      // Look for the meta info card which has specific styling
+      let heroSection: Element | null = null
+      
+      // Try to find the meta info card (has specific box shadow styling)
+      const cards = Array.from(document.querySelectorAll('div[style*="boxShadow"]'))
+      heroSection = cards.find(card => {
+        const style = card.getAttribute('style') || ''
+        return style.includes('0 12px 40px') || style.includes('position: absolute')
+      }) || null
+      
+      // Fallback: find section with hero background color
+      if (!heroSection) {
+        const sections = Array.from(document.querySelectorAll('div[style*="F3F6FC"]'))
+        heroSection = sections[0] || null
+      }
+      
+      if (heroSection) {
+        const rect = heroSection.getBoundingClientRect()
+        const sectionBottom = rect.bottom + window.scrollY
+        const scrollY = window.scrollY || window.pageYOffset
+        // Show banner when scrolled past the hero section (with 50px buffer)
+        const shouldShow = scrollY > sectionBottom - 50
+        setIsVisible(shouldShow)
+      } else {
+        // Fallback: show after scrolling 600px if section not found
+        const scrollY = window.scrollY || window.pageYOffset
+        setIsVisible(scrollY > 600)
+      }
+    }
+    
+    // Small delay to ensure DOM is ready
+    const timeoutId = setTimeout(() => {
+      handleScroll()
+    }, 100)
+    
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => {
+      clearTimeout(timeoutId)
+      window.removeEventListener('scroll', handleScroll)
     }
   }, [topCourse])
-
-  // Handle scroll to show/hide banner (commented out for testing - uncomment to enable scroll behavior)
-  // useEffect(() => {
-  //   if (!topCourse) return
-  //   
-  //   const handleScroll = () => {
-  //     const scrollY = window.scrollY || window.pageYOffset
-  //     const shouldShow = scrollY > 200
-  //     setIsVisible(shouldShow)
-  //   }
-  //   
-  //   handleScroll() // Check initial position
-  //   window.addEventListener('scroll', handleScroll, { passive: true })
-  //   return () => window.removeEventListener('scroll', handleScroll)
-  // }, [topCourse])
 
   // Debug logging
   useEffect(() => {

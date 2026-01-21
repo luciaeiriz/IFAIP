@@ -20,39 +20,47 @@ export default function LandingPageScrollBanner({ topCourse }: LandingPageScroll
     }
     
     const handleScroll = () => {
-      const scrollY = window.scrollY || window.pageYOffset
+      // Find the FeaturedTopPicks section by looking for the heading "Our Top 3 Providers"
+      // or by finding a section with the specific background color
+      let featuredSection: Element | null = null
       
-      // Find the FeaturedTopPicks section (which shows the top 3 courses)
-      // Look for section with background color #F6F7FF (the FeaturedTopPicks section)
-      const featuredSection = document.querySelector('section[style*="#F6F7FF"]')
+      // Try to find by heading text
+      const headings = Array.from(document.querySelectorAll('h2'))
+      const topProvidersHeading = headings.find(h => h.textContent?.includes('Our Top 3 Providers'))
+      if (topProvidersHeading) {
+        // Find the parent section
+        featuredSection = topProvidersHeading.closest('section')
+      }
+      
+      // Fallback: try to find by background color style
+      if (!featuredSection) {
+        const sections = Array.from(document.querySelectorAll('section'))
+        featuredSection = sections.find(s => {
+          const style = window.getComputedStyle(s)
+          return style.backgroundColor.includes('246') || style.backgroundColor.includes('F6F7FF')
+        }) || null
+      }
       
       if (featuredSection) {
         const rect = featuredSection.getBoundingClientRect()
-        // rect.top is relative to viewport, so add scrollY to get absolute position
-        const sectionTopAbsolute = rect.top + scrollY
-        
-        // Show banner when scrolled past the middle/top of the FeaturedTopPicks section
-        // This makes it appear much sooner - when you're about halfway through the section
-        const shouldShow = scrollY > (sectionTopAbsolute + 150)
-        
+        const sectionBottom = rect.bottom + window.scrollY
+        const scrollY = window.scrollY || window.pageYOffset
+        // Show banner when scrolled past the FeaturedTopPicks section (with 50px buffer)
+        const shouldShow = scrollY > sectionBottom - 50
         setIsVisible(shouldShow)
       } else {
-        // Fallback: show after scrolling 400px (sooner than before)
-        // Make sure we're not at the top of the page
-        setIsVisible(scrollY > 400)
+        // Fallback: show after scrolling 600px if section not found
+        const scrollY = window.scrollY || window.pageYOffset
+        setIsVisible(scrollY > 600)
       }
     }
     
-    // Ensure banner starts hidden
-    setIsVisible(false)
-    
-    // Wait a bit for the DOM to be ready, then check initial scroll position
+    // Small delay to ensure DOM is ready
     const timeoutId = setTimeout(() => {
       handleScroll()
-    }, 200)
+    }, 100)
     
     window.addEventListener('scroll', handleScroll, { passive: true })
-    
     return () => {
       clearTimeout(timeoutId)
       window.removeEventListener('scroll', handleScroll)
@@ -142,13 +150,13 @@ export default function LandingPageScrollBanner({ topCourse }: LandingPageScroll
         borderTop: '1px solid #E0E0E0',
       }}
     >
-      <div className="mx-auto max-w-full sm:max-w-2xl lg:max-w-7xl px-3 py-3 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6">
-          {/* Course info - centered */}
-          <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto justify-center">
+      <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          {/* Left side: Course info */}
+          <div className="flex items-center gap-4 flex-1 min-w-0">
             {/* Badge */}
             <div className="flex-shrink-0">
-              <div className="rounded-full bg-orange-100 px-2 sm:px-3 py-1 text-xs font-semibold text-orange-800 whitespace-nowrap">
+              <div className="rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-800 whitespace-nowrap">
                 ✓ Top Program
               </div>
             </div>
@@ -162,20 +170,20 @@ export default function LandingPageScrollBanner({ topCourse }: LandingPageScroll
             </div>
 
             {/* Course title and headline */}
-            <div className="text-center sm:text-left flex-1 min-w-0">
-              <h3 className="font-bold text-gray-900 text-sm sm:text-base lg:text-lg truncate" style={{ fontFamily: 'EuclidCircularB, sans-serif' }}>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-bold text-gray-900 text-base sm:text-lg truncate" style={{ fontFamily: 'EuclidCircularB, sans-serif' }}>
                 {topCourse.title}
               </h3>
               {topCourse.headline && (
-                <p className="text-xs sm:text-sm text-gray-600 mt-1 line-clamp-1" style={{ fontFamily: 'EuclidCircularB, sans-serif' }}>
+                <p className="text-sm text-gray-600 truncate mt-1" style={{ fontFamily: 'EuclidCircularB, sans-serif' }}>
                   {topCourse.headline}
                 </p>
               )}
             </div>
           </div>
 
-          {/* CTA button and rating - centered */}
-          <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto justify-center">
+          {/* Right side: CTA button */}
+          <div className="flex items-center gap-4 flex-shrink-0">
             {topCourse.rating && (
               <div className="hidden sm:flex items-center gap-1">
                 <span className="text-yellow-400 text-lg">★</span>
@@ -187,16 +195,16 @@ export default function LandingPageScrollBanner({ topCourse }: LandingPageScroll
                 href={topCourse.external_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-lg bg-[#0156D2] px-4 sm:px-6 py-2 sm:py-2.5 text-white font-semibold hover:bg-[#0144A8] transition-colors whitespace-nowrap text-xs sm:text-sm"
-                style={{ fontFamily: 'EuclidCircularB, sans-serif' }}
+                className="rounded-lg bg-[#0156D2] px-6 py-2.5 text-white font-semibold hover:bg-[#0144A8] transition-colors whitespace-nowrap"
+                style={{ fontSize: '14px', fontFamily: 'EuclidCircularB, sans-serif' }}
               >
                 Learn More
               </a>
             ) : topCourse.signup_enabled ? (
               <Link
                 href={`/courses/${topCourse.id}`}
-                className="rounded-lg bg-[#0156D2] px-4 sm:px-6 py-2 sm:py-2.5 text-white font-semibold hover:bg-[#0144A8] transition-colors whitespace-nowrap text-xs sm:text-sm"
-                style={{ fontFamily: 'EuclidCircularB, sans-serif' }}
+                className="rounded-lg bg-[#0156D2] px-6 py-2.5 text-white font-semibold hover:bg-[#0144A8] transition-colors whitespace-nowrap"
+                style={{ fontSize: '14px', fontFamily: 'EuclidCircularB, sans-serif' }}
               >
                 Learn More
               </Link>
