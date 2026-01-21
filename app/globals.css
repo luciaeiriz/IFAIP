@@ -703,8 +703,35 @@ html {
   }
 }
 
+/* Terms page - 1024px viewport specific fixes (1024px to 1279px) */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  /* Hero section - Reduce padding for better fit */
+  .terms-hero-container {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  
+  /* Content container - Reduce padding for better fit */
+  .terms-content-container {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  
+  /* Sidebar - Adjust positioning */
+  .terms-sidebar-content {
+    margin-right: 0 !important;
+    width: 100% !important;
+    max-width: 317px !important;
+  }
+  
+  /* Main content - Ensure proper spacing */
+  .terms-main-content {
+    padding-right: 24px !important;
+  }
+}
+
 /* Terms page - Desktop restore original values */
-@media (min-width: 1024px) {
+@media (min-width: 1280px) {
   .terms-hero-section {
     height: 562px !important;
   }
@@ -792,6 +819,10 @@ html {
     padding-top: 8px !important;
     padding-bottom: 8px !important;
   }
+  
+  .terms-main-content {
+    padding-right: 0 !important;
+  }
 }
 
 /* About page - Mobile/Tablet responsive styles */
@@ -848,8 +879,35 @@ html {
   }
 }
 
+/* About page - 1024px viewport specific fixes (1024px to 1279px) */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  /* Hero section - Reduce padding for better fit */
+  .about-hero-container {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  
+  /* Content container - Reduce padding for better fit */
+  .about-content-container {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  
+  /* Sidebar - Adjust positioning */
+  .about-sidebar-content {
+    margin-right: 0 !important;
+    width: 100% !important;
+    max-width: 317px !important;
+  }
+  
+  /* Main content - Ensure proper spacing */
+  .about-main-content {
+    padding-right: 24px !important;
+  }
+}
+
 /* About page - Desktop restore original values */
-@media (min-width: 1024px) {
+@media (min-width: 1280px) {
   .about-hero-section {
     height: 562px !important;
   }
@@ -885,6 +943,10 @@ html {
     width: 317px !important;
     height: 450px !important;
     margin-right: -72px !important;
+  }
+  
+  .about-main-content {
+    padding-right: 0 !important;
   }
 }
 
@@ -991,8 +1053,35 @@ html {
   }
 }
 
+/* Privacy page - 1024px viewport specific fixes (1024px to 1279px) */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  /* Hero section - Reduce padding for better fit */
+  .privacy-hero-container {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  
+  /* Content container - Reduce padding for better fit */
+  .privacy-content-container {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  
+  /* Sidebar - Adjust positioning */
+  .privacy-sidebar-content {
+    margin-right: 0 !important;
+    width: 100% !important;
+    max-width: 317px !important;
+  }
+  
+  /* Main content - Ensure proper spacing */
+  .privacy-main-content {
+    padding-right: 24px !important;
+  }
+}
+
 /* Privacy page - Desktop restore original values */
-@media (min-width: 1024px) {
+@media (min-width: 1280px) {
   .privacy-hero-section {
     height: 562px !important;
   }
@@ -1067,6 +1156,10 @@ html {
     width: 317px !important;
     height: 450px !important;
     margin-right: -72px !important;
+  }
+  
+  .privacy-main-content {
+    padding-right: 0 !important;
   }
 }
 
@@ -1173,8 +1266,35 @@ html {
   }
 }
 
+/* Membership page - 1024px viewport specific fixes (1024px to 1279px) */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  /* Hero section - Reduce padding for better fit */
+  .membership-hero-container {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  
+  /* Content container - Reduce padding for better fit */
+  .membership-content-container {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  
+  /* Sidebar - Adjust positioning */
+  .membership-sidebar-content {
+    margin-right: 0 !important;
+    width: 100% !important;
+    max-width: 317px !important;
+  }
+  
+  /* Main content - Ensure proper spacing */
+  .membership-main-content {
+    padding-right: 24px !important;
+  }
+}
+
 /* Membership page - Desktop restore original values */
-@media (min-width: 1024px) {
+@media (min-width: 1280px) {
   .membership-hero-section {
     height: 562px !important;
   }
@@ -1249,6 +1369,10 @@ html {
     width: 317px !important;
     height: 450px !important;
     margin-right: -72px !important;
+  }
+  
+  .membership-main-content {
+    padding-right: 0 !important;
   }
 }
 
@@ -1355,8 +1479,35 @@ html {
   }
 }
 
+/* Partner page - 1024px viewport specific fixes (1024px to 1279px) */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  /* Hero section - Reduce padding for better fit */
+  .partner-hero-container {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  
+  /* Content container - Reduce padding for better fit */
+  .partner-content-container {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  
+  /* Sidebar - Adjust positioning */
+  .partner-sidebar-content {
+    margin-right: 0 !important;
+    width: 100% !important;
+    max-width: 317px !important;
+  }
+  
+  /* Main content - Ensure proper spacing */
+  .partner-main-content {
+    padding-right: 24px !important;
+  }
+}
+
 /* Partner page - Desktop restore original values */
-@media (min-width: 1024px) {
+@media (min-width: 1280px) {
   .partner-hero-section {
     height: 562px !important;
   }
@@ -1431,6 +1582,10 @@ html {
     width: 317px !important;
     height: 450px !important;
     margin-right: -72px !important;
+  }
+  
+  .partner-main-content {
+    padding-right: 0 !important;
   }
 }
 
@@ -1546,8 +1701,35 @@ html {
   }
 }
 
+/* Contact page - 1024px viewport specific fixes (1024px to 1279px) */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  /* Hero section - Reduce padding for better fit */
+  .contact-hero-container {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  
+  /* Content container - Reduce padding for better fit */
+  .contact-content-container {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  
+  /* Sidebar - Adjust positioning */
+  .contact-sidebar-content {
+    margin-right: 0 !important;
+    width: 100% !important;
+    max-width: 317px !important;
+  }
+  
+  /* Main content - Ensure proper spacing */
+  .contact-main-content {
+    padding-right: 24px !important;
+  }
+}
+
 /* Contact page - Desktop restore original values */
-@media (min-width: 1024px) {
+@media (min-width: 1280px) {
   .contact-hero-section {
     height: 562px !important;
   }
@@ -1631,6 +1813,10 @@ html {
     height: 450px !important;
     margin-right: -72px !important;
   }
+  
+  .contact-main-content {
+    padding-right: 0 !important;
+  }
 }
 
 /* Course detail page - Mobile responsive styles */
@@ -1643,6 +1829,325 @@ html {
   
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+}
+
+/* Courses landing pages - 1024px viewport specific fixes (1024px to 1279px) */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  /* FeaturedTopPicks - Reduce padding to give more room for cards */
+  .featured-top-picks-container {
+    gap: 8px !important;
+    flex-wrap: nowrap !important;
+  }
+  
+  /* Reduce section padding at 1024px */
+  .featured-top-picks-inner {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  
+  .featured-top-pick-card {
+    width: auto !important;
+    flex: 1 1 0% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 150px !important;
+    margin-top: 0 !important;
+    padding: 14px !important;
+    padding-bottom: 80px !important;
+  }
+  
+  /* AllCoursesGrid - Hide Our Guides section at 1024px */
+  .our-guides-section {
+    display: none !important;
+  }
+  
+  /* AllCoursesGrid - Make courses section use full width when guides are hidden */
+  .all-courses-section {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: none !important;
+  }
+  
+  /* AllCoursesGrid container - remove flex layout at 1024px */
+  .all-courses-grid-container {
+    flex-direction: column !important;
+  }
+  
+  /* Reduce AllCoursesGrid padding at 1024px */
+  .all-courses-grid-container {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+}
+
+/* Courses landing pages - Desktop (1280px+) restore original layout */
+@media (min-width: 1280px) {
+  /* FeaturedTopPicks - Restore desktop card sizes (handled by useEffect) */
+  
+  /* AllCoursesGrid - Show Our Guides section on larger screens */
+  .our-guides-section {
+    display: block !important;
+  }
+  
+  /* AllCoursesGrid - Restore flex layout */
+  .all-courses-grid-container {
+    flex-direction: row !important;
+  }
+  
+  /* AllCoursesGrid - Restore courses section width */
+  .all-courses-section {
+    width: auto !important;
+    flex: 1 1 0% !important;
+    max-width: none !important;
+  }
+}
+
+/* Course detail page - 1024px viewport specific fixes (1024px to 1279px) */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  /* Hero section - Add proper padding and adjust height */
+  .course-detail-hero-section {
+    min-height: auto !important;
+    padding-bottom: 24px !important;
+  }
+  
+  .course-detail-hero-container {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    height: auto !important;
+    padding-bottom: 24px !important;
+  }
+  
+  /* Hero content - Remove negative margin and add proper padding */
+  .course-detail-hero-content {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+  }
+  
+  /* Meta Info Card - Fix width and positioning for 1024px */
+  .course-detail-meta-card {
+    position: relative !important;
+    top: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+    padding-top: 24px !important;
+    padding-bottom: 24px !important;
+    margin-top: 24px !important;
+    margin-bottom: 24px !important;
+    height: auto !important;
+    min-height: 116px !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Meta card content - Ensure proper wrapping in 2 columns with better spacing */
+  .course-detail-meta-content {
+    flex-wrap: wrap !important;
+    gap: 0 !important;
+    align-items: stretch !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+  }
+  
+  /* Disable divide-x utility class behavior - remove ALL borders first */
+  .course-detail-meta-content > div {
+    border-left: none !important;
+    border-right: none !important;
+    min-width: calc(50% - 20px) !important;
+    max-width: calc(50% - 20px) !important;
+    flex: 0 0 calc(50% - 20px) !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 20px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Override px-4 class and inline padding styles */
+  .course-detail-meta-content > div[class*="px-4"],
+  .course-detail-meta-content > div.first\:pl-0 {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  
+  /* Left column items (1st, 3rd, 5th) - ONLY divider on the RIGHT side */
+  .course-detail-meta-content > div:nth-child(odd) {
+    padding-right: 40px !important;
+    border-right: 1px solid #e5e7eb !important;
+    border-left: none !important;
+    margin-right: 0 !important;
+  }
+  
+  /* Right column items (2nd, 4th) - NO dividers, just padding left */
+  .course-detail-meta-content > div:nth-child(even) {
+    padding-left: 40px !important;
+    border-left: none !important;
+    border-right: none !important;
+    margin-left: 0 !important;
+  }
+  
+  /* Remove bottom padding on last row items */
+  .course-detail-meta-content > div:nth-last-child(-n+2) {
+    padding-bottom: 0 !important;
+  }
+  
+  /* Ensure consistent spacing between value and label within each item */
+  .course-detail-meta-content > div > div:first-child {
+    margin-bottom: 6px !important;
+    line-height: 1.3 !important;
+  }
+  
+  .course-detail-meta-content > div > div:last-child {
+    margin-bottom: 0 !important;
+    line-height: 1.4 !important;
+  }
+  
+  /* Ensure flex items with rating display properly */
+  .course-detail-meta-content > div > div.flex {
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    margin-bottom: 6px !important;
+  }
+  
+  /* Ensure rating star and value are properly aligned */
+  .course-detail-meta-content > div > div.flex > span {
+    display: inline-flex !important;
+    align-items: center !important;
+  }
+  
+  /* Ensure all text elements are properly aligned */
+  .course-detail-meta-content > div > div {
+    width: 100% !important;
+  }
+  
+  /* Main content section - Add proper padding */
+  .course-detail-content-section {
+    margin-top: 0 !important;
+  }
+  
+  .course-detail-content-container {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  
+  /* Content inner - Remove negative margin and add proper padding */
+  .course-detail-content-inner {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+  }
+}
+
+/* Course detail page - Desktop (1280px+) restore original layout */
+@media (min-width: 1280px) {
+  /* Restore original hero section */
+  .course-detail-hero-section {
+    min-height: 463px !important;
+    padding-bottom: 0px !important;
+  }
+  
+  /* Restore original hero container padding */
+  .course-detail-hero-container {
+    padding-left: 0 !important;
+    padding-right: 24px !important;
+    height: 537px !important;
+    padding-bottom: 16px !important;
+  }
+  
+  /* Restore original hero content margins */
+  .course-detail-hero-content {
+    margin-left: -24px !important;
+    padding-left: 24px !important;
+  }
+  
+  /* Restore original meta card positioning */
+  .course-detail-meta-card {
+    position: absolute !important;
+    top: 478px !important;
+    width: 1342px !important;
+    margin-left: -24px !important;
+    margin-right: -24px !important;
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Restore original meta card content layout */
+  .course-detail-meta-content {
+    flex-wrap: nowrap !important;
+    gap: 0 !important;
+  }
+  
+  .course-detail-meta-content > div {
+    min-width: 150px !important;
+    flex: 1 1 0% !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    padding-bottom: 0 !important;
+    border-right: 1px solid #e5e7eb !important;
+  }
+  
+  .course-detail-meta-content > div:first-child {
+    padding-left: 0 !important;
+  }
+  
+  .course-detail-meta-content > div:last-child {
+    border-right: none !important;
+  }
+  
+  /* Restore original content container padding */
+  .course-detail-content-container {
+    padding-left: 0 !important;
+    padding-right: 24px !important;
+  }
+  
+  /* Restore original content inner margins */
+  .course-detail-content-inner {
+    margin-left: -24px !important;
+    padding-left: 24px !important;
+  }
+}
+
+/* Homepage - 1024px viewport specific fixes (1024px to 1279px) */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  /* Hide the right overlay section at 1024px */
+  .homepage-hero-right-section {
+    display: none !important;
+  }
+  
+  /* Show feature cards section below hero at 1024px */
+  .homepage-feature-cards-section {
+    display: flex !important;
+  }
+  
+  /* Ensure proper spacing and layout */
+  .homepage-feature-cards-section > div {
+    max-width: 100% !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+}
+
+/* Homepage - Desktop (1280px+) restore original layout */
+@media (min-width: 1280px) {
+  /* Show the right overlay section on desktop */
+  .homepage-hero-right-section {
+    display: block !important;
+  }
+  
+  /* Hide feature cards section on desktop (already handled by lg:hidden, but ensure it's hidden) */
+  .homepage-feature-cards-section {
+    display: none !important;
   }
 }
 

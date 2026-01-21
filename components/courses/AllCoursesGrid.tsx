@@ -169,9 +169,9 @@ export default function AllCoursesGrid({ courses, tag }: AllCoursesGridProps) {
 
   return (
     <section className="bg-white py-4 sm:py-6 lg:py-0">
-      <div className="w-full px-4 sm:px-6 md:px-8 lg:px-20 flex flex-col lg:flex-row gap-4 sm:gap-5 lg:gap-6 items-start">
+      <div className="w-full px-4 sm:px-6 md:px-8 lg:px-20 flex flex-col lg:flex-row gap-4 sm:gap-5 lg:gap-6 items-start all-courses-grid-container">
         {/* Left side - Courses section */}
-        <div className="w-full lg:flex-1 lg:min-w-0">
+        <div className="w-full lg:flex-1 lg:min-w-0 all-courses-section">
           <h2 className="text-lg sm:text-xl lg:text-xl mb-3 sm:mb-4 lg:mb-4" style={{ 
             fontSize: '20px', 
             fontFamily: 'EuclidCircularB, sans-serif', 
@@ -530,7 +530,7 @@ export default function AllCoursesGrid({ courses, tag }: AllCoursesGridProps) {
         </div>
 
         {/* Right side - Our Guides component - Hidden on mobile */}
-        <div className="hidden lg:block" style={{ width: '305px', height: '241px', flexShrink: 0 }}>
+        <div className="hidden lg:block our-guides-section" style={{ width: '305px', height: '241px', flexShrink: 0 }}>
           <div style={{
             width: '100%',
             height: '100%',

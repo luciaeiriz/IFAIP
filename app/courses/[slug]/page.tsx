@@ -408,11 +408,11 @@ function CourseDetailView({
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <div style={{ backgroundColor: '#F3F6FC', minHeight: '463px', paddingBottom: '0px', overflow: 'visible', position: 'relative' }}>
-        <div className="mx-auto max-w-7xl py-16" style={{ paddingLeft: '0', paddingRight: '24px', overflow: 'visible', height: '537px' }}>
+      <div className="course-detail-hero-section" style={{ backgroundColor: '#F3F6FC', minHeight: '463px', paddingBottom: '0px', overflow: 'visible', position: 'relative' }}>
+        <div className="mx-auto max-w-7xl py-16 course-detail-hero-container" style={{ paddingLeft: '0', paddingRight: '24px', overflow: 'visible', height: '537px' }}>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Left side - Hero content (2/3 width) */}
-            <div className="lg:col-span-2" style={{ marginLeft: '-24px', paddingLeft: '24px' }}>
+            <div className="lg:col-span-2 course-detail-hero-content" style={{ marginLeft: '-24px', paddingLeft: '24px' }}>
               {/* Logo */}
               <div className="mb-6">
                 <Image 
@@ -500,8 +500,8 @@ function CourseDetailView({
           </div>
           
           {/* Meta Info Card */}
-          <div className="rounded-lg bg-white p-6 mb-0 relative z-10" style={{ marginLeft: '-24px', paddingLeft: '24px', marginRight: '-24px', paddingRight: '24px', marginBottom: '0', position: 'absolute', top: '478px', width: '1342px', height: '116px', boxShadow: '0 12px 40px rgba(0, 0, 0, 0.18), 0 6px 16px rgba(0, 0, 0, 0.12)' }}>
-            <div className="flex flex-wrap items-center divide-x divide-gray-200">
+          <div className="rounded-lg bg-white p-6 mb-0 relative z-10 course-detail-meta-card" style={{ marginLeft: '-24px', paddingLeft: '24px', marginRight: '-24px', paddingRight: '24px', marginBottom: '0', position: 'absolute', top: '478px', width: '1342px', height: '116px', boxShadow: '0 12px 40px rgba(0, 0, 0, 0.18), 0 6px 16px rgba(0, 0, 0, 0.12)' }}>
+            <div className="flex flex-wrap items-center divide-x divide-gray-200 course-detail-meta-content">
               {course.duration && (
                 <div className="flex-1 min-w-[150px] px-4 first:pl-0">
                   <div className="font-bold text-gray-900 mb-1" style={{ fontSize: '20px' }}>{course.duration}</div>
@@ -543,10 +543,10 @@ function CourseDetailView({
       </div>
 
       {/* Main Content Section */}
-      <div className="bg-white w-full relative" style={{ marginTop: '0', paddingTop: '24px', paddingBottom: '100px' }}>
-        <div className="mx-auto max-w-7xl py-12" style={{ paddingLeft: '0', paddingRight: '24px' }}>
+      <div className="bg-white w-full relative course-detail-content-section" style={{ marginTop: '0', paddingTop: '24px', paddingBottom: '100px' }}>
+        <div className="mx-auto max-w-7xl py-12 course-detail-content-container" style={{ paddingLeft: '0', paddingRight: '24px' }}>
           <div className="grid grid-cols-1 gap-8">
-            <div style={{ marginLeft: '-24px', paddingLeft: '24px' }}>
+            <div className="course-detail-content-inner" style={{ marginLeft: '-24px', paddingLeft: '24px' }}>
             {/* Tab Navigation */}
             <div className="mb-6 border-b border-gray-200 bg-white pb-0" style={{ marginTop: '20px' }}>
               <nav className="flex space-x-1" aria-label="Tabs">

@@ -229,7 +229,7 @@ export default function HomePage() {
 
           {/* Right Section - Blue Background with Feature Cards - Overlaid on desktop only */}
           <div 
-            className="hidden lg:block absolute top-0 right-0 w-[50%] h-full py-16 lg:py-24 flex flex-col justify-center z-20 bg-[#030EF9]"
+            className="hidden lg:block absolute top-0 right-0 w-[50%] h-full py-16 lg:py-24 flex flex-col justify-center z-20 bg-[#030EF9] homepage-hero-right-section"
             style={{ 
               clipPath: 'polygon(50% 0, 100% 0, 100% 100%, 0 100%, 15% 30%)',
             }}
@@ -314,7 +314,7 @@ export default function HomePage() {
       </section>
 
       {/* Blue Section - Feature Cards - Below hero on mobile/tablet */}
-      <section className="lg:hidden relative w-full py-12 md:py-16 flex flex-col justify-center bg-[#030EF9]">
+      <section className="lg:hidden relative w-full py-12 md:py-16 flex flex-col justify-center bg-[#030EF9] homepage-feature-cards-section">
         <div className="space-y-6 md:space-y-8 px-4 sm:px-6 md:px-8 max-w-2xl mx-auto">
           {featureCards.map((card, index) => (
             <Link

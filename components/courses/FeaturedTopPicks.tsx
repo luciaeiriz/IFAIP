@@ -12,7 +12,8 @@ export default function FeaturedTopPicks({ courses }: FeaturedTopPicksProps) {
   
   useEffect(() => {
     const updateDesktopStyles = () => {
-      if (typeof window !== 'undefined' && window.innerWidth >= 1024) {
+      // Only apply fixed widths for screens larger than 1024px (let CSS handle exactly 1024px)
+      if (typeof window !== 'undefined' && window.innerWidth > 1024) {
         cardRefs.current.forEach((card, index) => {
           if (!card) return
           const cardWidth = index === 1 ? '450px' : (index === 2 ? '415px' : '413px')
@@ -140,13 +141,13 @@ export default function FeaturedTopPicks({ courses }: FeaturedTopPicksProps) {
   }
 
   return (
-    <section className="block py-4 sm:py-5 md:py-5 lg:py-5" style={{ backgroundColor: '#F6F7FF', width: '100%', marginLeft: '0', marginRight: '0', minHeight: '249px' }}>
-      <div className="px-4 sm:px-6 md:px-8 lg:px-20" style={{ width: '100%', boxSizing: 'border-box' }}>
+    <section className="block py-4 sm:py-5 md:py-5 lg:py-5 featured-top-picks-section" style={{ backgroundColor: '#F6F7FF', width: '100%', marginLeft: '0', marginRight: '0', minHeight: '249px' }}>
+      <div className="px-4 sm:px-6 md:px-8 lg:px-20 featured-top-picks-inner" style={{ width: '100%', boxSizing: 'border-box' }}>
         <h2 className="mb-2 sm:mb-3 md:mb-3 lg:mb-3 text-base sm:text-lg md:text-lg lg:text-lg" style={{ fontSize: '18px', color: '#181716', fontFamily: 'EuclidCircularB, sans-serif', marginTop: '0' }}>
           Our Top 3 Providers
         </h2>
 
-        <div className="flex flex-col md:flex-row justify-start gap-4 sm:gap-4 md:gap-4 lg:gap-6" style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', marginTop: '0' }}>
+        <div className="flex flex-col md:flex-row justify-start gap-4 sm:gap-4 md:gap-4 lg:gap-6 featured-top-picks-container" style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', marginTop: '0' }}>
           {top3.map((course, index) => {
             // The middle card (index 1) is always the #1 ranked course (highest priority)
             // Only show "MOST POPULAR" badge if we have all 3 courses and this is the middle one

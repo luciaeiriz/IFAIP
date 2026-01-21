@@ -83,7 +83,7 @@ export default function AboutPage() {
         <div className="mx-auto max-w-7xl about-content-container px-4 sm:px-6 md:px-8 lg:px-0 lg:pr-[72px] pt-8 sm:pt-10 md:pt-10 lg:pt-10 pb-16 sm:pb-20 md:pb-24 lg:pb-24">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 sm:gap-10 md:gap-12 lg:gap-12">
             {/* Left Column - Main Content */}
-            <div className="lg:col-span-2 space-y-10 sm:space-y-12 md:space-y-14 lg:space-y-16">
+            <div className="lg:col-span-2 space-y-10 sm:space-y-12 md:space-y-14 lg:space-y-16 about-main-content">
               {/* Introduction Section */}
               <section id="introduction" className="scroll-mt-24">
                 <div>
