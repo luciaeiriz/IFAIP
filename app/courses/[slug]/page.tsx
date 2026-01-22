@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo, Suspense } from 'react'
+import { useState, useEffect, useMemo, useRef, Suspense } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -334,6 +334,179 @@ function CourseDetailView({
   setActiveTab: (tab: TabType) => void
   scrollToSection: (sectionId: string, tabType: TabType) => void
 }) {
+  const metaCardRef = useRef<HTMLDivElement>(null)
+  const heroSectionRef = useRef<HTMLDivElement>(null)
+  const heroContainerRef = useRef<HTMLDivElement>(null)
+  const heroContentRef = useRef<HTMLDivElement>(null)
+  const [isMobile, setIsMobile] = useState(false)
+  
+  // Detect screen size on mount and resize
+  useEffect(() => {
+    const checkScreenSize = () => {
+      if (typeof window !== 'undefined') {
+        setIsMobile(window.innerWidth < 768)
+      }
+    }
+    checkScreenSize()
+    window.addEventListener('resize', checkScreenSize)
+    return () => window.removeEventListener('resize', checkScreenSize)
+  }, [])
+  
+  // Adjust styles for tablet view (768px - 1023px)
+  useEffect(() => {
+    // Only run if course exists and we're in the browser (refs won't be attached otherwise)
+    if (!course || typeof window === 'undefined') return
+    
+    const updateTabletStyles = () => {
+      try {
+        const windowWidth = window.innerWidth
+        const isTablet = windowWidth >= 768 && windowWidth < 1024
+        const isPhone = windowWidth < 768
+        
+        if (isPhone) {
+          // Phone view adjustments
+          if (metaCardRef.current) {
+            metaCardRef.current.style.position = 'relative'
+            metaCardRef.current.style.top = 'auto'
+            metaCardRef.current.style.width = '100%'
+            metaCardRef.current.style.maxWidth = '100%'
+            metaCardRef.current.style.marginLeft = '0'
+            metaCardRef.current.style.marginRight = '0'
+            metaCardRef.current.style.paddingLeft = '16px'
+            metaCardRef.current.style.paddingRight = '16px'
+            metaCardRef.current.style.paddingTop = '20px'
+            metaCardRef.current.style.paddingBottom = '20px'
+            metaCardRef.current.style.marginTop = '-12px'
+            metaCardRef.current.style.marginBottom = '0'
+            metaCardRef.current.style.height = 'auto'
+            metaCardRef.current.style.minHeight = 'auto'
+          }
+          
+          // Hero section adjustments for phone
+          if (heroSectionRef.current) {
+            heroSectionRef.current.style.minHeight = 'auto'
+            heroSectionRef.current.style.paddingBottom = '0'
+            heroSectionRef.current.style.paddingTop = '20px'
+          }
+          
+          if (heroContainerRef.current) {
+            heroContainerRef.current.style.paddingLeft = '16px'
+            heroContainerRef.current.style.paddingRight = '16px'
+            heroContainerRef.current.style.height = 'auto'
+            heroContainerRef.current.style.paddingTop = '20px'
+            heroContainerRef.current.style.paddingBottom = '0'
+          }
+          
+          if (heroContentRef.current) {
+            heroContentRef.current.style.marginLeft = '0'
+            heroContentRef.current.style.paddingLeft = '0'
+          }
+        } else if (isTablet) {
+          // Meta card adjustments
+          if (metaCardRef.current) {
+            metaCardRef.current.style.position = 'relative'
+            metaCardRef.current.style.top = 'auto'
+            metaCardRef.current.style.width = '100%'
+            metaCardRef.current.style.maxWidth = '100%'
+            metaCardRef.current.style.marginLeft = '0'
+            metaCardRef.current.style.marginRight = '0'
+            metaCardRef.current.style.paddingLeft = '16px'
+            metaCardRef.current.style.paddingRight = '16px'
+            metaCardRef.current.style.paddingTop = '20px'
+            metaCardRef.current.style.paddingBottom = '20px'
+            metaCardRef.current.style.marginTop = '24px'
+            metaCardRef.current.style.marginBottom = '24px'
+            metaCardRef.current.style.height = 'auto'
+            metaCardRef.current.style.minHeight = 'auto'
+          }
+          
+          // Hero section adjustments
+          if (heroSectionRef.current) {
+            heroSectionRef.current.style.minHeight = 'auto'
+            heroSectionRef.current.style.paddingBottom = '24px'
+          }
+          
+          if (heroContainerRef.current) {
+            heroContainerRef.current.style.paddingLeft = '16px'
+            heroContainerRef.current.style.paddingRight = '16px'
+            heroContainerRef.current.style.height = 'auto'
+            heroContainerRef.current.style.paddingBottom = '24px'
+          }
+          
+          if (heroContentRef.current) {
+            heroContentRef.current.style.marginLeft = '0'
+            heroContentRef.current.style.paddingLeft = '0'
+          }
+        } else if (windowWidth >= 1024) {
+          // Restore desktop styles for screens >= 1024px
+          if (metaCardRef.current) {
+            // Desktop styles will be handled by CSS, clear inline styles
+            metaCardRef.current.style.position = ''
+            metaCardRef.current.style.top = ''
+            metaCardRef.current.style.width = ''
+            metaCardRef.current.style.maxWidth = ''
+            metaCardRef.current.style.marginLeft = ''
+            metaCardRef.current.style.marginRight = ''
+            metaCardRef.current.style.paddingLeft = ''
+            metaCardRef.current.style.paddingRight = ''
+            metaCardRef.current.style.paddingTop = ''
+            metaCardRef.current.style.paddingBottom = ''
+            metaCardRef.current.style.marginTop = ''
+            metaCardRef.current.style.marginBottom = ''
+            metaCardRef.current.style.height = ''
+            metaCardRef.current.style.minHeight = ''
+          }
+          
+          // Restore desktop hero styles
+          if (heroSectionRef.current) {
+            heroSectionRef.current.style.minHeight = ''
+            heroSectionRef.current.style.paddingBottom = ''
+            heroSectionRef.current.style.paddingTop = ''
+          }
+          
+          if (heroContainerRef.current) {
+            heroContainerRef.current.style.paddingLeft = ''
+            heroContainerRef.current.style.paddingRight = ''
+            heroContainerRef.current.style.height = ''
+            heroContainerRef.current.style.paddingTop = ''
+            heroContainerRef.current.style.paddingBottom = ''
+          }
+          
+          if (heroContentRef.current) {
+            heroContentRef.current.style.marginLeft = ''
+            heroContentRef.current.style.paddingLeft = ''
+          }
+        }
+      } catch (error) {
+        // Silently fail if there's an error accessing refs
+        console.warn('Error updating tablet styles:', error)
+      }
+    }
+    
+    // Use requestAnimationFrame to ensure DOM is ready
+    const rafId = requestAnimationFrame(() => {
+      updateTabletStyles()
+    })
+    
+    window.addEventListener('resize', updateTabletStyles)
+    return () => {
+      cancelAnimationFrame(rafId)
+      window.removeEventListener('resize', updateTabletStyles)
+    }
+  }, [course])
+  
+  // Track course view when course is loaded
+  useEffect(() => {
+    if (course) {
+      trackCourseView(
+        course.id,
+        course.title,
+        course.tags && course.tags.length > 0 ? course.tags[0] : undefined, // Use first tag if available
+        course.provider || undefined
+      )
+    }
+  }, [course])
+  
   const getLevelBadgeColor = (level: string | null) => {
     switch (level) {
       case 'Beginner':
@@ -393,26 +566,47 @@ function CourseDetailView({
   const keySkills = parseKeySkills(course.key_skills)
   const modules = parseModules(course.modules)
 
-  // Track course view when course is loaded
-  useEffect(() => {
-    if (course) {
-      trackCourseView(
-        course.id,
-        course.title,
-        course.tags[0], // Use first tag
-        course.provider || undefined
-      )
+  // Get available tabs for dropdown
+  const getAvailableTabs = (): Array<{ value: TabType; label: string; sectionId: string }> => {
+    const tabs: Array<{ value: TabType; label: string; sectionId: string }> = [
+      { value: 'about', label: 'About', sectionId: 'section-about' }
+    ]
+    
+    if (keySkills.length > 0) {
+      tabs.push({ value: 'learn', label: "What You'll Learn", sectionId: 'section-learn' })
     }
-  }, [course])
+    
+    if (modules.length > 0) {
+      tabs.push({ value: 'curriculum', label: 'Curriculum', sectionId: 'section-curriculum' })
+    }
+    
+    if (course.instructors || course.effort || course.languages || course.free_trial) {
+      tabs.push({ value: 'information', label: 'Information', sectionId: 'section-information' })
+    }
+    
+    tabs.push({ value: 'details', label: 'Details', sectionId: 'section-details' })
+    
+    return tabs
+  }
+
+  const availableTabs = getAvailableTabs()
+
+  const handleDropdownChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedTab = e.target.value as TabType
+    const tabInfo = availableTabs.find(tab => tab.value === selectedTab)
+    if (tabInfo) {
+      scrollToSection(tabInfo.sectionId, selectedTab)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <div className="course-detail-hero-section" style={{ backgroundColor: '#F3F6FC', minHeight: '463px', paddingBottom: '0px', overflow: 'visible', position: 'relative' }}>
-        <div className="mx-auto max-w-7xl py-16 course-detail-hero-container" style={{ paddingLeft: '0', paddingRight: '24px', overflow: 'visible', height: '537px' }}>
+      <div ref={heroSectionRef} className="course-detail-hero-section" style={{ backgroundColor: '#F3F6FC', minHeight: '463px', paddingBottom: '0px', overflow: 'visible', position: 'relative' }}>
+        <div ref={heroContainerRef} className="mx-auto max-w-7xl py-16 course-detail-hero-container" style={{ paddingLeft: '0', paddingRight: '24px', overflow: 'visible', height: '537px' }}>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Left side - Hero content (2/3 width) */}
-            <div className="lg:col-span-2 course-detail-hero-content" style={{ marginLeft: '-24px', paddingLeft: '24px' }}>
+            <div ref={heroContentRef} className="lg:col-span-2 course-detail-hero-content" style={{ marginLeft: '-24px', paddingLeft: '24px' }}>
               {/* Logo */}
               <div className="mb-6">
                 <Image 
@@ -500,7 +694,7 @@ function CourseDetailView({
           </div>
           
           {/* Meta Info Card */}
-          <div className="rounded-lg bg-white p-6 mb-0 relative z-10 course-detail-meta-card" style={{ marginLeft: '-24px', paddingLeft: '24px', marginRight: '-24px', paddingRight: '24px', marginBottom: '0', position: 'absolute', top: '478px', width: '1342px', height: '116px', boxShadow: '0 12px 40px rgba(0, 0, 0, 0.18), 0 6px 16px rgba(0, 0, 0, 0.12)' }}>
+          <div ref={metaCardRef} className="rounded-lg bg-white p-6 mb-0 relative z-10 course-detail-meta-card" style={{ marginLeft: '-24px', paddingLeft: '24px', marginRight: '-24px', paddingRight: '24px', marginBottom: '0', position: 'absolute', top: '478px', width: '1342px', height: '116px', boxShadow: '0 12px 40px rgba(0, 0, 0, 0.18), 0 6px 16px rgba(0, 0, 0, 0.12)' }}>
             <div className="flex flex-wrap items-center divide-x divide-gray-200 course-detail-meta-content">
               {course.duration && (
                 <div className="flex-1 min-w-[150px] px-4 first:pl-0">
@@ -549,7 +743,32 @@ function CourseDetailView({
             <div className="course-detail-content-inner" style={{ marginLeft: '-24px', paddingLeft: '24px' }}>
             {/* Tab Navigation */}
             <div className="mb-6 border-b border-gray-200 bg-white pb-0" style={{ marginTop: '20px' }}>
-              <nav className="flex space-x-1" aria-label="Tabs">
+              {/* Mobile Dropdown - Visible on phone only */}
+              <div className="md:hidden mb-4">
+                <select
+                  value={activeTab}
+                  onChange={handleDropdownChange}
+                  className="w-full px-4 py-3 text-sm font-medium border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0156D2] focus:border-[#0156D2]"
+                  style={{ 
+                    fontFamily: '"Source Sans Pro", Arial, sans-serif',
+                    appearance: 'none',
+                    backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 12 12\'%3E%3Cpath fill=\'%23333\' d=\'M6 9L1 4h10z\'/%3E%3C/svg%3E")',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: 'right 1rem center',
+                    backgroundSize: '12px',
+                    paddingRight: '2.5rem'
+                  }}
+                >
+                  {availableTabs.map((tab) => (
+                    <option key={tab.value} value={tab.value}>
+                      {tab.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              {/* Desktop/Tablet Horizontal Tabs - Hidden on phone */}
+              <nav className="hidden md:flex space-x-1" aria-label="Tabs">
                 <button
                   onClick={() => scrollToSection('section-about', 'about')}
                   className={`px-4 py-3 text-sm font-medium transition-colors ${

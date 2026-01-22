@@ -411,7 +411,7 @@ export default function Header() {
           <div className="md:hidden bg-white border-t border-gray-200">
             <div className="px-2 pt-2 pb-3 space-y-1">
               <Link
-                href="/courses/business"
+                href="/courses"
                 className="block px-3 py-2 text-base font-medium text-black hover:bg-gray-50"
                 style={{ fontSize: '15px' }}
                 onClick={() => setMobileMenuOpen(false)}

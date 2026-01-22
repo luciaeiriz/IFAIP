@@ -17,8 +17,14 @@ export default function CoursesPage() {
   const [landingPages, setLandingPages] = useState<LandingPage[]>([])
   const [courseCounts, setCourseCounts] = useState<Record<string, number>>({})
   const [isLoading, setIsLoading] = useState(true)
+  const [windowWidth, setWindowWidth] = useState<number>(0)
+  const [sectionHeight, setSectionHeight] = useState<string>('auto')
   const gridRef = useRef<HTMLDivElement>(null)
   const heroTitleRef = useRef<HTMLHeadingElement>(null)
+  const heroDescriptionRef = useRef<HTMLParagraphElement>(null)
+  const heroButtonRef = useRef<HTMLAnchorElement>(null)
+  const heroTextContainerRef = useRef<HTMLDivElement>(null)
+  const heroBreadcrumbRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -157,54 +163,147 @@ export default function CoursesPage() {
     return () => window.removeEventListener('resize', updateGridColumns)
   }, [])
   
-  // Set hero title font size to 60px on desktop
+  // Set hero title font size: 48px (3rem) on tablet, 60px on desktop
   useEffect(() => {
     const updateHeroTitle = () => {
       if (heroTitleRef.current && typeof window !== 'undefined') {
-        if (window.innerWidth >= 1024) {
+        // Always use window.innerWidth directly for accurate current width
+        const currentWidth = window.innerWidth
+        if (currentWidth >= 1024) {
+          // Desktop: 60px
           heroTitleRef.current.style.fontSize = '60px'
+          heroTitleRef.current.style.lineHeight = '1.2'
+        } else if (currentWidth >= 768 && currentWidth < 1024) {
+          // Tablet: 48px (3rem) - significantly larger than default md:text-4xl (36px)
+          heroTitleRef.current.style.fontSize = '3rem'
+          heroTitleRef.current.style.lineHeight = '1.2'
         } else {
+          // Phone: use Tailwind classes - remove inline styles
           heroTitleRef.current.style.fontSize = ''
+          heroTitleRef.current.style.lineHeight = ''
         }
       }
     }
     
-    updateHeroTitle()
-    window.addEventListener('resize', updateHeroTitle)
-    return () => window.removeEventListener('resize', updateHeroTitle)
+    // Run immediately and on resize
+    if (typeof window !== 'undefined') {
+      updateHeroTitle()
+      window.addEventListener('resize', updateHeroTitle)
+      return () => window.removeEventListener('resize', updateHeroTitle)
+    }
+  }, [windowWidth])
+
+  // Track window width for responsive height calculation
+  useEffect(() => {
+    const updateWindowWidth = () => {
+      if (typeof window !== 'undefined') {
+        setWindowWidth(window.innerWidth)
+      }
+    }
+    
+    updateWindowWidth()
+    window.addEventListener('resize', updateWindowWidth)
+    return () => window.removeEventListener('resize', updateWindowWidth)
   }, [])
 
-  // Calculate dynamic section height based on number of enabled landing pages
-  // Cards are now wider (600px max), so we get fewer per row (typically 2-3 max)
-  const calculateSectionHeight = () => {
-    if (landingPages.length === 0) return 'auto'
+  // Calculate section height based on landing pages and window width
+  useEffect(() => {
+    const calculateHeight = () => {
+      if (landingPages.length === 0) {
+        setSectionHeight('auto')
+        return
+      }
+      
+      // Check screen size - use windowWidth state if available, otherwise check window directly
+      const currentWidth = windowWidth > 0 
+        ? windowWidth 
+        : (typeof window !== 'undefined' && window.innerWidth > 0 ? window.innerWidth : 1024)
+      const isTablet = currentWidth >= 768 && currentWidth < 1024
+      const isPhone = currentWidth < 768
+      
+      // For tablet and phone views, return 'auto' so the section adjusts dynamically to card content
+      if (isTablet || isPhone) {
+        setSectionHeight('auto')
+        return
+      }
+      
+      // Desktop view (>= 1024px) - calculate height based on number of cards
+      if (landingPages.length === 1) {
+        setSectionHeight('120vh')
+      } else if (landingPages.length === 2) {
+        setSectionHeight('140vh')
+      } else if (landingPages.length === 3) {
+        setSectionHeight('160vh')
+      } else if (landingPages.length === 4) {
+        setSectionHeight('180vh')
+      } else {
+        // For 5+ cards, add 20vh per additional card
+        setSectionHeight(`${180 + ((landingPages.length - 4) * 20)}vh`)
+      }
+    }
     
-    // Card height is 280px, gap is 24px (gap-6), padding top is 100px, padding bottom is 200px
-    // Title section takes ~110px (mb-12 = 48px + content height ~62px)
-    const cardHeight = 280
-    const gap = 24
-    const paddingTop = 100
-    const paddingBottom = 200
-    const titleSectionHeight = 110
+    calculateHeight()
+  }, [landingPages.length, windowWidth])
+
+  // Adjust hero text elements for tablet view (768px - 1023px)
+  useEffect(() => {
+    const updateHeroTextSizes = () => {
+      if (typeof window === 'undefined') return
+      
+      const currentWidth = windowWidth > 0 ? windowWidth : window.innerWidth
+      const isTablet = currentWidth >= 768 && currentWidth < 1024
+      
+      // Update breadcrumb spacing for tablet
+      if (heroBreadcrumbRef.current) {
+        if (isTablet) {
+          heroBreadcrumbRef.current.style.marginBottom = '1.5rem' // mb-6 - increased spacing
+        } else {
+          heroBreadcrumbRef.current.style.marginBottom = ''
+        }
+      }
+      
+      // Update title spacing for tablet
+      if (heroTitleRef.current) {
+        if (isTablet) {
+          heroTitleRef.current.style.marginBottom = '1.5rem' // mb-6 - increased spacing
+        } else {
+          // Don't override Tailwind classes for non-tablet
+          if (currentWidth < 768 || currentWidth >= 1024) {
+            heroTitleRef.current.style.marginBottom = ''
+          }
+        }
+      }
+      
+      // Update description size and spacing for tablet
+      if (heroDescriptionRef.current) {
+        if (isTablet) {
+          heroDescriptionRef.current.style.fontSize = '1.25rem' // 20px - larger than md:text-lg (18px)
+          heroDescriptionRef.current.style.lineHeight = '1.75'
+          heroDescriptionRef.current.style.marginBottom = '2rem' // mb-8 - increased spacing
+        } else {
+          heroDescriptionRef.current.style.fontSize = ''
+          heroDescriptionRef.current.style.lineHeight = ''
+          heroDescriptionRef.current.style.marginBottom = ''
+        }
+      }
+      
+      // Update button size for tablet
+      if (heroButtonRef.current) {
+        if (isTablet) {
+          heroButtonRef.current.style.fontSize = '1rem' // 16px
+          heroButtonRef.current.style.padding = '0.75rem 1.5rem' // py-3 px-6
+        } else {
+          heroButtonRef.current.style.fontSize = ''
+          heroButtonRef.current.style.padding = ''
+        }
+      }
+    }
     
-    // Estimate cards per row: with 600px cards, typically 2 per row on most screens
-    // On very wide screens (>1400px) we might get 3, but calculate conservatively for 2
-    const cardsPerRow = Math.min(landingPages.length, 2)
-    const numberOfRows = Math.ceil(landingPages.length / cardsPerRow)
-    
-    // Calculate total content height in pixels
-    const cardsHeight = numberOfRows * cardHeight + (numberOfRows > 0 ? (numberOfRows - 1) * gap : 0)
-    const totalHeightPx = paddingTop + titleSectionHeight + cardsHeight + paddingBottom
-    
-    // Convert to viewport height with some buffer
-    // Use a more responsive calculation: base height + per-row addition
-    if (landingPages.length === 1) return '120vh'
-    if (landingPages.length === 2) return '140vh'
-    if (landingPages.length === 3) return '160vh'
-    if (landingPages.length === 4) return '180vh'
-    // For 5+ cards, add 20vh per additional card
-    return `${180 + ((landingPages.length - 4) * 20)}vh`
-  }
+    updateHeroTextSizes()
+    window.addEventListener('resize', updateHeroTextSizes)
+    return () => window.removeEventListener('resize', updateHeroTextSizes)
+  }, [windowWidth])
+
 
   // Calculate clip path based on number of cards - keep shape consistent
   const getClipPath = () => {
@@ -219,9 +318,9 @@ export default function CoursesPage() {
       {/* White Hero Section */}
       <section className="bg-white min-h-[60vh] sm:min-h-[70vh] md:min-h-[80vh] lg:h-[calc(100vh-4rem)] flex items-center py-12 sm:py-16 md:py-20 lg:py-0">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full">
-          <div className="max-w-3xl">
+          <div ref={heroTextContainerRef} className="max-w-3xl">
             {/* Breadcrumb */}
-            <div className="mb-3 sm:mb-4 lg:mb-4">
+            <div ref={heroBreadcrumbRef} className="mb-3 sm:mb-4 lg:mb-4">
               <span className="text-xs sm:text-sm lg:text-sm text-gray-600">Courses</span>
               <div className="mt-2 h-px w-12 sm:w-16 lg:w-16 bg-black" />
             </div>
@@ -241,12 +340,16 @@ export default function CoursesPage() {
             </h1>
             
             {/* Description */}
-            <p className="text-base sm:text-lg md:text-lg lg:text-lg text-gray-700 mb-6 sm:mb-7 md:mb-8 lg:mb-8 leading-relaxed">
+            <p 
+              ref={heroDescriptionRef}
+              className="text-base sm:text-lg md:text-lg lg:text-lg text-gray-700 mb-6 sm:mb-7 md:mb-8 lg:mb-8 leading-relaxed"
+            >
               Delivering real-world impact through data science and AI. Our comprehensive training programs are designed to advance your career in artificial intelligence.
             </p>
             
             {/* Learn More Button */}
             <Link
+              ref={heroButtonRef}
               href="#courses"
               className="inline-flex items-center justify-center bg-black text-white px-5 py-2.5 sm:px-6 sm:py-3 lg:px-6 lg:py-3 text-sm sm:text-base lg:text-base font-medium hover:bg-gray-800 transition-colors"
             >
@@ -262,7 +365,7 @@ export default function CoursesPage() {
         className="relative flex items-start courses-cards-section"
         style={{ 
           backgroundColor: '#1C1C1C', 
-          minHeight: calculateSectionHeight(),
+          minHeight: sectionHeight,
           height: 'auto',
         }}
       >

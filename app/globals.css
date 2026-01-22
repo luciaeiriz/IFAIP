@@ -348,6 +348,22 @@ html {
   }
 }
 
+/* Phone view (360px) - Adjust title size for better fit */
+@media (max-width: 767px) {
+  .courses-hero-title {
+    font-size: 1.5rem !important; /* 24px - slightly smaller than text-2xl for better fit */
+    line-height: 1.2 !important;
+  }
+}
+
+/* Tablet specific - Override with larger font size for better readability */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .courses-hero-title {
+    font-size: 3rem !important;
+    line-height: 1.2 !important;
+  }
+}
+
 /* FeaturedTopPicks - Mobile responsive styles */
 @media (max-width: 767px) {
   .featured-top-pick-card {
@@ -374,14 +390,25 @@ html {
     max-width: 100% !important;
     width: auto !important;
     height: auto !important;
-    min-height: 180px !important;
+    min-height: 220px !important; /* Increased from 180px for better spacing */
     margin-top: 0 !important;
-    padding: 18px !important;
-    padding-bottom: 80px !important;
   }
   
+  /* Most popular card (middle) - adjust border */
   .featured-top-pick-card[style*="border"] {
     border-width: 3px !important;
+  }
+  
+  /* Ensure proper spacing between cards */
+  .featured-top-picks-container {
+    gap: 12px !important; /* Increased gap for better separation */
+    align-items: stretch !important; /* Make cards same height */
+  }
+  
+  /* Adjust section padding for tablet */
+  .featured-top-picks-inner {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
   }
 }
 
@@ -506,6 +533,13 @@ html {
   .mobile-rating-label .flex {
     align-items: center !important;
     justify-content: center !important;
+  }
+}
+
+/* AllCoursesGrid - Phone view (360px) - Align rating box with logo on the right */
+@media (max-width: 767px) {
+  .mobile-rating-box {
+    top: 40px !important;
   }
 }
 
@@ -1904,6 +1938,284 @@ html {
   }
 }
 
+/* Course detail page - Phone view (360px) adjustments */
+@media (max-width: 767px) {
+  /* Hero section - Adjust for phone */
+  .course-detail-hero-section {
+    min-height: auto !important;
+    padding-bottom: 0 !important;
+    overflow: visible !important;
+    padding-top: 20px !important;
+  }
+  
+  .course-detail-hero-container {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    padding-top: 20px !important;
+    padding-bottom: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+  
+  /* Hero content - Remove negative margins */
+  .course-detail-hero-content {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+  }
+  
+  /* Meta Info Card - Change to relative positioning and align with content */
+  .course-detail-meta-card {
+    position: relative !important;
+    top: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    padding-top: 20px !important;
+    padding-bottom: 20px !important;
+    margin-top: 8px !important;
+    margin-bottom: 0 !important;
+    height: auto !important;
+    min-height: auto !important;
+    box-sizing: border-box !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06) !important;
+  }
+  
+  /* Ensure hero container doesn't extend beyond viewport */
+  .course-detail-hero-container {
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+  
+  /* Meta card content - Stack items vertically on phone */
+  .course-detail-meta-content {
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+    gap: 16px !important;
+    align-items: stretch !important;
+    width: 100% !important;
+  }
+  
+  /* Meta content items - Full width, no dividers */
+  .course-detail-meta-content > div {
+    border-left: none !important;
+    border-right: none !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    flex: 1 1 auto !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 16px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Remove border on last item */
+  .course-detail-meta-content > div:last-child {
+    border-bottom: none !important;
+    padding-bottom: 0 !important;
+  }
+  
+  /* Override px-4 class and inline padding styles */
+  .course-detail-meta-content > div[class*="px-4"],
+  .course-detail-meta-content > div.first\:pl-0 {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  
+  /* Main content section - Align with meta card margins */
+  .course-detail-content-section {
+    margin-top: 0 !important;
+    padding-top: 24px !important;
+    padding-bottom: 60px !important;
+  }
+  
+  .course-detail-content-container {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    max-width: 100% !important;
+  }
+  
+  .course-detail-content-inner {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+    width: 100% !important;
+  }
+  
+  /* Ensure hero section container aligns properly */
+  .course-detail-hero-section {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  
+  /* Adjust hero title size for phone */
+  .course-detail-hero-content h1 {
+    font-size: 28px !important;
+    line-height: 1.2 !important;
+  }
+  
+  /* Adjust button width for phone */
+  .course-detail-hero-content a[style*="width: '285px'"],
+  .course-detail-hero-content button[style*="width: '285px'"] {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  /* Override inline styles for meta card - more specific selectors */
+  .course-detail-meta-card[style*="margin-left"],
+  .course-detail-meta-card[style*="marginLeft"],
+  .course-detail-meta-card[style*="position"],
+  .course-detail-meta-card[style*="width"],
+  .course-detail-meta-card[style*="top"] {
+    position: relative !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    top: auto !important;
+    margin-top: 8px !important;
+  }
+  
+  /* Also target by class and ensure override */
+  div.course-detail-meta-card {
+    position: relative !important;
+    top: auto !important;
+    margin-top: 8px !important;
+  }
+  
+  /* Prevent horizontal overflow on course detail page */
+  div.min-h-screen.bg-gray-50 {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+  }
+  
+  /* Ensure all sections fit within viewport */
+  .course-detail-hero-section,
+  .course-detail-content-section {
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+}
+
+/* Course detail page - Tablet viewport fixes (768px to 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  /* Hero section - Adjust padding and height for tablet */
+  .course-detail-hero-section {
+    min-height: auto !important;
+    padding-bottom: 24px !important;
+    overflow: visible !important;
+  }
+  
+  .course-detail-hero-container {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    height: auto !important;
+    padding-bottom: 24px !important;
+    overflow: visible !important;
+  }
+  
+  /* Hero content - Remove negative margin and add proper padding */
+  .course-detail-hero-content {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+  }
+  
+  /* Meta Info Card - Fix width and positioning for tablet */
+  .course-detail-meta-card {
+    position: relative !important;
+    top: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    padding-top: 20px !important;
+    padding-bottom: 20px !important;
+    margin-top: 24px !important;
+    margin-bottom: 24px !important;
+    height: auto !important;
+    min-height: auto !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Meta card content - Ensure proper wrapping for tablet */
+  .course-detail-meta-content {
+    flex-wrap: wrap !important;
+    gap: 0 !important;
+    align-items: stretch !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+  }
+  
+  /* Meta content items - 2 columns on tablet */
+  .course-detail-meta-content > div {
+    border-left: none !important;
+    border-right: none !important;
+    min-width: calc(50% - 12px) !important;
+    max-width: calc(50% - 12px) !important;
+    flex: 0 0 calc(50% - 12px) !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 16px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Override px-4 class and inline padding styles */
+  .course-detail-meta-content > div[class*="px-4"],
+  .course-detail-meta-content > div.first\:pl-0 {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  
+  /* Left column items (1st, 3rd, 5th) - divider on the RIGHT side */
+  .course-detail-meta-content > div:nth-child(odd) {
+    padding-right: 16px !important;
+    border-right: 1px solid #e5e7eb !important;
+    border-left: none !important;
+  }
+  
+  /* Right column items (2nd, 4th) - padding left, no dividers */
+  .course-detail-meta-content > div:nth-child(even) {
+    padding-left: 16px !important;
+    border-left: none !important;
+    border-right: none !important;
+  }
+  
+  /* Remove bottom padding on last row items */
+  .course-detail-meta-content > div:nth-last-child(-n+2) {
+    padding-bottom: 0 !important;
+  }
+  
+  /* Main content section - Adjust padding for tablet */
+  .course-detail-content-section {
+    margin-top: 0 !important;
+    padding-top: 24px !important;
+  }
+  
+  .course-detail-content-container {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  
+  .course-detail-content-inner {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+  }
+}
+
 /* Course detail page - 1024px viewport specific fixes (1024px to 1279px) */
 @media (min-width: 1024px) and (max-width: 1279px) {
   /* Hero section - Add proper padding and adjust height */
@@ -2148,6 +2460,126 @@ html {
   /* Hide feature cards section on desktop (already handled by lg:hidden, but ensure it's hidden) */
   .homepage-feature-cards-section {
     display: none !important;
+  }
+}
+
+/* Courses landing pages (/courses/[slug]) - Phone view (360px) adjustments */
+@media (max-width: 767px) {
+  /* Main container - reduce bottom padding for better fit */
+  /* Target the main wrapper div with inline paddingBottom style */
+  div.min-h-screen.bg-white[style*="paddingBottom"] {
+    padding-bottom: 60px !important;
+  }
+  
+  /* Also target without the style attribute selector as fallback */
+  div.min-h-screen.bg-white {
+    padding-bottom: 60px !important;
+  }
+  
+  /* ForbesHeroSection - adjust padding and margins */
+  .forbes-hero-section {
+    padding-top: 20px !important;
+    padding-bottom: 20px !important;
+    margin-bottom: 0 !important;
+    min-height: auto !important;
+  }
+  
+  .forbes-hero-content {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  
+  /* FeaturedTopPicks section wrapper - adjust spacing */
+  section:has(.featured-top-picks-container) {
+    padding-top: 24px !important;
+    padding-bottom: 24px !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+  
+  .featured-top-picks-inner {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  
+  .featured-top-picks-container {
+    gap: 12px !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+  
+  .featured-top-pick-card {
+    margin-bottom: 0 !important;
+    padding-bottom: 90px !important;
+    min-height: 150px !important;
+  }
+  
+  /* AllCoursesGrid section wrapper - adjust margins */
+  div.bg-white.pt-4.pb-12 {
+    padding-top: 24px !important;
+    padding-bottom: 24px !important;
+  }
+  
+  .all-courses-grid-container {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    gap: 16px !important;
+  }
+  
+  .all-courses-section {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+  
+  /* Course cards - ensure proper spacing */
+  .course-card-container {
+    margin-bottom: 16px !important;
+  }
+  
+  /* EmailCaptureCTA section - adjust padding */
+  section.bg-primary-600 {
+    padding-top: 32px !important;
+    padding-bottom: 32px !important;
+    margin-top: 24px !important;
+  }
+  
+  /* LandingPageScrollBanner - ensure it doesn't overlap content */
+  .fixed.bottom-0.left-0.right-0 {
+    padding-bottom: env(safe-area-inset-bottom, 0) !important;
+  }
+  
+  /* Section spacing - ensure proper gaps between sections */
+  section.bg-white {
+    margin-bottom: 0 !important;
+  }
+  
+  /* Prevent any horizontal overflow */
+  body {
+    overflow-x: hidden !important;
+  }
+  
+  /* Ensure buttons don't overflow and have proper spacing */
+  a[href*="/courses"],
+  button[class*="bg-"],
+  a[class*="bg-"] {
+    max-width: 100% !important;
+    word-wrap: break-word !important;
+    white-space: normal !important;
+  }
+  
+  /* Adjust button padding for better fit */
+  .inline-flex.items-center.justify-center[class*="px-"],
+  a[class*="px-"][class*="py-"] {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+  
+  /* Ensure text doesn't overflow */
+  h1, h2, h3, p {
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
   }
 }
 

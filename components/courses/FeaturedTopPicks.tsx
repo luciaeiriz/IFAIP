@@ -12,8 +12,13 @@ export default function FeaturedTopPicks({ courses }: FeaturedTopPicksProps) {
   
   useEffect(() => {
     const updateDesktopStyles = () => {
+      if (typeof window === 'undefined') return
+      
+      const windowWidth = window.innerWidth
+      const isTablet = windowWidth >= 768 && windowWidth < 1024
+      
       // Only apply fixed widths for screens larger than 1024px (let CSS handle exactly 1024px)
-      if (typeof window !== 'undefined' && window.innerWidth > 1024) {
+      if (windowWidth > 1024) {
         cardRefs.current.forEach((card, index) => {
           if (!card) return
           const cardWidth = index === 1 ? '450px' : (index === 2 ? '415px' : '413px')
@@ -26,7 +31,22 @@ export default function FeaturedTopPicks({ courses }: FeaturedTopPicksProps) {
           card.style.padding = isMostPopular ? '20px 20px 0px 33px' : '20px 20px 0px 20px'
           card.style.borderWidth = isMostPopular ? '5px' : '1px'
         })
+      } else if (isTablet) {
+        // Tablet-specific adjustments: increase padding-bottom and min-height for better spacing
+        cardRefs.current.forEach((card, index) => {
+          if (!card) return
+          const isMostPopular = index === 1 && courses.length >= 3
+          card.style.width = '100%'
+          card.style.height = 'auto'
+          card.style.marginTop = '0'
+          card.style.minHeight = '220px' // Increased from default for better spacing
+          card.style.paddingBottom = '100px' // Increased from 80px to prevent overlap
+          card.style.paddingTop = isMostPopular ? '24px' : '20px'
+          card.style.paddingLeft = isMostPopular ? '24px' : '20px'
+          card.style.paddingRight = '20px'
+        })
       } else {
+        // Mobile: use default styles
         cardRefs.current.forEach((card) => {
           if (!card) return
           card.style.width = '100%'
@@ -209,7 +229,7 @@ export default function FeaturedTopPicks({ courses }: FeaturedTopPicksProps) {
                     lineHeight: '1.4',
                     marginTop: isMostPopular ? '26px' : '0px',
                     marginLeft: '0px',
-                    marginBottom: '2px'
+                    marginBottom: '8px' // Increased from 2px for better spacing
                   }}
                 >
                   {course.title}
@@ -227,8 +247,8 @@ export default function FeaturedTopPicks({ courses }: FeaturedTopPicksProps) {
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
-                      marginTop: index === 2 ? '0px' : '2px',
-                      marginBottom: '0px'
+                      marginTop: '4px', // Increased spacing
+                      marginBottom: '12px' // Added bottom margin to create space before bottom section
                     }}
                   >
                     {/* Use headline if available, otherwise fallback to description extraction */}
@@ -246,7 +266,7 @@ export default function FeaturedTopPicks({ courses }: FeaturedTopPicksProps) {
                 )}
 
                 {/* Bottom section: Logo on left, Learn More button and Rating on right */}
-                <div style={{ position: 'absolute', bottom: '20px', left: isMostPopular ? '33px' : '20px', right: '20px', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', paddingTop: '12px' }}>
+                <div style={{ position: 'absolute', bottom: '24px', left: isMostPopular ? '33px' : '20px', right: '20px', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', paddingTop: '0px' }}>
                     {/* Provider Logo - Left aligned */}
                     <div style={{ marginLeft: isMostPopular ? '-13px' : '-13px' }}>
                       <ProviderLogo 
